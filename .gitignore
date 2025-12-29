@@ -1,0 +1,215 @@
+# =========================
+# Python / Django Backend
+# =========================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+*.pot
+*.pyc
+
+# Static files
+staticfiles/
+static/
+
+# Media files
+media/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Node.js / React Frontend
+# =========================
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+
+# Testing
+coverage/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite
+*.local
+
+# =========================
+# IDE / Editor
+# =========================
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains (PyCharm, WebStorm)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+
+# =========================
+# OS Generated
+# =========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# =========================
+# Misc
+# =========================
+
+# Secrets
+*.pem
+*.key
+secrets.json
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+# =========================
+# Project Specific Paths
+# =========================
+
+# Backend virtual environment (explicit paths)
+backend/venv/
+backend/.env
+backend/db.sqlite3
+backend/db.sqlite3-journal
+backend/staticfiles/
+backend/media/
+backend/**/__pycache__/
+backend/**/*.pyc
+
+# Frontend dependencies and build (explicit paths)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Migrations (optional - uncomment if you don't want to track)
+# backend/*/migrations/
+
+# =========================
+# Large files
+# =========================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.sqlite
+*.db

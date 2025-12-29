@@ -1,0 +1,3 @@
+"""
+Dost Django project configuration.
+"""
