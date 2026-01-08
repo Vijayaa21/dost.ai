@@ -3,10 +3,17 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     RegisterView, ProfileView, ChangePasswordView, OnboardingView, DeleteAccountView
 )
+from .serializers import CustomTokenObtainPairSerializer
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """Custom token view that uses email instead of username."""
+    serializer_class = CustomTokenObtainPairSerializer
+
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
-    path('login/', TokenObtainPairView.as_view(), name='login'),
+    path('login/', CustomTokenObtainPairView.as_view(), name='login'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),

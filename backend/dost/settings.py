@@ -15,7 +15,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1, dost-ai-oob2.onrender.com').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,dost-ai-0.onrender.com,.onrender.com').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -122,9 +122,21 @@ SIMPLE_JWT = {
 # CORS
 CORS_ALLOWED_ORIGINS = os.getenv(
     'CORS_ALLOWED_ORIGINS', 
-    'http://localhost:5173,http://127.0.0.1:5173'
+    'http://localhost:5173,http://127.0.0.1:5173,https://dost-ai-1-2edy.onrender.com'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL', 'False').lower() == 'true'
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
