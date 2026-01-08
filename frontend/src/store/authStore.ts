@@ -7,6 +7,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean;
   error: string | null;
   
   login: (email: string, password: string) => Promise<void>;
@@ -15,6 +16,7 @@ interface AuthState {
   fetchProfile: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
   clearError: () => void;
+  initialize: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -23,6 +25,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: false,
+      isInitialized: false,
       error: null,
 
       login: async (email: string, password: string) => {
@@ -81,6 +84,23 @@ export const useAuthStore = create<AuthState>()(
       },
 
       clearError: () => set({ error: null }),
+
+      initialize: async () => {
+        const token = localStorage.getItem('access_token');
+        if (token && get().isAuthenticated) {
+          try {
+            const user = await authService.getProfile();
+            set({ user, isAuthenticated: true, isInitialized: true });
+          } catch {
+            // Token is invalid, clear auth state
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            set({ user: null, isAuthenticated: false, isInitialized: true });
+          }
+        } else {
+          set({ isInitialized: true });
+        }
+      },
     }),
     {
       name: 'auth-storage',

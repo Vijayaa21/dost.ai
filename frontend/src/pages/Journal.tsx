@@ -20,6 +20,7 @@ export default function Journal() {
   const [searchQuery, setSearchQuery] = useState('');
   const [prompt, setPrompt] = useState<JournalPrompt | null>(null);
   const [stats, setStats] = useState<{ total_entries: number; writing_streak: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // New entry form
   const [newEntry, setNewEntry] = useState({
@@ -38,9 +39,20 @@ export default function Journal() {
   const loadEntries = async () => {
     try {
       const data = await journalService.getEntries(searchQuery);
-      setEntries(data);
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setEntries(data);
+      } else if (data && typeof data === 'object') {
+        const arrayData = data.results || data.entries || [];
+        setEntries(Array.isArray(arrayData) ? arrayData : []);
+      } else {
+        setEntries([]);
+      }
+      setError(null);
     } catch (error) {
       console.error('Failed to load entries:', error);
+      setError('Failed to load journal entries. Please try again.');
+      setEntries([]);
     }
   };
 
@@ -48,8 +60,10 @@ export default function Journal() {
     try {
       const data = await journalService.getStats();
       setStats(data);
+      setError(null);
     } catch (error) {
       console.error('Failed to load stats:', error);
+      setError('Failed to load journal statistics.');
     }
   };
 
@@ -93,8 +107,10 @@ export default function Journal() {
       setSelectedEntry(null);
       loadEntries();
       loadStats();
+      setError(null);
     } catch (error) {
       console.error('Failed to delete entry:', error);
+      setError('Failed to delete entry. Please try again.');
     }
   };
 
@@ -111,8 +127,10 @@ export default function Journal() {
     try {
       const entry = await journalService.getEntry(id);
       setSelectedEntry(entry);
+      setError(null);
     } catch (error) {
       console.error('Failed to load entry:', error);
+      setError('Failed to load entry. Please try again.');
     }
   };
 
@@ -158,9 +176,16 @@ export default function Journal() {
           />
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         {/* Entries Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {entries.length === 0 ? (
+          {!Array.isArray(entries) || entries.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <BookOpen className="w-12 h-12 mx-auto text-gray-300 mb-4" />
               <p className="text-gray-500">No journal entries yet</p>

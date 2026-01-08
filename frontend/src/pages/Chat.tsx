@@ -13,6 +13,7 @@ export default function Chat() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -31,9 +32,21 @@ export default function Chat() {
   const loadConversations = async () => {
     try {
       const data = await chatService.getConversations();
-      setConversations(data);
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setConversations(data);
+      } else if (data && typeof data === 'object') {
+        // If response is paginated or wrapped, try to extract array
+        const arrayData = data.results || data.conversations || [];
+        setConversations(Array.isArray(arrayData) ? arrayData : []);
+      } else {
+        setConversations([]);
+      }
+      setError(null);
     } catch (error) {
       console.error('Failed to load conversations:', error);
+      setError('Failed to load conversations. Please try again.');
+      setConversations([]);
     }
   };
 
@@ -41,9 +54,11 @@ export default function Chat() {
     try {
       const data = await chatService.getConversation(id);
       setCurrentConversation(id);
-      setMessages(data.messages);
+      setMessages(Array.isArray(data.messages) ? data.messages : []);
+      setError(null);
     } catch (error) {
       console.error('Failed to load conversation:', error);
+      setError('Failed to load conversation. Please try again.');
     }
   };
 
@@ -78,7 +93,9 @@ export default function Chat() {
       // Update with actual messages
       setMessages(prev => {
         const filtered = prev.filter(m => m.id !== tempUserMsg.id);
-        return [...filtered, response.user_message, response.assistant_message];
+        const userMsg = response.user_message || { ...tempUserMsg, id: Math.random() };
+        const assistantMsg = response.assistant_message;
+        return assistantMsg ? [...filtered, userMsg, assistantMsg] : [...filtered, userMsg];
       });
 
       // Update current conversation
@@ -86,8 +103,10 @@ export default function Chat() {
         setCurrentConversation(response.conversation_id);
         loadConversations();
       }
+      setError(null);
     } catch (error) {
       console.error('Failed to send message:', error);
+      setError('Failed to send message. Please try again.');
       // Remove optimistic message on error
       setMessages(prev => prev.filter(m => m.id !== tempUserMsg.id));
     } finally {
@@ -117,7 +136,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="h-screen flex">
+    <div className="h-full flex">
       {/* Sidebar - Conversations List */}
       <div className="hidden lg:flex flex-col w-72 bg-white border-r border-gray-100">
         <div className="p-4 border-b border-gray-100">
@@ -182,6 +201,13 @@ export default function Chat() {
             </div>
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border-b border-red-200 px-6 py-3">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">

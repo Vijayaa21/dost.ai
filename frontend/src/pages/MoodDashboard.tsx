@@ -31,6 +31,7 @@ export default function MoodDashboard() {
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [period, setPeriod] = useState<'week' | 'month'>('week');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -47,11 +48,13 @@ export default function MoodDashboard() {
       
       if (todayData) {
         setSelectedMood(todayData.mood_score);
-        setSelectedEmotions(todayData.emotions);
-        setNote(todayData.note);
+        setSelectedEmotions(todayData.emotions || []);
+        setNote(todayData.note || '');
       }
+      setError(null);
     } catch (error) {
       console.error('Failed to load mood data:', error);
+      setError('Failed to load mood data. Please try again.');
     }
   };
 
@@ -66,8 +69,10 @@ export default function MoodDashboard() {
         note: note,
       });
       await loadData();
+      setError(null);
     } catch (error) {
       console.error('Failed to save mood:', error);
+      setError('Failed to save mood. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -116,6 +121,13 @@ export default function MoodDashboard() {
             </button>
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
 
         {/* Today's Check-in */}
         <motion.div

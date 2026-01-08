@@ -28,6 +28,7 @@ export default function CopingToolkit() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [affirmation, setAffirmation] = useState<Affirmation | null>(null);
   const [isExerciseActive, setIsExerciseActive] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Breathing exercise state
   const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'hold' | 'exhale' | 'idle'>('idle');
@@ -42,9 +43,19 @@ export default function CopingToolkit() {
   const loadTools = async () => {
     try {
       const data = await copingService.getTools(selectedCategory || undefined);
-      setTools(data);
+      if (Array.isArray(data)) {
+        setTools(data);
+      } else if (data && typeof data === 'object') {
+        const arrayData = data.results || data.tools || [];
+        setTools(Array.isArray(arrayData) ? arrayData : []);
+      } else {
+        setTools([]);
+      }
+      setError(null);
     } catch (error) {
       console.error('Failed to load tools:', error);
+      setError('Failed to load coping tools. Please try again.');
+      setTools([]);
     }
   };
 
@@ -52,8 +63,10 @@ export default function CopingToolkit() {
     try {
       const data = await copingService.getAffirmation();
       setAffirmation(data);
+      setError(null);
     } catch (error) {
       console.error('Failed to load affirmation:', error);
+      setError('Failed to load affirmation. Please try again.');
     }
   };
 
@@ -209,34 +222,48 @@ export default function CopingToolkit() {
           ))}
         </div>
 
-        {/* Tools Grid */}
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        {/* Tools Grid - Coping Tools */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tools.map((tool) => (
-            <motion.div
-              key={tool.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="card-hover cursor-pointer"
-              onClick={() => openTool(tool.id)}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-2xl">
-                  {tool.icon}
+          {!Array.isArray(tools) || tools.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <Heart className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-500">No coping tools available</p>
+            </div>
+          ) : (
+            tools.map((tool) => (
+              <motion.div
+                key={tool.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="card-hover cursor-pointer"
+                onClick={() => openTool(tool.id)}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-2xl">
+                    {tool.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800">{tool.title}</h3>
+                    <p className="text-sm text-gray-500 capitalize">{tool.category}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800">{tool.title}</h3>
-                  <p className="text-sm text-gray-500 capitalize">{tool.category}</p>
+                <p className="text-gray-600 text-sm mt-3 line-clamp-2">{tool.description}</p>
+                <div className="flex items-center gap-2 mt-3 text-sm text-gray-400">
+                  <Clock className="w-4 h-4" />
+                  <span>{tool.duration_minutes} min</span>
+                  <span className="mx-2">•</span>
+                  <span className="capitalize">{tool.difficulty}</span>
                 </div>
-              </div>
-              <p className="text-gray-600 text-sm mt-3 line-clamp-2">{tool.description}</p>
-              <div className="flex items-center gap-2 mt-3 text-sm text-gray-400">
-                <Clock className="w-4 h-4" />
-                <span>{tool.duration_minutes} min</span>
-                <span className="mx-2">•</span>
-                <span className="capitalize">{tool.difficulty}</span>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </div>
 
         {/* Tool Detail Modal */}
