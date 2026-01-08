@@ -43,7 +43,8 @@ export default function Journal() {
       if (Array.isArray(data)) {
         setEntries(data);
       } else if (data && typeof data === 'object') {
-        const arrayData = data.results || data.entries || [];
+        const apiResponse = data as { results?: JournalEntry[]; entries?: JournalEntry[] };
+        const arrayData = apiResponse.results || apiResponse.entries || [];
         setEntries(Array.isArray(arrayData) ? arrayData : []);
       } else {
         setEntries([]);

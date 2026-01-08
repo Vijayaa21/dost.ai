@@ -65,7 +65,8 @@ export default function Chat() {
       if (Array.isArray(data)) {
         setConversations(data);
       } else if (data && typeof data === 'object') {
-        const arrayData = data.results || data.conversations || [];
+        const apiResponse = data as { results?: Conversation[]; conversations?: Conversation[] };
+        const arrayData = apiResponse.results || apiResponse.conversations || [];
         setConversations(Array.isArray(arrayData) ? arrayData : []);
       } else {
         setConversations([]);
@@ -119,22 +120,23 @@ export default function Chat() {
 
     try {
       const response = await chatService.sendMessage(text, currentConversation || undefined);
+      const chatResponse = response as { conversation_id: number; user_message: Message; assistant_message: Message; coping_suggestion?: CopingSuggestion };
       
       setMessages(prev => {
         const filtered = prev.filter(m => m.id !== tempUserMsg.id);
-        const userMsg = response.user_message || { ...tempUserMsg, id: Math.random() };
-        const assistantMsg = response.assistant_message;
+        const userMsg = chatResponse.user_message || { ...tempUserMsg, id: Math.random() };
+        const assistantMsg = chatResponse.assistant_message;
         return assistantMsg ? [...filtered, userMsg, assistantMsg] : [...filtered, userMsg];
       });
 
-      if (response.coping_suggestion) {
-        setCopingSuggestion(response.coping_suggestion);
+      if (chatResponse.coping_suggestion) {
+        setCopingSuggestion(chatResponse.coping_suggestion);
       } else {
         setCopingSuggestion(null);
       }
 
       if (!currentConversation) {
-        setCurrentConversation(response.conversation_id);
+        setCurrentConversation(chatResponse.conversation_id);
         loadConversations();
       }
       setError(null);
