@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Onboarding from './pages/Onboarding';
+import Home from './pages/Home';
 import Chat from './pages/Chat';
 import MoodDashboard from './pages/MoodDashboard';
 import Journal from './pages/Journal';
@@ -40,16 +41,16 @@ function App() {
     <Router>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/chat" />} />
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/chat" />} />
-        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/chat" />} />
+        <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/home" />} />
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/home" />} />
         
         {/* Onboarding */}
         <Route 
           path="/onboarding" 
           element={
             <PrivateRoute>
-              {user?.onboarding_completed ? <Navigate to="/chat" /> : <Onboarding />}
+              {user?.onboarding_completed ? <Navigate to="/home" /> : <Onboarding />}
             </PrivateRoute>
           } 
         />
@@ -62,6 +63,7 @@ function App() {
             </PrivateRoute>
           }
         >
+          <Route path="/home" element={<Home />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/mood" element={<MoodDashboard />} />
           <Route path="/journal" element={<Journal />} />

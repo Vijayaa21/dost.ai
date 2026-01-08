@@ -7,6 +7,18 @@
 ![React](https://img.shields.io/badge/React-18-61dafb?style=flat-square)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square)
 
+## 📸 Screenshots
+
+### Home Dashboard
+![Home Dashboard](./docs/screenshots/home-dashboard.jpg)
+
+*Beautiful watercolor-inspired home page with daily mood check-in, affirmations, and quick access to coping tools.*
+
+### Quick Tools
+![Quick Tools](./docs/screenshots/quick-tools.jpg)
+
+*Easy access to breathing exercises and zen sounds for instant calm.*
+
 ## ✨ Features
 
 ### 🗣️ AI Conversational Support

@@ -1,0 +1,233 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Sun, RefreshCw, ChevronRight, Wind, Sparkles, ChevronDown } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+import { moodService } from '../services/moodService';
+import clsx from 'clsx';
+
+// Daily affirmations
+const affirmations = [
+  "I am worthy of peace, joy, and all the good things that life has to offer. My feelings are valid, and I am doing my best.",
+  "Today, I choose to focus on what I can control and let go of what I cannot.",
+  "I am stronger than my challenges and bigger than my fears.",
+  "My journey is unique, and I embrace every step of it with courage.",
+  "I deserve love, kindness, and compassion - especially from myself.",
+  "Every breath I take fills me with calm and peace.",
+  "I am allowed to take up space and make my voice heard.",
+  "My emotions are valid, and I honor them without judgment.",
+  "I am growing, healing, and becoming the best version of myself.",
+  "Today is a new opportunity to nurture my mind, body, and soul.",
+];
+
+// Quick tools
+const quickTools = [
+  {
+    id: 'breathing-box',
+    icon: Wind,
+    title: 'Box Breathing',
+    subtitle: 'Calm your nervous system',
+    color: 'bg-cyan-100',
+    iconColor: 'text-cyan-600',
+  },
+  {
+    id: 'grounding-54321',
+    icon: Sparkles,
+    title: '5-4-3-2-1 Technique',
+    subtitle: 'Ground yourself in the present',
+    color: 'bg-emerald-100',
+    iconColor: 'text-emerald-600',
+  },
+];
+
+export default function Home() {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const [moodLogged, setMoodLogged] = useState(false);
+  const [affirmationIndex, setAffirmationIndex] = useState(0);
+  const [moodData, setMoodData] = useState<{ date: string; score: number }[]>([]);
+
+  const firstName = user?.first_name || user?.username || 'Friend';
+
+  useEffect(() => {
+    // Set random affirmation on load
+    setAffirmationIndex(Math.floor(Math.random() * affirmations.length));
+    
+    // Check if mood logged today
+    const checkMood = async () => {
+      try {
+        const today = await moodService.getTodayMood();
+        if (today) setMoodLogged(true);
+        
+        // Get mood stats for chart
+        const stats = await moodService.getMoodStats('week');
+        if (stats?.weekly_trend) {
+          setMoodData(stats.weekly_trend.map((t: any) => ({
+            date: new Date(t.date).toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+            score: t.mood_score
+          })));
+        }
+      } catch {
+        // Ignore errors
+      }
+    };
+    checkMood();
+  }, []);
+
+  const newAffirmation = () => {
+    setAffirmationIndex((prev) => (prev + 1) % affirmations.length);
+  };
+
+  const handleToolClick = (toolId: string) => {
+    navigate(`/coping?exercise=${toolId}`);
+  };
+
+  const weekDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-2">
+            Welcome back, {firstName} <span className="text-2xl">✨</span>
+          </h1>
+          <p className="text-gray-500 text-lg mt-1">How is your heart feeling today?</p>
+        </motion.div>
+
+        {/* Top Section - Affirmation & Check-in */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Daily Affirmation Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-purple-600 p-6 text-white min-h-[200px]"
+          >
+            {/* Decorative elements */}
+            <div className="absolute top-4 right-4 opacity-20">
+              <svg width="80" height="80" viewBox="0 0 80 80" fill="currentColor">
+                <path d="M40 0L45 30L80 35L50 45L55 80L40 55L25 80L30 45L0 35L35 30L40 0Z" />
+              </svg>
+            </div>
+            <div className="absolute bottom-0 right-0 opacity-10">
+              <svg width="150" height="150" viewBox="0 0 150 150" fill="currentColor">
+                <circle cx="75" cy="75" r="75" />
+              </svg>
+            </div>
+
+            <h2 className="text-xl font-semibold mb-4">Daily Affirmation</h2>
+            <p className="text-white/90 text-lg italic leading-relaxed mb-6 max-w-md">
+              "{affirmations[affirmationIndex]}"
+            </p>
+            <button
+              onClick={newAffirmation}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 rounded-full transition-all text-sm font-medium"
+            >
+              <RefreshCw className="w-4 h-4" />
+              New Affirmation
+            </button>
+          </motion.div>
+
+          {/* Morning Check-in Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+              <Sun className="w-8 h-8 text-amber-500" />
+            </div>
+            <h3 className="font-semibold text-gray-800 text-lg">Morning Check-in</h3>
+            <p className="text-gray-500 text-sm mt-1 mb-4">
+              {moodLogged ? "You've logged your mood today!" : "You haven't logged your mood yet."}
+            </p>
+            <button
+              onClick={() => navigate('/mood')}
+              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-all"
+            >
+              {moodLogged ? 'View Entry' : 'Log Now'}
+            </button>
+          </motion.div>
+        </div>
+
+        {/* Bottom Section - Mood Trends & Quick Tools */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Mood Trends */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-semibold text-gray-800 text-lg">Mood Trends</h3>
+              <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg border border-gray-200">
+                Last 7 Days
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Simple Bar Chart */}
+            <div className="h-32 flex items-end justify-between gap-2 mb-4">
+              {weekDays.map((day, i) => {
+                const entry = moodData.find(m => m.date === day);
+                const height = entry ? (entry.score / 5) * 100 : 0;
+                return (
+                  <div key={day} className="flex-1 flex flex-col items-center gap-2">
+                    <div className="w-full bg-gray-100 rounded-t-lg relative" style={{ height: '100px' }}>
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${height}%` }}
+                        transition={{ delay: 0.5 + i * 0.1 }}
+                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-indigo-500 to-violet-400 rounded-t-lg"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex justify-between text-xs text-gray-400 font-medium">
+              {weekDays.map(day => (
+                <span key={day} className="flex-1 text-center">{day}</span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Quick Tools */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+          >
+            <h3 className="font-semibold text-gray-800 text-lg mb-4">Quick Tools</h3>
+            <div className="space-y-3">
+              {quickTools.map((tool) => (
+                <button
+                  key={tool.id}
+                  onClick={() => handleToolClick(tool.id)}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-all group text-left"
+                >
+                  <div className={clsx('p-3 rounded-xl', tool.color)}>
+                    <tool.icon className={clsx('w-5 h-5', tool.iconColor)} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-800">{tool.title}</h4>
+                    <p className="text-sm text-gray-500">{tool.subtitle}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-gray-400 transition-colors" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
