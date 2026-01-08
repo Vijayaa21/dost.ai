@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -7,8 +8,10 @@ import {
 import { Calendar, TrendingUp, Smile, Activity } from 'lucide-react';
 import { moodService } from '../services/moodService';
 import { MoodEntry, MoodStats } from '../types';
+import { useAuthStore } from '../store/authStore';
 import clsx from 'clsx';
 import { format } from 'date-fns';
+import { AxiosError } from 'axios';
 
 const moodEmojis = [
   { score: 1, emoji: '😢', label: 'Very Low' },
@@ -24,6 +27,8 @@ const emotionTags = [
 ];
 
 export default function MoodDashboard() {
+  const navigate = useNavigate();
+  const logout = useAuthStore(state => state.logout);
   const [todayMood, setTodayMood] = useState<MoodEntry | null>(null);
   const [stats, setStats] = useState<MoodStats | null>(null);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
@@ -36,6 +41,15 @@ export default function MoodDashboard() {
   useEffect(() => {
     loadData();
   }, [period]);
+
+  const handleAuthError = (error: unknown) => {
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      logout();
+      navigate('/login');
+      return true;
+    }
+    return false;
+  };
 
   const loadData = async () => {
     try {
@@ -54,7 +68,9 @@ export default function MoodDashboard() {
       setError(null);
     } catch (error) {
       console.error('Failed to load mood data:', error);
-      setError('Failed to load mood data. Please try again.');
+      if (!handleAuthError(error)) {
+        setError('Failed to load mood data. Please try again.');
+      }
     }
   };
 
@@ -72,7 +88,11 @@ export default function MoodDashboard() {
       setError(null);
     } catch (error) {
       console.error('Failed to save mood:', error);
-      setError('Failed to save mood. Please try again.');
+      if (!handleAuthError(error)) {
+        const axiosError = error as AxiosError<{ detail?: string }>;
+        const message = axiosError.response?.data?.detail || 'Failed to save mood. Please try again.';
+        setError(message);
+      }
     } finally {
       setIsSubmitting(false);
     }

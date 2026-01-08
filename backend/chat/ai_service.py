@@ -37,6 +37,72 @@ EMOTION_KEYWORDS = {
     'lonely': ['lonely', 'alone', 'isolated', 'disconnected', 'abandoned', 'empty', 'solitary'],
 }
 
+# Coping exercise recommendations based on emotional state
+COPING_RECOMMENDATIONS = {
+    'anxious': {
+        'category': 'breathing',
+        'message': 'Take a breath with me? 💙',
+        'exercises': [
+            {'name': 'Box Breathing', 'id': 1, 'duration': '2 min'},
+            {'name': '4-7-8 Breathing', 'id': 2, 'duration': '3 min'},
+        ]
+    },
+    'stressed': {
+        'category': 'breathing',
+        'message': 'Let\'s slow down for a sec 💙',
+        'exercises': [
+            {'name': 'Deep Breathing', 'id': 3, 'duration': '2 min'},
+            {'name': 'Body Scan', 'id': 4, 'duration': '5 min'},
+        ]
+    },
+    'sad': {
+        'category': 'grounding',
+        'message': 'This might help a little 💙',
+        'exercises': [
+            {'name': '5-4-3-2-1 Grounding', 'id': 5, 'duration': '3 min'},
+            {'name': 'Gratitude Moment', 'id': 6, 'duration': '2 min'},
+        ]
+    },
+    'angry': {
+        'category': 'relaxation',
+        'message': 'Want to let some of that out? 💙',
+        'exercises': [
+            {'name': 'Progressive Muscle Relaxation', 'id': 7, 'duration': '5 min'},
+            {'name': 'Calm Breathing', 'id': 8, 'duration': '2 min'},
+        ]
+    },
+    'lonely': {
+        'category': 'mindfulness',
+        'message': 'You\'re not alone 💙',
+        'exercises': [
+            {'name': 'Self-Compassion', 'id': 9, 'duration': '3 min'},
+            {'name': 'Loving Kindness', 'id': 10, 'duration': '5 min'},
+        ]
+    },
+    'overwhelmed': {
+        'category': 'grounding',
+        'message': 'One thing at a time 💙',
+        'exercises': [
+            {'name': 'Grounding Exercise', 'id': 5, 'duration': '3 min'},
+            {'name': 'Simple Breathing', 'id': 1, 'duration': '2 min'},
+        ]
+    },
+}
+
+def get_coping_recommendation(emotion: str, stress_level: str) -> dict | None:
+    """Get coping exercise recommendation based on emotion and stress level."""
+    # Only recommend for medium/high stress or negative emotions
+    if stress_level in ['high', 'medium'] or emotion in COPING_RECOMMENDATIONS:
+        recommendation = COPING_RECOMMENDATIONS.get(emotion)
+        if recommendation:
+            return {
+                'show_coping': True,
+                'message': recommendation['message'],
+                'category': recommendation['category'],
+                'exercises': recommendation['exercises']
+            }
+    return None
+
 
 def detect_crisis(text: str) -> bool:
     """Detect if the message contains crisis-related content."""
@@ -222,7 +288,7 @@ def get_chat_response(user_message: str, conversation_history: list, user_tone: 
     Main function to get chat response with crisis detection, emotion analysis, and stress tracking.
     
     Returns:
-        dict with 'response', 'is_crisis', 'detected_emotion', 'stress_level', and 'conversation_impact'
+        dict with 'response', 'is_crisis', 'detected_emotion', 'stress_level', 'conversation_impact', and 'coping_suggestion'
     """
     # Check for crisis content first
     is_crisis = detect_crisis(user_message)
@@ -233,7 +299,8 @@ def get_chat_response(user_message: str, conversation_history: list, user_tone: 
             'is_crisis': True,
             'detected_emotion': 'distressed',
             'stress_level': 'critical',
-            'conversation_impact': {'impact': 'crisis', 'trend': 'immediate support needed'}
+            'conversation_impact': {'impact': 'crisis', 'trend': 'immediate support needed'},
+            'coping_suggestion': None
         }
     
     # Detect emotion
@@ -244,6 +311,9 @@ def get_chat_response(user_message: str, conversation_history: list, user_tone: 
     
     # Analyze conversation impact
     conversation_impact = detect_conversation_impact(conversation_history)
+    
+    # Get coping recommendation based on emotion/stress
+    coping_suggestion = get_coping_recommendation(detected_emotion, stress_analysis['level'])
     
     # Prepare emotion context for AI
     emotion_context = {
@@ -261,11 +331,6 @@ def get_chat_response(user_message: str, conversation_history: list, user_tone: 
         'is_crisis': False,
         'detected_emotion': detected_emotion,
         'stress_level': stress_analysis['level'],
-        'conversation_impact': conversation_impact
-    }
-    
-    return {
-        'response': ai_response,
-        'is_crisis': False,
-        'detected_emotion': detected_emotion
+        'conversation_impact': conversation_impact,
+        'coping_suggestion': coping_suggestion
     }

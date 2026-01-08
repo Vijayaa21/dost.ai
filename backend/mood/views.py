@@ -27,19 +27,23 @@ class MoodEntryListCreateView(generics.ListCreateAPIView):
         
         return queryset
     
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         # Check if entry already exists for today
         today = timezone.now().date()
-        existing = MoodEntry.objects.filter(user=self.request.user, date=today).first()
+        existing = MoodEntry.objects.filter(user=request.user, date=today).first()
         
         if existing:
             # Update existing entry
-            for key, value in serializer.validated_data.items():
-                setattr(existing, key, value)
-            existing.save()
-            return existing
+            serializer = self.get_serializer(existing, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
-        serializer.save(user=self.request.user)
+        # Create new entry
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class MoodEntryDetailView(generics.RetrieveUpdateDestroyAPIView):

@@ -89,11 +89,17 @@ class ChatView(APIView):
         # Update conversation
         conversation.save()  # Updates updated_at
         
-        return Response({
+        response_data = {
             'conversation_id': conversation.id,
             'user_message': MessageSerializer(user_msg).data,
             'assistant_message': MessageSerializer(assistant_msg).data
-        })
+        }
+        
+        # Include coping suggestion if available
+        if result.get('coping_suggestion'):
+            response_data['coping_suggestion'] = result['coping_suggestion']
+        
+        return Response(response_data)
 
 
 class DeleteChatHistoryView(APIView):

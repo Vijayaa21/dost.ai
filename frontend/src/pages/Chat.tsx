@@ -1,12 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Plus, MessageCircle, Trash2 } from 'lucide-react';
+import { Send, Plus, MessageCircle, Trash2, Wind, Heart, Brain, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { chatService } from '../services/chatService';
 import { Message, Conversation } from '../types';
 import clsx from 'clsx';
 import { format } from 'date-fns';
 
+interface CopingSuggestion {
+  show_coping: boolean;
+  message: string;
+  category: string;
+  exercises: Array<{
+    name: string;
+    id: number;
+    duration: string;
+  }>;
+}
+
+const categoryIcons: Record<string, React.ReactNode> = {
+  breathing: <Wind className="w-4 h-4" />,
+  grounding: <Heart className="w-4 h-4" />,
+  mindfulness: <Brain className="w-4 h-4" />,
+  relaxation: <Sparkles className="w-4 h-4" />,
+};
+
 export default function Chat() {
+  const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -14,6 +34,7 @@ export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copingSuggestion, setCopingSuggestion] = useState<CopingSuggestion | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -98,6 +119,13 @@ export default function Chat() {
         return assistantMsg ? [...filtered, userMsg, assistantMsg] : [...filtered, userMsg];
       });
 
+      // Check for coping suggestion
+      if (response.coping_suggestion) {
+        setCopingSuggestion(response.coping_suggestion);
+      } else {
+        setCopingSuggestion(null);
+      }
+
       // Update current conversation
       if (!currentConversation) {
         setCurrentConversation(response.conversation_id);
@@ -157,11 +185,11 @@ export default function Chat() {
             </div>
           ) : (
             conversations.map((conv) => (
-              <button
+              <div
                 key={conv.id}
                 onClick={() => loadConversation(conv.id)}
                 className={clsx(
-                  'w-full p-3 rounded-xl text-left mb-1 group transition-all',
+                  'w-full p-3 rounded-xl text-left mb-1 group transition-all cursor-pointer',
                   currentConversation === conv.id
                     ? 'bg-primary-50 border border-primary-200'
                     : 'hover:bg-gray-50'
@@ -181,7 +209,7 @@ export default function Chat() {
                 <p className="text-xs text-gray-500 mt-1">
                   {format(new Date(conv.updated_at), 'MMM d, h:mm a')}
                 </p>
-              </button>
+              </div>
             ))
           )}
         </div>
@@ -268,6 +296,43 @@ export default function Chat() {
                   <span></span>
                   <span></span>
                 </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Coping Suggestion Card */}
+          {copingSuggestion && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-start"
+            >
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 max-w-sm border border-indigo-100 shadow-sm">
+                <p className="text-gray-700 font-medium mb-3">{copingSuggestion.message}</p>
+                <div className="space-y-2">
+                  {copingSuggestion.exercises.map((exercise) => (
+                    <button
+                      key={exercise.id}
+                      onClick={() => navigate(`/coping?exercise=${exercise.id}&category=${copingSuggestion.category}`)}
+                      className="w-full flex items-center gap-3 p-3 bg-white rounded-xl hover:bg-indigo-50 transition-all border border-indigo-100 hover:border-indigo-200 group"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-200 transition-colors">
+                        {categoryIcons[copingSuggestion.category] || <Wind className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="font-medium text-gray-800 text-sm">{exercise.name}</p>
+                        <p className="text-xs text-gray-500">{exercise.duration}</p>
+                      </div>
+                      <span className="text-indigo-500 text-xs font-medium">Try now →</span>
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCopingSuggestion(null)}
+                  className="text-xs text-gray-400 hover:text-gray-600 mt-2 w-full text-center"
+                >
+                  Maybe later
+                </button>
               </div>
             </motion.div>
           )}
