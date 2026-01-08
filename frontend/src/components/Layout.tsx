@@ -9,8 +9,7 @@ import {
   LogOut,
   Menu,
   X,
-  AlertCircle,
-  Heart
+  AlertCircle
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
@@ -40,9 +39,7 @@ export default function Layout() {
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-100">
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-6">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center">
-            <Heart className="w-5 h-5 text-white fill-white" />
-          </div>
+          <img src="/dost-logo.svg" alt="Dost AI" className="w-10 h-10" />
           <span className="text-xl font-bold text-gray-800">Dost AI</span>
         </div>
 
@@ -90,9 +87,7 @@ export default function Layout() {
       <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white fill-white" />
-            </div>
+            <img src="/dost-logo.svg" alt="Dost AI" className="w-8 h-8" />
             <span className="text-lg font-bold text-gray-800">Dost AI</span>
           </div>
           <button
