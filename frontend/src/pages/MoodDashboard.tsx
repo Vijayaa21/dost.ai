@@ -5,6 +5,7 @@ import { BookOpen } from 'lucide-react';
 import { moodService } from '../services/moodService';
 import { MoodEntry } from '../types';
 import clsx from 'clsx';
+import toast from '../utils/toast';
 
 // Mood options matching the design
 const moodOptions = [
@@ -89,11 +90,12 @@ export default function MoodDashboard() {
         note: note,
       });
       setSuccess(true);
+      toast.success('Mood logged successfully! 🎉');
       setTimeout(() => {
         navigate('/home');
       }, 1500);
     } catch (err) {
-      console.error('Failed to save mood:', err);
+      toast.handleError('Save Mood', err);
       setError('Failed to save mood. Please try again.');
     } finally {
       setIsSubmitting(false);

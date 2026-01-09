@@ -7,6 +7,7 @@ import { journalService } from '../services/journalService';
 import { JournalEntry, JournalPrompt } from '../types';
 import clsx from 'clsx';
 import { format } from 'date-fns';
+import toast from '../utils/toast';
 
 const tagOptions = [
   'gratitude', 'reflection', 'anxiety', 'stress', 'calm',
@@ -51,7 +52,7 @@ export default function Journal() {
       }
       setError(null);
     } catch (error) {
-      console.error('Failed to load entries:', error);
+      toast.handleError('Load Journal Entries', error);
       setError('Failed to load journal entries. Please try again.');
       setEntries([]);
     }
@@ -63,7 +64,7 @@ export default function Journal() {
       setStats(data);
       setError(null);
     } catch (error) {
-      console.error('Failed to load stats:', error);
+      toast.logError('Load Journal Stats', error);
       setError('Failed to load journal statistics.');
     }
   };
@@ -73,7 +74,7 @@ export default function Journal() {
       const data = await journalService.getPrompt();
       setPrompt(data);
     } catch (error) {
-      console.error('Failed to load prompt:', error);
+      toast.logError('Load Writing Prompt', error);
     }
   };
 
@@ -95,8 +96,9 @@ export default function Journal() {
       });
       loadEntries();
       loadStats();
+      toast.success('Journal entry saved! ✨');
     } catch (error) {
-      console.error('Failed to create entry:', error);
+      toast.handleError('Create Journal Entry', error);
     }
   };
 
@@ -109,8 +111,9 @@ export default function Journal() {
       loadEntries();
       loadStats();
       setError(null);
+      toast.success('Entry deleted');
     } catch (error) {
-      console.error('Failed to delete entry:', error);
+      toast.handleError('Delete Journal Entry', error);
       setError('Failed to delete entry. Please try again.');
     }
   };
@@ -130,7 +133,7 @@ export default function Journal() {
       setSelectedEntry(entry);
       setError(null);
     } catch (error) {
-      console.error('Failed to load entry:', error);
+      toast.handleError('Load Journal Entry', error);
       setError('Failed to load entry. Please try again.');
     }
   };

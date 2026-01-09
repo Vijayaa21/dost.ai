@@ -6,6 +6,7 @@ import { chatService } from '../services/chatService';
 import { Message, Conversation } from '../types';
 import clsx from 'clsx';
 import { format } from 'date-fns';
+import toast from '../utils/toast';
 
 interface CopingSuggestion {
   show_coping: boolean;
@@ -87,7 +88,7 @@ export default function Chat() {
       setError(null);
       setShowSidebar(false);
     } catch (error) {
-      console.error('Failed to load conversation:', error);
+      toast.handleError('Load Conversation', error);
       setError('Failed to load conversation. Please try again.');
     }
   };
@@ -141,7 +142,7 @@ export default function Chat() {
       }
       setError(null);
     } catch (error) {
-      console.error('Failed to send message:', error);
+      toast.handleError('Send Message', error);
       setError('Failed to send message. Please try again.');
       setMessages(prev => prev.filter(m => m.id !== tempUserMsg.id));
     } finally {
@@ -158,8 +159,9 @@ export default function Chat() {
         startNewConversation();
       }
       loadConversations();
+      toast.success('Conversation deleted');
     } catch (error) {
-      console.error('Failed to delete conversation:', error);
+      toast.handleError('Delete Conversation', error);
     }
   };
 

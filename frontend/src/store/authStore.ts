@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User, AuthTokens } from '../types';
 import { authService } from '../services/authService';
+import toast from '../utils/toast';
 
 interface AuthState {
   user: User | null;
@@ -37,8 +38,9 @@ export const useAuthStore = create<AuthState>()(
           
           const user = await authService.getProfile();
           set({ user, isAuthenticated: true, isLoading: false });
+          toast.success(`Welcome back, ${user.username || user.email}! 👋`);
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'Login failed. Please check your credentials.';
+          const errorMessage = toast.handleError('Login', error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
@@ -48,10 +50,11 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           await authService.register({ email, username, password, password_confirm: passwordConfirm });
+          toast.success('Account created successfully! 🎉');
           // Auto-login after registration
           await get().login(email, password);
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'Registration failed.';
+          const errorMessage = toast.handleError('Registration', error);
           set({ error: errorMessage, isLoading: false });
           throw error;
         }
@@ -61,13 +64,15 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         set({ user: null, isAuthenticated: false, error: null });
+        toast.info('You have been logged out. See you soon! 👋');
       },
 
       fetchProfile: async () => {
         try {
           const user = await authService.getProfile();
           set({ user });
-        } catch {
+        } catch (error) {
+          toast.logError('Fetch Profile', error);
           get().logout();
         }
       },
@@ -76,8 +81,9 @@ export const useAuthStore = create<AuthState>()(
         try {
           const user = await authService.updateProfile(data);
           set({ user });
+          toast.success('Profile updated successfully! ✨');
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'Failed to update profile.';
+          const errorMessage = toast.handleError('Update Profile', error);
           set({ error: errorMessage });
           throw error;
         }
@@ -91,8 +97,9 @@ export const useAuthStore = create<AuthState>()(
           try {
             const user = await authService.getProfile();
             set({ user, isAuthenticated: true, isInitialized: true });
-          } catch {
+          } catch (error) {
             // Token is invalid, clear auth state
+            toast.logError('Initialize Auth', error);
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             set({ user: null, isAuthenticated: false, isInitialized: true });
