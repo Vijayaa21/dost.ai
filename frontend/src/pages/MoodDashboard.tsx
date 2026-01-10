@@ -103,18 +103,18 @@ export default function MoodDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-6 md:mb-8"
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
             How's your mood right now?
           </h1>
-          <p className="text-gray-500 text-lg">
+          <p className="text-gray-500 text-base md:text-lg">
             Daily check-ins help you spot patterns over time.
           </p>
         </motion.div>
@@ -146,7 +146,7 @@ export default function MoodDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex justify-center gap-3 md:gap-4 mb-8"
+          className="flex justify-center gap-2 md:gap-3 lg:gap-4 mb-6 md:mb-8 flex-wrap"
         >
           {moodOptions.map((mood) => (
             <motion.button
@@ -155,16 +155,16 @@ export default function MoodDashboard() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className={clsx(
-                'flex flex-col items-center p-4 md:p-6 rounded-2xl transition-all border-2',
+                'flex flex-col items-center p-3 md:p-4 lg:p-6 rounded-xl md:rounded-2xl transition-all border-2',
                 mood.color,
                 selectedMood === mood.score 
                   ? `${mood.borderColor} shadow-lg` 
                   : 'border-transparent'
               )}
             >
-              <span className="text-3xl md:text-4xl mb-2">{mood.emoji}</span>
+              <span className="text-2xl md:text-3xl lg:text-4xl mb-1 md:mb-2">{mood.emoji}</span>
               <span className={clsx(
-                'text-xs md:text-sm font-bold tracking-wide',
+                'text-xs font-bold tracking-wide',
                 mood.textColor
               )}>
                 {mood.label}

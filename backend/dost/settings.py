@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'mood',
     'journal',
     'coping',
+    'pet',
+    'insights',
+    'games',
 ]
 
 MIDDLEWARE = [

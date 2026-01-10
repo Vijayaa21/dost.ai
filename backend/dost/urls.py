@@ -20,6 +20,9 @@ def api_root(request):
             'mood': '/api/mood/',
             'journal': '/api/journal/',
             'coping': '/api/coping/',
+            'pet': '/api/pet/',
+            'insights': '/api/insights/',
+            'games': '/api/games/',
         }
     })
 
@@ -32,6 +35,9 @@ urlpatterns = [
     path('api/mood/', include('mood.urls')),
     path('api/journal/', include('journal.urls')),
     path('api/coping/', include('coping.urls')),
+    path('api/pet/', include('pet.urls')),
+    path('api/insights/', include('insights.urls')),
+    path('api/games/', include('games.urls')),
 ]
 
 if settings.DEBUG:

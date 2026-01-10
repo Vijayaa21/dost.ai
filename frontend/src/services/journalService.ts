@@ -1,5 +1,6 @@
 import api from './api';
 import { JournalEntry, JournalPrompt } from '../types';
+import { petService } from './petService';
 
 export const journalService = {
   async getEntries(search?: string, tag?: string): Promise<JournalEntry[]> {
@@ -24,6 +25,14 @@ export const journalService = {
     ai_reflection_enabled?: boolean;
   }): Promise<JournalEntry> {
     const response = await api.post('/journal/entries/', data);
+    
+    // Award XP to pet for journaling
+    try {
+      await petService.interact('journal', 'Wrote journal entry');
+    } catch {
+      // Pet interaction failed silently
+    }
+    
     return response.data;
   },
 

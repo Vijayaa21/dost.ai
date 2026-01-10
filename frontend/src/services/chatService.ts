@@ -1,5 +1,6 @@
 import api from './api';
 import { Conversation, Message } from '../types';
+import { petService } from './petService';
 
 export const chatService = {
   async getConversations(): Promise<Conversation[]> {
@@ -33,6 +34,14 @@ export const chatService = {
       message,
       conversation_id: conversationId,
     });
+    
+    // Award XP to pet for chatting
+    try {
+      await petService.interact('chat', 'Had a conversation');
+    } catch {
+      // Pet interaction failed silently
+    }
+    
     return response.data;
   },
 

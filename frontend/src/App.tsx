@@ -12,6 +12,9 @@ import MoodDashboard from './pages/MoodDashboard';
 import Journal from './pages/Journal';
 import CopingToolkit from './pages/CopingToolkit';
 import Settings from './pages/Settings';
+import Pet from './pages/Pet';
+import Insights from './pages/Insights';
+import EmotionGames from './pages/EmotionGames';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -68,6 +71,9 @@ function App() {
           <Route path="/mood" element={<MoodDashboard />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/coping" element={<CopingToolkit />} />
+          <Route path="/pet" element={<Pet />} />
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/games" element={<EmotionGames />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         

@@ -9,7 +9,10 @@ import {
   LogOut,
   Menu,
   X,
-  AlertCircle
+  AlertCircle,
+  PawPrint,
+  Brain,
+  Gamepad2
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
@@ -20,6 +23,9 @@ const navItems = [
   { path: '/chat', icon: MessageCircle, label: 'Chat with Dost' },
   { path: '/mood', icon: Smile, label: 'Mood Journal' },
   { path: '/journal', icon: BookOpen, label: 'Journaling' },
+  { path: '/pet', icon: PawPrint, label: 'Wellness Pet' },
+  { path: '/insights', icon: Brain, label: 'Insights' },
+  { path: '/games', icon: Gamepad2, label: 'Emotion Games' },
   { path: '/coping', icon: SlidersHorizontal, label: 'Coping Tools' },
 ];
 
@@ -138,7 +144,7 @@ export default function Layout() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-0 mt-14 md:mt-0 h-[calc(100vh-3.5rem)] md:h-screen overflow-hidden">
+      <main className="flex-1 md:ml-0 mt-14 md:mt-0 min-h-[calc(100vh-3.5rem)] md:min-h-screen overflow-y-auto">
         <Outlet />
       </main>
     </div>
