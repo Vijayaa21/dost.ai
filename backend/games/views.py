@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, F
 from .models import TherapeuticGame, GameSession, EmotionGameRecommendation
 from .serializers import (
     TherapeuticGameSerializer, GameSessionSerializer, 
@@ -209,7 +209,7 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         
         # Emotion improvement rate
         improved_sessions = sessions.filter(
-            emotion_intensity_after__lt=models.F('emotion_intensity_before')
+            emotion_intensity_after__lt=F('emotion_intensity_before')
         ).count()
         sessions_with_after = sessions.exclude(emotion_intensity_after__isnull=True).count()
         
