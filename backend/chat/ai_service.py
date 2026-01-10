@@ -267,10 +267,9 @@ def _get_openai_response(messages: list, system_prompt: str) -> str:
 
 def _get_gemini_response(messages: list, system_prompt: str) -> str:
     """Get response from Google Gemini API."""
-    import google.generativeai as genai
+    from google import genai
     
-    genai.configure(api_key=settings.GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    client = genai.Client(api_key=settings.GEMINI_API_KEY)
     
     # Format conversation history
     conversation_text = f"System Instructions: {system_prompt}\n\n"
@@ -279,7 +278,10 @@ def _get_gemini_response(messages: list, system_prompt: str) -> str:
         conversation_text += f"{role}: {msg['content']}\n"
     conversation_text += "Dost:"
     
-    response = model.generate_content(conversation_text)
+    response = client.models.generate_content(
+        model='gemini-2.0-flash',
+        contents=conversation_text
+    )
     return response.text
 
 

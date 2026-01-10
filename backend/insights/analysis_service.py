@@ -11,9 +11,10 @@ from collections import defaultdict
 from django.db import models
 
 
-# Try to import Google Generative AI
+# Try to import Google GenAI (new package)
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
@@ -26,12 +27,14 @@ class TriggerAnalysisService:
         if GEMINI_AVAILABLE:
             api_key = os.getenv('GEMINI_API_KEY')
             if api_key:
-                genai.configure(api_key=api_key)
-                self.model = genai.GenerativeModel('gemini-2.0-flash')
+                self.client = genai.Client(api_key=api_key)
+                self.model_name = 'gemini-2.0-flash'
             else:
-                self.model = None
+                self.client = None
+                self.model_name = None
         else:
-            self.model = None
+            self.client = None
+            self.model_name = None
     
     def analyze_patterns(self, user):
         """Main analysis function - analyzes all user data for patterns"""
@@ -70,7 +73,7 @@ class TriggerAnalysisService:
         patterns.extend(day_patterns)
         
         # 3. Topic/keyword patterns (using AI if available)
-        if self.model and (journal_entries.exists() or messages.exists()):
+        if self.client and (journal_entries.exists() or messages.exists()):
             topic_patterns = self._analyze_topic_patterns(user, journal_entries, messages)
             patterns.extend(topic_patterns)
         
@@ -190,7 +193,10 @@ Respond in JSON format:
 
 Only include clear patterns with evidence. Return empty array [] if no clear patterns found."""
 
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+            )
             response_text = response.text.strip()
             
             # Parse JSON from response
