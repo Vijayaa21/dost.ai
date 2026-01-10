@@ -1,0 +1,22 @@
+services:
+  # Frontend - Static Site
+  - type: web
+    name: dost-ai-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+
+  # Backend - Web Service (optional, if deploying together)
+  # - type: web
+  #   name: dost-ai-backend
+  #   runtime: python
+  #   buildCommand: cd backend && pip install -r requirements.txt
+  #   startCommand: cd backend && gunicorn dost.wsgi:application
