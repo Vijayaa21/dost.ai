@@ -1,10 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sun, RefreshCw, ChevronRight, Wind, Sparkles, ChevronDown } from 'lucide-react';
+import { Sun, RefreshCw, ChevronRight, Wind, Sparkles, ChevronDown, Star, Flame, Brain } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { moodService } from '../services/moodService';
+import { petService, WellnessPet } from '../services/petService';
+import { insightsService, TriggerPattern } from '../services/insightsService';
+import { DashboardSkeleton } from '../components/Skeleton';
 import clsx from 'clsx';
+
+// Species to emoji mapping
+const speciesEmojis: Record<string, { happy: string; sad: string; neutral: string }> = {
+  cat: { happy: '😺', sad: '😿', neutral: '🐱' },
+  dog: { happy: '🐶', sad: '🐕', neutral: '🐕' },
+  plant: { happy: '🌱', sad: '🥀', neutral: '🌿' },
+  bunny: { happy: '🐰', sad: '🐇', neutral: '🐇' },
+};
 
 // Daily affirmations
 const affirmations = [
@@ -43,9 +54,12 @@ const quickTools = [
 export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const [loading, setLoading] = useState(true);
   const [moodLogged, setMoodLogged] = useState(false);
   const [affirmationIndex, setAffirmationIndex] = useState(0);
   const [moodData, setMoodData] = useState<{ date: string; score: number }[]>([]);
+  const [pet, setPet] = useState<WellnessPet | null>(null);
+  const [topPattern, setTopPattern] = useState<TriggerPattern | null>(null);
 
   const firstName = user?.first_name || user?.username || 'Friend';
 
@@ -71,7 +85,33 @@ export default function Home() {
         // Ignore errors
       }
     };
-    checkMood();
+    
+    // Load pet data
+    const loadPet = async () => {
+      try {
+        const petData = await petService.getPet();
+        setPet(petData);
+      } catch {
+        // Ignore errors
+      }
+    };
+    
+    // Load top insight pattern
+    const loadInsights = async () => {
+      try {
+        const patterns = await insightsService.getActivePatterns();
+        if (patterns.length > 0) {
+          setTopPattern(patterns[0]);
+        }
+      } catch {
+        // Ignore errors
+      }
+    };
+    
+    // Load all data then hide skeleton
+    Promise.all([checkMood(), loadPet(), loadInsights()]).finally(() => {
+      setLoading(false);
+    });
   }, []);
 
   const newAffirmation = () => {
@@ -84,29 +124,33 @@ export default function Home() {
 
   const weekDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-2">
-            Welcome back, {firstName} <span className="text-2xl">✨</span>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 flex items-center gap-2">
+            Welcome back, {firstName} <span className="text-xl md:text-2xl">✨</span>
           </h1>
-          <p className="text-gray-500 text-lg mt-1">How is your heart feeling today?</p>
+          <p className="text-gray-500 text-base md:text-lg mt-1">How is your heart feeling today?</p>
         </motion.div>
 
         {/* Top Section - Affirmation & Check-in */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
           {/* Daily Affirmation Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-purple-600 p-6 text-white min-h-[200px]"
+            className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-purple-600 p-4 md:p-6 text-white min-h-[180px] md:min-h-[200px]"
           >
             {/* Decorative elements */}
             <div className="absolute top-4 right-4 opacity-20">
@@ -120,8 +164,8 @@ export default function Home() {
               </svg>
             </div>
 
-            <h2 className="text-xl font-semibold mb-4">Daily Affirmation</h2>
-            <p className="text-white/90 text-lg italic leading-relaxed mb-6 max-w-md">
+            <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Daily Affirmation</h2>
+            <p className="text-white/90 text-base md:text-lg italic leading-relaxed mb-4 md:mb-6 max-w-md">
               "{affirmations[affirmationIndex]}"
             </p>
             <button
@@ -157,17 +201,17 @@ export default function Home() {
         </div>
 
         {/* Bottom Section - Mood Trends & Quick Tools */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Mood Trends */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-semibold text-gray-800 text-lg">Mood Trends</h3>
-              <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <h3 className="font-semibold text-gray-800 text-base md:text-lg">Mood Trends</h3>
+              <button className="flex items-center gap-1 text-xs md:text-sm text-gray-500 hover:text-gray-700 px-2 md:px-3 py-1 md:py-1.5 rounded-lg border border-gray-200">
                 Last 7 Days
                 <ChevronDown className="w-4 h-4" />
               </button>
@@ -204,27 +248,135 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100"
           >
-            <h3 className="font-semibold text-gray-800 text-lg mb-4">Quick Tools</h3>
-            <div className="space-y-3">
+            <h3 className="font-semibold text-gray-800 text-base md:text-lg mb-3 md:mb-4">Quick Tools</h3>
+            <div className="space-y-2 md:space-y-3">
               {quickTools.map((tool) => (
                 <button
                   key={tool.id}
                   onClick={() => handleToolClick(tool.id)}
-                  className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-all group text-left"
+                  className="w-full flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-gray-50 transition-all group text-left"
                 >
-                  <div className={clsx('p-3 rounded-xl', tool.color)}>
-                    <tool.icon className={clsx('w-5 h-5', tool.iconColor)} />
+                  <div className={clsx('p-2 md:p-3 rounded-xl', tool.color)}>
+                    <tool.icon className={clsx('w-4 h-4 md:w-5 md:h-5', tool.iconColor)} />
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-800">{tool.title}</h4>
-                    <p className="text-sm text-gray-500">{tool.subtitle}</p>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-800 text-sm md:text-base truncate">{tool.title}</h4>
+                    <p className="text-xs md:text-sm text-gray-500 truncate">{tool.subtitle}</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-gray-400 transition-colors" />
                 </button>
               ))}
             </div>
+          </motion.div>
+        </div>
+
+        {/* New Section - Pet & Insights */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-6">
+          {/* Pet Widget */}
+          {pet && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 md:p-6 shadow-sm border border-amber-100"
+            >
+              <div className="flex items-center justify-between mb-3 md:mb-4">
+                <h3 className="font-semibold text-gray-800 text-base md:text-lg">Your Pet</h3>
+                <button
+                  onClick={() => navigate('/pet')}
+                  className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1"
+                >
+                  Visit <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex items-center gap-4">
+                <motion.div
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="text-5xl"
+                >
+                  {(() => {
+                    const species = pet.pet_type?.species || 'cat';
+                    const speciesEmoji = speciesEmojis[species] || speciesEmojis.cat;
+                    const moodKey = ['ecstatic', 'happy'].includes(pet.mood) ? 'happy' 
+                      : ['sad', 'very_sad'].includes(pet.mood) ? 'sad' : 'neutral';
+                    return speciesEmoji[moodKey];
+                  })()}
+                </motion.div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800">{pet.name}</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-sm text-gray-600 flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      Level {pet.level}
+                    </span>
+                    <span className="text-sm text-gray-600 flex items-center gap-1">
+                      <Flame className="w-4 h-4 text-orange-500" />
+                      {pet.current_streak} day streak
+                    </span>
+                  </div>
+                  {/* XP Bar */}
+                  <div className="mt-2">
+                    <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full"
+                        style={{ width: `${pet.level_progress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-amber-700 mt-1">
+                      {pet.experience}/{pet.xp_for_next_level} XP to next level
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Insights Widget */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-6 shadow-sm border border-violet-100"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-800 text-lg flex items-center gap-2">
+                <Brain className="w-5 h-5 text-violet-500" />
+                AI Insights
+              </h3>
+              <button
+                onClick={() => navigate('/insights')}
+                className="text-sm text-violet-600 hover:text-violet-700 flex items-center gap-1"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            {topPattern ? (
+              <div className="bg-white/60 rounded-xl p-4">
+                <p className="font-medium text-gray-800">{topPattern.pattern_name}</p>
+                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                  {topPattern.description}
+                </p>
+                {topPattern.custom_advice && (
+                  <p className="text-sm text-violet-600 mt-2 flex items-start gap-1">
+                    <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    {topPattern.custom_advice}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-gray-500 text-sm mb-3">No patterns detected yet</p>
+                <button
+                  onClick={() => navigate('/insights')}
+                  className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+                >
+                  Run Analysis →
+                </button>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

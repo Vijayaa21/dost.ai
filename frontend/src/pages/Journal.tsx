@@ -139,17 +139,17 @@ export default function Journal() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-4 md:p-6">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Journal</h1>
-            <p className="text-gray-600">Express yourself through writing</p>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Journal</h1>
+            <p className="text-gray-600 text-sm md:text-base">Express yourself through writing</p>
           </div>
           <button
             onClick={() => { setIsCreating(true); loadPrompt(); }}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
             New Entry
@@ -157,26 +157,26 @@ export default function Journal() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="card text-center">
-            <p className="text-3xl font-bold text-primary-600">{stats?.total_entries || 0}</p>
-            <p className="text-sm text-gray-500">Total Entries</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+          <div className="card text-center p-4">
+            <p className="text-2xl md:text-3xl font-bold text-primary-600">{stats?.total_entries || 0}</p>
+            <p className="text-xs md:text-sm text-gray-500">Total Entries</p>
           </div>
-          <div className="card text-center">
-            <p className="text-3xl font-bold text-lavender-600">{stats?.writing_streak || 0}</p>
-            <p className="text-sm text-gray-500">Day Streak 🔥</p>
+          <div className="card text-center p-4">
+            <p className="text-2xl md:text-3xl font-bold text-lavender-600">{stats?.writing_streak || 0}</p>
+            <p className="text-xs md:text-sm text-gray-500">Day Streak 🔥</p>
           </div>
         </div>
 
         {/* Search */}
-        <div className="relative mb-6">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <div className="relative mb-4 md:mb-6">
+          <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search your entries..."
-            className="input-field pl-12"
+            className="input-field pl-10 md:pl-12 text-sm md:text-base"
           />
         </div>
 

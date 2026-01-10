@@ -109,6 +109,21 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
 /* Gradient backgrounds */
 .gradient-primary {
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -121,3 +136,50 @@
 .gradient-warm {
   background: linear-gradient(135deg, #F7CAC9 0%, #FFF8E7 100%);
 }
+
+/* Mobile-friendly touch targets */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline {
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+  }
+  
+  .input-field {
+    min-height: 44px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Improve tap targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better scrolling on mobile */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Improved focus states for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+

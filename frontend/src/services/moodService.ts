@@ -1,5 +1,6 @@
 import api from './api';
 import { MoodEntry, MoodStats } from '../types';
+import { petService } from './petService';
 
 export const moodService = {
   async getMoodEntries(startDate?: string, endDate?: string): Promise<MoodEntry[]> {
@@ -29,6 +30,14 @@ export const moodService = {
     energy_level?: number;
   }): Promise<MoodEntry> {
     const response = await api.post('/mood/entries/', data);
+    
+    // Award XP to pet for mood logging
+    try {
+      await petService.interact('mood_log', 'Logged mood');
+    } catch {
+      // Pet interaction failed silently - don't block mood creation
+    }
+    
     return response.data;
   },
 
