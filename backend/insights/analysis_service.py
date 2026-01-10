@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.db.models import Avg, Count
 from collections import defaultdict
+from django.db import models
+
 
 # Try to import Google Generative AI
 try:
@@ -281,4 +283,3 @@ Only include clear patterns with evidence. Return empty array [] if no clear pat
 
 
 # Import models for Q lookup
-from django.db import models

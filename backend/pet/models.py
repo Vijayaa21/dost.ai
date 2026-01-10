@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from datetime import timedelta
 
 
 class PetType(models.Model):
@@ -130,7 +131,7 @@ class WellnessPet(models.Model):
             self.current_streak = 1
         elif self.last_interaction == today:
             pass  # Already interacted today
-        elif self.last_interaction == today - timezone.timedelta(days=1):
+        elif self.last_interaction == today - timedelta(days=1):
             self.current_streak += 1
         else:
             # Streak broken
