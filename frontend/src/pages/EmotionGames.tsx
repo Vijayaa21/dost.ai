@@ -6,9 +6,13 @@ import {
   Play, 
   ArrowLeft,
   Sparkles,
+  Users,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from 'react-toastify';
+
+// Import our new modal
+import InviteFriendsModal from '../components/games/InviteFriendsModal';
 
 // Import built-in games
 import {
@@ -47,6 +51,7 @@ export default function EmotionGames() {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const [selectedGame, setSelectedGame] = useState<BuiltInGame | null>(null);
   const [recommendedGames, setRecommendedGames] = useState<BuiltInGame[]>([]);
+  const [isInviteModalOpen, setInviteModalOpen] = useState(false);
 
   const handleEmotionSelect = (emotionId: string) => {
     setSelectedEmotion(emotionId);
@@ -108,6 +113,10 @@ export default function EmotionGames() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 p-4 md:p-6">
+      <InviteFriendsModal 
+        isOpen={isInviteModalOpen} 
+        onClose={() => setInviteModalOpen(false)} 
+      />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
@@ -115,9 +124,18 @@ export default function EmotionGames() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-6 md:mb-8"
         >
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium mb-3 md:mb-4">
-            <Gamepad2 className="w-3 h-3 md:w-4 md:h-4" />
-            Emotion Games
+          <div className="flex justify-center items-center gap-2 mb-3 md:mb-4">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium">
+              <Gamepad2 className="w-3 h-3 md:w-4 md:h-4" />
+              Emotion Games
+            </div>
+            <button 
+              onClick={() => setInviteModalOpen(true)}
+              className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              <Users className="w-3 h-3 md:w-4 md:h-4 text-blue-500" />
+              Invite Friends
+            </button>
           </div>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
             Play Your Feelings Away
