@@ -11,6 +11,22 @@ from .models import UserProfile
 User = get_user_model()
 
 
+class FriendsListView(generics.ListAPIView):
+    """List a user's friends."""
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return self.request.user.friends.all()
+
+
+class InviteLinkView(APIView):
+    """Get the user's unique invite link."""
+    
+    def get(self, request):
+        user = request.user
+        return Response({"invite_code": user.invite_code})
+
+
 class RegisterView(generics.CreateAPIView):
     """Register a new user."""
     queryset = User.objects.all()

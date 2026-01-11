@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Share2, Copy, Check } from 'lucide-react';
+import { X, Share2, Copy, Check, Loader2 } from 'lucide-react';
+import { getInviteCode } from '../../services/friendService';
+import { toast } from 'react-toastify';
 
 interface InviteFriendsModalProps {
   isOpen: boolean;
@@ -9,11 +11,34 @@ interface InviteFriendsModalProps {
 
 export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsModalProps) {
   const [copied, setCopied] = useState(false);
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   
-  // This will be replaced with a real invite link from the backend later
-  const inviteLink = `http://localhost:5174/signup?invite=dost-ai-friend-${Date.now()}`;
+  useEffect(() => {
+    if (isOpen) {
+      const fetchInviteCode = async () => {
+        try {
+          setLoading(true);
+          const code = await getInviteCode();
+          setInviteCode(code);
+        } catch (error) {
+          console.error("Failed to fetch invite code:", error);
+          toast.error("Could not load your invite link. Please try again.");
+          onClose();
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchInviteCode();
+    }
+  }, [isOpen, onClose]);
+
+  const inviteLink = inviteCode 
+    ? `${window.location.origin}/signup?invite=${inviteCode}`
+    : '';
 
   const handleCopy = () => {
+    if (!inviteLink) return;
     navigator.clipboard.writeText(inviteLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -50,23 +75,31 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Invite Friends to Play</h2>
               <p className="text-gray-500 mb-6">Share this link with your friends. When they sign up, you can play games together!</p>
 
-              <div className="w-full bg-gray-100 border border-gray-200 rounded-lg p-2 flex items-center gap-2 mb-4">
-                <input 
-                  type="text" 
-                  readOnly 
-                  value={inviteLink}
-                  className="bg-transparent w-full text-gray-600 text-sm outline-none"
-                />
-                <button 
-                  onClick={handleCopy}
-                  className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
-                    copied 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  }`}
-                >
-                  {copied ? <Check size={16} /> : <Copy size={16} />}
-                </button>
+              <div className="w-full h-14 bg-gray-100 border border-gray-200 rounded-lg p-2 flex items-center gap-2 mb-4">
+                {loading ? (
+                  <div className="w-full flex items-center justify-center">
+                    <Loader2 className="animate-spin text-gray-400" />
+                  </div>
+                ) : (
+                  <>
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={inviteLink}
+                      className="bg-transparent w-full text-gray-600 text-sm outline-none"
+                    />
+                    <button 
+                      onClick={handleCopy}
+                      className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
+                        copied 
+                          ? 'bg-green-500 text-white' 
+                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      }`}
+                    >
+                      {copied ? <Check size={16} /> : <Copy size={16} />}
+                    </button>
+                  </>
+                )}
               </div>
               
               <p className="text-xs text-gray-400">

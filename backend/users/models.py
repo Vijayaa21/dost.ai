@@ -1,3 +1,4 @@
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -23,6 +24,11 @@ class User(AbstractUser):
     data_collection_consent = models.BooleanField(default=True)
     reminder_enabled = models.BooleanField(default=True)
     reminder_time = models.TimeField(null=True, blank=True)
+
+    # Friendship and Invites
+    invite_code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    invited_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='invited_users')
+    friends = models.ManyToManyField('self', blank=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

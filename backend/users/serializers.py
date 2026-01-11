@@ -20,25 +20,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
-    
+    friends = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    invited_by = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = User
         fields = [
             'id', 'email', 'username', 'first_name', 'last_name',
             'avatar', 'preferred_tone', 'is_anonymous', 'onboarding_completed',
             'data_collection_consent', 'reminder_enabled', 'reminder_time',
-            'profile', 'created_at'
+            'profile', 'created_at', 'invite_code', 'invited_by', 'friends'
         ]
-        read_only_fields = ['id', 'email', 'created_at']
+        read_only_fields = ['id', 'email', 'created_at', 'invite_code', 'invited_by', 'friends']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     password_confirm = serializers.CharField(write_only=True)
+    invite_code = serializers.UUIDField(required=False, write_only=True)
     
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'password_confirm', 'first_name', 'last_name']
+        fields = ['email', 'username', 'password', 'password_confirm', 'first_name', 'last_name', 'invite_code']
     
     def validate(self, attrs):
         if attrs['password'] != attrs['password_confirm']:
@@ -47,8 +50,25 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data.pop('password_confirm')
+        invite_code = validated_data.pop('invite_code', None)
+        
         user = User.objects.create_user(**validated_data)
         UserProfile.objects.create(user=user)
+
+        if invite_code:
+            try:
+                inviter = User.objects.get(invite_code=invite_code)
+                user.invited_by = inviter
+                user.save()
+                
+                # Add each other as friends
+                inviter.friends.add(user)
+                user.friends.add(inviter)
+
+            except User.DoesNotExist:
+                # Silently fail if invite code is invalid, or you could raise a validation error
+                pass
+                
         return user
 
 

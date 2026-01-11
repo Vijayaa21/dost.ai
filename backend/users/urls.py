@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
-    RegisterView, ProfileView, ChangePasswordView, OnboardingView, DeleteAccountView
+    RegisterView, ProfileView, ChangePasswordView, OnboardingView, DeleteAccountView,
+    FriendsListView, InviteLinkView
 )
 from .serializers import CustomTokenObtainPairSerializer
 
@@ -19,4 +20,8 @@ urlpatterns = [
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('onboarding/', OnboardingView.as_view(), name='onboarding'),
     path('delete-account/', DeleteAccountView.as_view(), name='delete_account'),
+    
+    # Friends and Invites
+    path('friends/', FriendsListView.as_view(), name='friends_list'),
+    path('invite-link/', InviteLinkView.as_view(), name='invite_link'),
 ]
