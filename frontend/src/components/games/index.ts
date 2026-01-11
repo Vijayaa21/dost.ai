@@ -9,6 +9,7 @@ export { default as NeonCruise } from './NeonCruise';
 export { default as ColorSort } from './ColorSort';
 export { default as CloudBrush } from './CloudBrush';
 export { default as RunnerGame } from './RunnerGame';
+export { default as TicTacToe } from './TicTacToe';
 
 // Game metadata for the games page
 export interface BuiltInGame {
@@ -20,6 +21,7 @@ export interface BuiltInGame {
   emotions: string[];
   duration: string;
   benefit: string;
+  isMultiplayer?: boolean;
 }
 
 export const builtInGames: BuiltInGame[] = [
@@ -123,6 +125,17 @@ export const builtInGames: BuiltInGame[] = [
     duration: '1-3 min',
     benefit: 'Metaphorical clearing brings mental clarity',
   },
+  {
+    id: 'tic-tac-toe',
+    name: 'Tic Tac Toe',
+    description: 'Classic multiplayer game! Play with a friend online and enjoy some friendly competition.',
+    emoji: '⭕',
+    color: 'from-indigo-400 to-purple-500',
+    emotions: ['loneliness', 'boredom', 'joy'],
+    duration: '2-5 min',
+    benefit: 'Connect with friends through playful competition',
+    isMultiplayer: true,
+  },
 ];
 
 // Map emotions to recommended games
@@ -130,10 +143,10 @@ export const emotionGameMap: Record<string, string[]> = {
   anger: ['bubble-pop', 'fruit-slice', 'breathing-bubble', 'neon-cruise'],
   sadness: ['catch-stars', 'color-canvas', 'runner-game', 'memory-match', 'cloud-brush'],
   anxiety: ['breathing-bubble', 'memory-match', 'bubble-pop', 'color-sort', 'cloud-brush'],
-  loneliness: ['catch-stars', 'color-canvas', 'runner-game', 'cloud-brush'],
-  boredom: ['fruit-slice', 'runner-game', 'bubble-pop', 'memory-match', 'neon-cruise', 'color-sort'],
+  loneliness: ['catch-stars', 'color-canvas', 'runner-game', 'cloud-brush', 'tic-tac-toe'],
+  boredom: ['fruit-slice', 'runner-game', 'bubble-pop', 'memory-match', 'neon-cruise', 'color-sort', 'tic-tac-toe'],
   love: ['color-canvas', 'catch-stars'],
-  joy: ['fruit-slice', 'catch-stars', 'runner-game', 'color-canvas', 'neon-cruise'],
+  joy: ['fruit-slice', 'catch-stars', 'runner-game', 'color-canvas', 'neon-cruise', 'tic-tac-toe'],
   fear: ['breathing-bubble', 'memory-match', 'catch-stars', 'color-sort'],
 };
 

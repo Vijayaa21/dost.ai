@@ -1,4 +1,4 @@
-import { api } from './api';
+import api from './api';
 
 export const getInviteCode = async (): Promise<string> => {
   const response = await api.get<{ invite_code: string }>('/users/invite-link/');

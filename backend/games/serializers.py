@@ -1,5 +1,34 @@
 from rest_framework import serializers
-from .models import TherapeuticGame, GameSession, EmotionGameRecommendation
+from .models import TherapeuticGame, GameSession, EmotionGameRecommendation, MultiplayerGameSession, Player
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class PlayerSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    
+    class Meta:
+        model = Player
+        fields = ['id', 'username', 'symbol', 'score', 'joined_at']
+
+
+class MultiplayerGameSessionSerializer(serializers.ModelSerializer):
+    host_username = serializers.CharField(source='host.username', read_only=True)
+    player_list = PlayerSerializer(source='player_set', many=True, read_only=True)
+    player_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = MultiplayerGameSession
+        fields = [
+            'id', 'room_code', 'game_type', 'host', 'host_username',
+            'player_list', 'player_count', 'max_players', 'status', 'game_state',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'room_code', 'host', 'status', 'game_state', 'created_at', 'updated_at']
+
+    def get_player_count(self, obj):
+        return obj.players.count()
 
 
 class TherapeuticGameSerializer(serializers.ModelSerializer):

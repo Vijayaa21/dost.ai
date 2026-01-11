@@ -27,6 +27,7 @@ import {
   NeonCruise,
   ColorSort,
   CloudBrush,
+  TicTacToe,
   builtInGames,
   emotionGameMap,
   getEmotionMessage,
@@ -104,6 +105,7 @@ export default function EmotionGames() {
       'neon-cruise': NeonCruise,
       'color-sort': ColorSort,
       'cloud-brush': CloudBrush,
+      'tic-tac-toe': TicTacToe,
     };
 
     const GameComponent = gameComponents[selectedGame.id];
