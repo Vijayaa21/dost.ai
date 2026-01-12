@@ -17,6 +17,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const Pet = lazy(() => import('./pages/Pet'));
 const Insights = lazy(() => import('./pages/Insights'));
 const EmotionGames = lazy(() => import('./pages/EmotionGames'));
+const JoinGame = lazy(() => import('./pages/JoinGame'));
 
 // Loading fallback component
 function PageLoader() {
@@ -89,6 +90,7 @@ function App() {
             <Route path="/pet" element={<Pet />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/games" element={<EmotionGames />} />
+            <Route path="/games/join" element={<JoinGame />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
           

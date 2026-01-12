@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Copy, Check, RefreshCw, Users, Loader2, Trophy, Frown } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -7,9 +8,11 @@ import gamesService, { MultiplayerGameSession } from '../../services/gamesServic
 interface TicTacToeProps {
   onBack: () => void;
   onComplete: (wasHelpful: boolean) => void;
+  initialRoomCode?: string;
 }
 
-export default function TicTacToe({ onBack, onComplete }: TicTacToeProps) {
+export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTacToeProps) {
+  const [searchParams] = useSearchParams();
   const [gameSession, setGameSession] = useState<MultiplayerGameSession | null>(null);
   const [loading, setLoading] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -17,6 +20,58 @@ export default function TicTacToe({ onBack, onComplete }: TicTacToeProps) {
   const [copied, setCopied] = useState(false);
   const [mySymbol, setMySymbol] = useState<'X' | 'O' | null>(null);
   const [view, setView] = useState<'menu' | 'waiting' | 'playing' | 'finished'>('menu');
+  const [initializing, setInitializing] = useState(false);
+
+  // Check for room code in URL or props on mount
+  useEffect(() => {
+    const roomFromUrl = searchParams.get('room') || initialRoomCode;
+    if (roomFromUrl && !gameSession) {
+      handleAutoJoin(roomFromUrl);
+    }
+  }, [searchParams, initialRoomCode]);
+
+  const handleAutoJoin = async (roomCode: string) => {
+    setInitializing(true);
+    try {
+      // First try to get the room details
+      const session = await gamesService.getGameRoom(roomCode);
+      setGameSession(session);
+      
+      // Determine my symbol based on player list
+      const myPlayer = session.player_list.find(p => p.symbol);
+      if (session.player_list.length === 1) {
+        // I'm the second player, try to join
+        try {
+          const joinedSession = await gamesService.joinGameRoom(roomCode);
+          setGameSession(joinedSession);
+          setMySymbol('O');
+          if (joinedSession.status === 'in-progress') {
+            setView('playing');
+          } else {
+            setView('waiting');
+          }
+        } catch (err: any) {
+          // If already in game, figure out our symbol
+          if (err.response?.data?.error?.includes('already in this game')) {
+            setMySymbol(session.player_list[0].symbol as 'X' | 'O');
+            setView(session.status === 'in-progress' ? 'playing' : 
+                   session.status === 'finished' ? 'finished' : 'waiting');
+          }
+        }
+      } else {
+        // Game might have started, figure out our role
+        // For now, assume we're 'O' if joining via link
+        setMySymbol('O');
+        setView(session.status === 'in-progress' ? 'playing' : 
+               session.status === 'finished' ? 'finished' : 'waiting');
+      }
+    } catch (error) {
+      console.error('Failed to auto-join game:', error);
+      toast.error('Could not join the game room.');
+    } finally {
+      setInitializing(false);
+    }
+  };
 
   // Polling for game state updates
   useEffect(() => {
@@ -143,6 +198,18 @@ export default function TicTacToe({ onBack, onComplete }: TicTacToeProps) {
     );
   };
 
+  // Show loading when auto-joining from URL
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="animate-spin mx-auto text-indigo-500 mb-4" size={48} />
+          <p className="text-gray-600">Joining game...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 p-4 flex flex-col">
       <button onClick={onBack} className="text-gray-600 hover:text-gray-800 mb-4 self-start flex items-center gap-1">
@@ -155,7 +222,7 @@ export default function TicTacToe({ onBack, onComplete }: TicTacToeProps) {
 
         <AnimatePresence mode="wait">
           {/* Menu View */}
-          {view === 'menu' && (
+          {view === 'menu' && !initializing && (
             <motion.div
               key="menu"
               initial={{ opacity: 0, y: 20 }}
