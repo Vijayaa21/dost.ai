@@ -25,7 +25,7 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
   const [copied, setCopied] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [roomCode, setRoomCode] = useState<string | null>(null);
-  const [selectedGame, setSelectedGame] = useState<GameType | null>(null);
+  const [, setSelectedGame] = useState<GameType | null>(null);
   const [loading, setLoading] = useState(true);
   const [creatingGame, setCreatingGame] = useState(false);
   const [showGameSelection, setShowGameSelection] = useState(false);

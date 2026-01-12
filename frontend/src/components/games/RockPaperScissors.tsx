@@ -76,7 +76,7 @@ export default function RockPaperScissors({ onBack, initialRoomCode }: RockPaper
   };
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (gameSession && (view === 'waiting' || view === 'playing')) {
       interval = setInterval(async () => {
         try {

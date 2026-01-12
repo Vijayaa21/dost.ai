@@ -37,8 +37,8 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
       const session = await gamesService.getGameRoom(roomCode);
       setGameSession(session);
       
-      // Check if I'm already a player
-      const alreadyJoined = session.player_list.some(p => p.user === session.host);
+      // Check if I'm already a player (use player_list length to determine)
+      const alreadyJoined = session.player_list.length > 0;
       
       if (!alreadyJoined || session.player_list.length === 0) {
         // Not joined yet, join the room
@@ -46,8 +46,8 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
           const joinedSession = await gamesService.joinGameRoom(roomCode);
           setGameSession(joinedSession);
           
-          // Find my symbol from the player list
-          const myPlayerData = joinedSession.player_list.find(p => p.user);
+          // Find my symbol from the player list (last joined player)
+          const myPlayerData = joinedSession.player_list[joinedSession.player_list.length - 1];
           setMySymbol((myPlayerData?.symbol || 'X') as 'X' | 'O');
           
           if (joinedSession.status === 'in-progress') {
@@ -58,7 +58,7 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
         } catch (err: any) {
           if (err.response?.data?.error?.includes('already in this game')) {
             // Already joined, just determine symbol
-            const myPlayerData = session.player_list.find(p => p.user);
+            const myPlayerData = session.player_list[0];
             setMySymbol((myPlayerData?.symbol || 'X') as 'X' | 'O');
             setView(session.status === 'in-progress' ? 'playing' : 
                    session.status === 'finished' ? 'finished' : 'waiting');
@@ -68,7 +68,7 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
         }
       } else {
         // Already in the game, determine my symbol
-        const myPlayerData = session.player_list.find(p => p.user);
+        const myPlayerData = session.player_list[0];
         setMySymbol((myPlayerData?.symbol || 'X') as 'X' | 'O');
         setView(session.status === 'in-progress' ? 'playing' : 
                session.status === 'finished' ? 'finished' : 'waiting');
@@ -83,7 +83,7 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
 
   // Polling for game state updates
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (gameSession && (view === 'waiting' || view === 'playing')) {
       interval = setInterval(async () => {
         try {
@@ -183,7 +183,7 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
           {winner ? getResultMessage() : (isMyTurn ? 'Your turn!' : "Opponent's turn...")}
         </p>
         <div className="grid grid-cols-3 gap-2 bg-indigo-100 p-3 rounded-xl">
-          {board.map((cell, index) => (
+          {board.map((cell: string, index: number) => (
             <motion.button
               key={index}
               whileHover={{ scale: cell === ' ' && isMyTurn ? 1.05 : 1 }}
