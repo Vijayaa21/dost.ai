@@ -9,7 +9,12 @@ export { default as NeonCruise } from './NeonCruise';
 export { default as ColorSort } from './ColorSort';
 export { default as CloudBrush } from './CloudBrush';
 export { default as RunnerGame } from './RunnerGame';
+
+// Multiplayer games
 export { default as TicTacToe } from './TicTacToe';
+export { default as RockPaperScissors } from './RockPaperScissors';
+export { default as ConnectFour } from './ConnectFour';
+export { default as MultiplayerMemory } from './MultiplayerMemory';
 
 // Game metadata for the games page
 export interface BuiltInGame {
@@ -136,17 +141,50 @@ export const builtInGames: BuiltInGame[] = [
     benefit: 'Connect with friends through playful competition',
     isMultiplayer: true,
   },
+  {
+    id: 'rock-paper-scissors',
+    name: 'Rock Paper Scissors',
+    description: 'Challenge your friend to the ultimate battle! Best of unlimited rounds.',
+    emoji: '🪨📄✂️',
+    color: 'from-pink-400 to-red-500',
+    emotions: ['loneliness', 'boredom', 'joy', 'anger'],
+    duration: '2-5 min',
+    benefit: 'Quick competitive fun that connects friends',
+    isMultiplayer: true,
+  },
+  {
+    id: 'connect-four',
+    name: 'Connect Four',
+    description: 'Drop discs and connect 4 in a row! Strategic multiplayer puzzle game.',
+    emoji: '🔴🟡',
+    color: 'from-blue-400 to-indigo-500',
+    emotions: ['loneliness', 'boredom', 'joy'],
+    duration: '5-10 min',
+    benefit: 'Strategic thinking and friendly competition',
+    isMultiplayer: true,
+  },
+  {
+    id: 'memory-match-mp',
+    name: 'Memory Match Battle',
+    description: 'Take turns finding pairs! Player with most matches wins.',
+    emoji: '🧠🎴',
+    color: 'from-purple-400 to-pink-500',
+    emotions: ['loneliness', 'boredom', 'anxiety'],
+    duration: '5-10 min',
+    benefit: 'Mental focus and social connection',
+    isMultiplayer: true,
+  },
 ];
 
 // Map emotions to recommended games
 export const emotionGameMap: Record<string, string[]> = {
-  anger: ['bubble-pop', 'fruit-slice', 'breathing-bubble', 'neon-cruise'],
+  anger: ['bubble-pop', 'fruit-slice', 'breathing-bubble', 'neon-cruise', 'rock-paper-scissors'],
   sadness: ['catch-stars', 'color-canvas', 'runner-game', 'memory-match', 'cloud-brush'],
-  anxiety: ['breathing-bubble', 'memory-match', 'bubble-pop', 'color-sort', 'cloud-brush'],
-  loneliness: ['catch-stars', 'color-canvas', 'runner-game', 'cloud-brush', 'tic-tac-toe'],
-  boredom: ['fruit-slice', 'runner-game', 'bubble-pop', 'memory-match', 'neon-cruise', 'color-sort', 'tic-tac-toe'],
+  anxiety: ['breathing-bubble', 'memory-match', 'bubble-pop', 'color-sort', 'cloud-brush', 'memory-match-mp'],
+  loneliness: ['catch-stars', 'color-canvas', 'runner-game', 'cloud-brush', 'tic-tac-toe', 'rock-paper-scissors', 'connect-four', 'memory-match-mp'],
+  boredom: ['fruit-slice', 'runner-game', 'bubble-pop', 'memory-match', 'neon-cruise', 'color-sort', 'tic-tac-toe', 'rock-paper-scissors', 'connect-four', 'memory-match-mp'],
   love: ['color-canvas', 'catch-stars'],
-  joy: ['fruit-slice', 'catch-stars', 'runner-game', 'color-canvas', 'neon-cruise', 'tic-tac-toe'],
+  joy: ['fruit-slice', 'catch-stars', 'runner-game', 'color-canvas', 'neon-cruise', 'tic-tac-toe', 'rock-paper-scissors', 'connect-four'],
   fear: ['breathing-bubble', 'memory-match', 'catch-stars', 'color-sort'],
 };
 

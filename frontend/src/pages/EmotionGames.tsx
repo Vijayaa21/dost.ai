@@ -28,6 +28,9 @@ import {
   ColorSort,
   CloudBrush,
   TicTacToe,
+  RockPaperScissors,
+  ConnectFour,
+  MultiplayerMemory,
   builtInGames,
   emotionGameMap,
   getEmotionMessage,
@@ -106,6 +109,9 @@ export default function EmotionGames() {
       'color-sort': ColorSort,
       'cloud-brush': CloudBrush,
       'tic-tac-toe': TicTacToe,
+      'rock-paper-scissors': RockPaperScissors,
+      'connect-four': ConnectFour,
+      'memory-match-mp': MultiplayerMemory,
     };
 
     const GameComponent = gameComponents[selectedGame.id];

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Share2, Copy, Check, Loader2, Gamepad2 } from 'lucide-react';
 import { getInviteCode } from '../../services/friendService';
@@ -10,12 +11,24 @@ interface InviteFriendsModalProps {
   onClose: () => void;
 }
 
+type GameType = 'tic-tac-toe' | 'rock-paper-scissors' | 'connect-four' | 'memory-match-mp';
+
+const gameOptions = [
+  { id: 'tic-tac-toe', name: 'Tic Tac Toe', emoji: '⭕' },
+  { id: 'rock-paper-scissors', name: 'Rock Paper Scissors', emoji: '🪨📄✂️' },
+  { id: 'connect-four', name: 'Connect Four', emoji: '🔴🟡' },
+  { id: 'memory-match-mp', name: 'Memory Match', emoji: '🧠🎴' },
+];
+
 export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsModalProps) {
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [selectedGame, setSelectedGame] = useState<GameType | null>(null);
   const [loading, setLoading] = useState(true);
   const [creatingGame, setCreatingGame] = useState(false);
+  const [showGameSelection, setShowGameSelection] = useState(false);
   
   useEffect(() => {
     if (isOpen) {
@@ -36,11 +49,13 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
     }
   }, [isOpen, onClose]);
 
-  const handleCreateGameInvite = async () => {
+  const handleCreateGameInvite = async (gameType: GameType) => {
     setCreatingGame(true);
     try {
-      const session = await gamesService.createGameRoom('tic-tac-toe');
+      const session = await gamesService.createGameRoom(gameType);
       setRoomCode(session.room_code);
+      setSelectedGame(gameType);
+      setShowGameSelection(false);
       toast.success('Game room created! Share the link with your friend.');
     } catch (error) {
       toast.error('Failed to create game room.');
@@ -65,7 +80,16 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
 
   const handleClose = () => {
     setRoomCode(null);
-    onClose();
+    setSelectedGame(null);
+    setShowGameSelection(false);
+    
+
+  const handleJoinGame = () => {
+    if (roomCode) {
+      navigate(`/games/join?room=${roomCode}`);
+      handleClose();
+    }
+  };onClose();
   };
 
   return (
@@ -105,21 +129,48 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
                   : 'Create a game room and share the link, or just invite them to become friends.'}
               </p>
 
-              {!roomCode && (
+              {!roomCode && !showGameSelection && (
                 <button
-                  onClick={handleCreateGameInvite}
-                  disabled={creatingGame || loading}
+                  onClick={() => setShowGameSelection(true)}
+                  disabled={loading}
                   className="w-full mb-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {creatingGame ? (
-                    <Loader2 className="animate-spin" size={20} />
-                  ) : (
-                    <>
-                      <Gamepad2 size={20} />
-                      Create Game & Invite
-                    </>
-                  )}
+                  <Gamepad2 size={20} />
+                  Create Game & Invite
                 </button>
+              )}
+
+              {showGameSelection && !roomCode && (
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Choose a game:</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {gameOptions.map((game) => (
+                      <motion.button
+                        key={game.id}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleCreateGameInvite(game.id as GameType)}
+                        disabled={creatingGame}
+                        className="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border-2 border-purple-200 hover:border-purple-400 transition-all disabled:opacity-50"
+                      >
+                        <div className="text-3xl mb-2">{game.emoji}</div>
+                        <div className="text-sm font-semibold text-gray-700">{game.name}</div>
+                      </motion.button>
+                    ))}
+                  </div>
+                  {creatingGame && (
+                    <div className="mt-3 flex items-center justify-center gap-2 text-gray-600">
+                      <Loader2 className="animate-spin" size={16} />
+                      <span className="text-sm">Creating room...</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setShowGameSelection(false)}
+                    className="mt-3 text-sm text-gray-500 hover:text-gray-700 underline"
+                  >
+                    Cancel
+                  </button>
+                </div>
               )}
 
               <div className="w-full">
@@ -155,14 +206,23 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
               </div>
 
               {roomCode && (
-                <p className="mt-4 text-sm text-indigo-600 font-medium">
-                  Waiting for your friend to join... You can also go to Games → Tic Tac Toe → Join with code: {roomCode.slice(0, 8)}...
-                </p>
+                <div className="mt-6 space-y-3">
+                  <button
+                    onClick={handleJoinGame}
+                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  >
+                    <Gamepad2 size={20} />
+                    Join Game Now
+                  </button>
+                  <p className="text-sm text-gray-600">
+                    Or share the link above with your friend to play together!
+                  </p>
+                </div>
               )}
               
               <p className="text-xs text-gray-400 mt-4">
                 {roomCode 
-                  ? 'The game will start automatically when your friend joins!'
+                  ? 'Room code: ' + roomCode.slice(0, 12)
                   : 'New users will become your friend after signing up.'}
               </p>
             </div>

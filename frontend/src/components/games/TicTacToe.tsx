@@ -37,31 +37,39 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
       const session = await gamesService.getGameRoom(roomCode);
       setGameSession(session);
       
-      // Determine my symbol based on player list
-      const myPlayer = session.player_list.find(p => p.symbol);
-      if (session.player_list.length === 1) {
-        // I'm the second player, try to join
+      // Check if I'm already a player
+      const alreadyJoined = session.player_list.some(p => p.user === session.host);
+      
+      if (!alreadyJoined || session.player_list.length === 0) {
+        // Not joined yet, join the room
         try {
           const joinedSession = await gamesService.joinGameRoom(roomCode);
           setGameSession(joinedSession);
-          setMySymbol('O');
+          
+          // Find my symbol from the player list
+          const myPlayerData = joinedSession.player_list.find(p => p.user);
+          setMySymbol((myPlayerData?.symbol || 'X') as 'X' | 'O');
+          
           if (joinedSession.status === 'in-progress') {
             setView('playing');
           } else {
             setView('waiting');
           }
         } catch (err: any) {
-          // If already in game, figure out our symbol
           if (err.response?.data?.error?.includes('already in this game')) {
-            setMySymbol(session.player_list[0].symbol as 'X' | 'O');
+            // Already joined, just determine symbol
+            const myPlayerData = session.player_list.find(p => p.user);
+            setMySymbol((myPlayerData?.symbol || 'X') as 'X' | 'O');
             setView(session.status === 'in-progress' ? 'playing' : 
                    session.status === 'finished' ? 'finished' : 'waiting');
+          } else {
+            throw err;
           }
         }
       } else {
-        // Game might have started, figure out our role
-        // For now, assume we're 'O' if joining via link
-        setMySymbol('O');
+        // Already in the game, determine my symbol
+        const myPlayerData = session.player_list.find(p => p.user);
+        setMySymbol((myPlayerData?.symbol || 'X') as 'X' | 'O');
         setView(session.status === 'in-progress' ? 'playing' : 
                session.status === 'finished' ? 'finished' : 'waiting');
       }
