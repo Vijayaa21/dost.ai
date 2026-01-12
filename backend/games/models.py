@@ -1,5 +1,70 @@
+import uuid
 from django.db import models
 from django.conf import settings
+
+
+def default_game_state():
+    return {'board': list(' ' * 9), 'turn': 'X', 'winner': None}
+
+
+class MultiplayerGameSession(models.Model):
+    """Model for a real-time multiplayer game session (e.g., a game room)."""
+    
+    GAME_TYPE_CHOICES = [
+        ('tic-tac-toe', 'Tic Tac Toe'),
+        # Add other game types here in the future
+    ]
+    
+    STATUS_CHOICES = [
+        ('waiting', 'Waiting for players'),
+        ('in-progress', 'In Progress'),
+        ('finished', 'Finished'),
+        ('abandoned', 'Abandoned'),
+    ]
+
+    room_code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    game_type = models.CharField(max_length=50, choices=GAME_TYPE_CHOICES, default='tic-tac-toe')
+    host = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='hosted_games'
+    )
+    players = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='game_sessions_played',
+        through='Player'
+    )
+    max_players = models.PositiveIntegerField(default=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
+    
+    # Store game-specific state as JSON. E.g., for Tic Tac Toe: board, current turn, winner.
+    game_state = models.JSONField(default=default_game_state)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.get_game_type_display()} Room - {self.room_code}"
+
+    def is_full(self):
+        return self.players.count() >= self.max_players
+
+
+class Player(models.Model):
+    """Through model to connect users to a multiplayer game session."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    game_session = models.ForeignKey(MultiplayerGameSession, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    score = models.IntegerField(default=0)
+    
+    # Symbol for games like Tic Tac Toe ('X' or 'O')
+    symbol = models.CharField(max_length=1, blank=True)
+
+    class Meta:
+        unique_together = ('user', 'game_session')
+
+    def __str__(self):
+        return f"{self.user.username} in {self.game_session.room_code}"
 
 
 class TherapeuticGame(models.Model):

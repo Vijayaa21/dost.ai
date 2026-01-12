@@ -53,6 +53,30 @@ export interface GameStats {
   improvement_rate: number;
 }
 
+export interface MultiplayerPlayer {
+  id: number;
+  user_id: number;
+  username: string;
+  symbol: string;
+  score: number;
+  joined_at: string;
+}
+
+export interface MultiplayerGameSession {
+  id: number;
+  room_code: string;
+  game_type: string;
+  host: number;
+  host_username: string;
+  player_list: MultiplayerPlayer[];
+  player_count: number;
+  max_players: number;
+  status: 'waiting' | 'in-progress' | 'finished' | 'abandoned';
+  game_state: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
 const gamesService = {
   // Get all games
   getGames: async (params?: { emotion?: string; type?: string; intensity?: number }): Promise<TherapeuticGame[]> => {
@@ -112,6 +136,32 @@ const gamesService = {
   // Get gaming stats
   getStats: async (): Promise<GameStats> => {
     const response = await api.get('/games/sessions/stats/');
+    return response.data;
+  },
+
+  // --- Multiplayer Game Services ---
+
+  // Create a new multiplayer game room
+  createGameRoom: async (gameType: string = 'tic-tac-toe'): Promise<MultiplayerGameSession> => {
+    const response = await api.post('/games/multiplayer/create/', { game_type: gameType });
+    return response.data;
+  },
+
+  // Join an existing game room
+  joinGameRoom: async (roomCode: string): Promise<MultiplayerGameSession> => {
+    const response = await api.post(`/games/multiplayer/${roomCode}/join/`);
+    return response.data;
+  },
+
+  // Get game room details
+  getGameRoom: async (roomCode: string): Promise<MultiplayerGameSession> => {
+    const response = await api.get(`/games/multiplayer/${roomCode}/`);
+    return response.data;
+  },
+
+  // Make a move in a game
+  makeMove: async (roomCode: string, gameState: Record<string, any>): Promise<MultiplayerGameSession> => {
+    const response = await api.post(`/games/multiplayer/${roomCode}/move/`, gameState);
     return response.data;
   },
 };

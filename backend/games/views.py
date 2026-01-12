@@ -2,13 +2,15 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from django.utils import timezone
 from django.db.models import Count, Avg, F
-from .models import TherapeuticGame, GameSession, EmotionGameRecommendation
+from django.shortcuts import get_object_or_404
+from .models import TherapeuticGame, GameSession, EmotionGameRecommendation, MultiplayerGameSession, Player
 from .serializers import (
     TherapeuticGameSerializer, GameSessionSerializer, 
     GameSessionEndSerializer, EmotionGameRecommendationSerializer,
-    EmotionInputSerializer
+    EmotionInputSerializer, MultiplayerGameSessionSerializer
 )
 
 
@@ -220,3 +222,194 @@ class GameSessionViewSet(viewsets.ModelViewSet):
             'top_games': list(top_games),
             'improvement_rate': improved_sessions / sessions_with_after if sessions_with_after > 0 else 0,
         })
+
+
+# --- Multiplayer Game Views ---
+
+class CreateGameRoomView(APIView):
+    """Create a new multiplayer game room."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        game_type = request.data.get('game_type', 'tic-tac-toe')
+        
+        # Initialize game state based on game type
+        initial_state = {}
+        if game_type == 'tic-tac-toe':
+            initial_state = {
+                'board': [' '] * 9,
+                'turn': 'X',
+                'winner': None
+            }
+        elif game_type == 'connect-four':
+            initial_state = {
+                'board': [['empty'] * 7 for _ in range(6)],
+                'currentTurn': 'red',
+                'winner': None
+            }
+        elif game_type == 'rock-paper-scissors':
+            initial_state = {
+                'round': 1,
+                'p1Choice': None,
+                'p2Choice': None,
+                'scores': {'player1': 0, 'player2': 0}
+            }
+        elif game_type == 'memory-match-mp':
+            import random
+            emojis = ['🎨', '🎭', '🎪', '🎬', '🎮', '🎯', '🎲', '🎸']
+            cards_list = emojis + emojis
+            random.shuffle(cards_list)
+            initial_state = {
+                'cards': [
+                    {'id': i, 'emoji': emoji, 'isFlipped': False, 'isMatched': False}
+                    for i, emoji in enumerate(cards_list)
+                ],
+                'currentTurn': 'player1',
+                'scores': {'player1': 0, 'player2': 0},
+                'winner': None
+            }
+        
+        game_session = MultiplayerGameSession.objects.create(
+            host=request.user,
+            game_type=game_type,
+            game_state=initial_state
+        )
+        
+        # Automatically add the creator as the first player
+        Player.objects.create(
+            user=request.user,
+            game_session=game_session,
+            symbol='X'  # Creator is always first player (X/red/player1)
+        )
+        
+        return Response(MultiplayerGameSessionSerializer(game_session).data, status=status.HTTP_201_CREATED)
+
+
+class JoinGameRoomView(APIView):
+    """Join an existing multiplayer game room by its code."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, room_code):
+        game_session = get_object_or_404(MultiplayerGameSession, room_code=room_code)
+
+        if game_session.status == 'finished':
+            return Response({'error': 'This game has already finished.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if game_session.is_full():
+            return Response({'error': 'This game room is full.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if game_session.players.filter(id=request.user.id).exists():
+            return Response({'error': 'You are already in this game.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Determine symbol based on number of existing players
+        player_count = game_session.players.count()
+        symbol = 'X' if player_count == 0 else 'O'
+        
+        # Add user as a player
+        Player.objects.create(user=request.user, game_session=game_session, symbol=symbol)
+
+        # If room is now full, start the game
+        if game_session.is_full():
+            game_session.status = 'in-progress'
+            game_session.save()
+
+        return Response(MultiplayerGameSessionSerializer(game_session).data, status=status.HTTP_200_OK)
+
+
+class GameRoomDetailView(APIView):
+    """Get the details of a game room."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, room_code):
+        game_session = get_object_or_404(MultiplayerGameSession, room_code=room_code)
+        return Response(MultiplayerGameSessionSerializer(game_session).data)
+
+
+class MakeMoveView(APIView):
+    """Make a move in a multiplayer game - supports all game types."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, room_code):
+        game_session = get_object_or_404(MultiplayerGameSession, room_code=room_code)
+
+        if game_session.status == 'finished':
+            return Response({'error': 'Game is already finished.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            player = Player.objects.get(user=request.user, game_session=game_session)
+        except Player.DoesNotExist:
+            return Response({'error': 'You are not a player in this game.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # For tic-tac-toe, handle the old position-based format
+        if game_session.game_type == 'tic-tac-toe' and 'position' in request.data:
+            return self._handle_tic_tac_toe(game_session, player, request.data.get('position'))
+        
+        # For all other games, accept arbitrary game state updates
+        new_game_state = request.data
+        
+        # Validate that some data was sent
+        if not new_game_state:
+            return Response({'error': 'No game state provided.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update the game state
+        game_session.game_state = new_game_state
+        
+        # Check if the game is finished based on the 'winner' field
+        if new_game_state.get('winner'):
+            game_session.status = 'finished'
+        elif game_session.status == 'waiting':
+            game_session.status = 'in-progress'
+        
+        game_session.save()
+
+        return Response(MultiplayerGameSessionSerializer(game_session).data)
+
+    def _handle_tic_tac_toe(self, game_session, player, position):
+        """Handle tic-tac-toe specific move logic."""
+        if game_session.status != 'in-progress':
+            return Response({'error': 'Game is not in progress.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        game_state = game_session.game_state or {}
+        board = game_state.get('board', [' '] * 9)
+        current_turn = game_state.get('turn', 'X')
+
+        if player.symbol != current_turn:
+            return Response({'error': "It's not your turn."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if position is None or not (0 <= position < 9):
+            return Response({'error': 'Invalid position.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if board[position] != ' ':
+            return Response({'error': 'Position already taken.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Make the move
+        board[position] = player.symbol
+        game_state['board'] = board
+
+        # Check for winner
+        winner = self._check_winner(board)
+        if winner:
+            game_state['winner'] = winner
+            game_session.status = 'finished'
+        elif ' ' not in board:
+            game_state['winner'] = 'draw'
+            game_session.status = 'finished'
+        else:
+            # Switch turn
+            game_state['turn'] = 'O' if current_turn == 'X' else 'X'
+
+        game_session.game_state = game_state
+        game_session.save()
+
+        return Response(MultiplayerGameSessionSerializer(game_session).data)
+
+    def _check_winner(self, board):
+        win_conditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Columns
+            [0, 4, 8], [2, 4, 6]              # Diagonals
+        ]
+        for condition in win_conditions:
+            if board[condition[0]] == board[condition[1]] == board[condition[2]] != ' ':
+                return board[condition[0]]
+        return None
