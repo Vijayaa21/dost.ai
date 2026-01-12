@@ -55,6 +55,7 @@ export interface GameStats {
 
 export interface MultiplayerPlayer {
   id: number;
+  user_id: number;
   username: string;
   symbol: string;
   score: number;
@@ -71,11 +72,7 @@ export interface MultiplayerGameSession {
   player_count: number;
   max_players: number;
   status: 'waiting' | 'in-progress' | 'finished' | 'abandoned';
-  game_state: {
-    board: string[];
-    turn: 'X' | 'O';
-    winner: 'X' | 'O' | 'draw' | null;
-  };
+  game_state: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
@@ -163,8 +160,8 @@ const gamesService = {
   },
 
   // Make a move in a game
-  makeMove: async (roomCode: string, position: number): Promise<MultiplayerGameSession> => {
-    const response = await api.post(`/games/multiplayer/${roomCode}/move/`, { position });
+  makeMove: async (roomCode: string, gameState: Record<string, any>): Promise<MultiplayerGameSession> => {
+    const response = await api.post(`/games/multiplayer/${roomCode}/move/`, gameState);
     return response.data;
   },
 };

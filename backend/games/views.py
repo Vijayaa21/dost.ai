@@ -275,6 +275,13 @@ class CreateGameRoomView(APIView):
             game_state=initial_state
         )
         
+        # Automatically add the creator as the first player
+        Player.objects.create(
+            user=request.user,
+            game_session=game_session,
+            symbol='X'  # Creator is always first player (X/red/player1)
+        )
+        
         return Response(MultiplayerGameSessionSerializer(game_session).data, status=status.HTTP_201_CREATED)
 
 

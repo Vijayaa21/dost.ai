@@ -7,10 +7,11 @@ User = get_user_model()
 
 class PlayerSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
     
     class Meta:
         model = Player
-        fields = ['id', 'username', 'symbol', 'score', 'joined_at']
+        fields = ['id', 'user_id', 'username', 'symbol', 'score', 'joined_at']
 
 
 class MultiplayerGameSessionSerializer(serializers.ModelSerializer):

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Copy, Check, RefreshCw, Users, Loader2, Trophy } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import gamesService, { MultiplayerGameSession } from '../../services/gamesService';
 
 interface MultiplayerMemoryProps {
   onBack: () => void;
-  onComplete: (wasHelpful: boolean) => void;
+  onComplete?: (wasHelpful: boolean) => void;
   initialRoomCode?: string;
 }
 
@@ -21,7 +21,7 @@ interface Card {
   isMatched: boolean;
 }
 
-export default function MultiplayerMemory({ onBack, onComplete, initialRoomCode }: MultiplayerMemoryProps) {
+export default function MultiplayerMemory({ onBack, initialRoomCode }: MultiplayerMemoryProps) {
   const [searchParams] = useSearchParams();
   const [gameSession, setGameSession] = useState<MultiplayerGameSession | null>(null);
   const [loading, setLoading] = useState(false);
@@ -54,14 +54,15 @@ export default function MultiplayerMemory({ onBack, onComplete, initialRoomCode 
         try {
           const joinedSession = await gamesService.joinGameRoom(roomCode);
           setGameSession(joinedSession);
-          const myPlayerIndex = joinedSession.player_list.findIndex(p => p.user);
+          // Last player who joined
+          const myPlayerIndex = joinedSession.player_list.length - 1;
           setMyPlayer(myPlayerIndex === 0 ? 'player1' : 'player2');
           setView(joinedSession.status === 'in-progress' ? 'playing' : 'waiting');
         } catch (err: any) {
           if (err.response?.data?.error?.includes('already in this game')) {
             setGameSession(session);
-            const myPlayerIndex = session.player_list.findIndex(p => p.user);
-            setMyPlayer(myPlayerIndex === 0 ? 'player1' : 'player2');
+            // Assume first player is host
+            setMyPlayer('player1');
             setView(session.status === 'in-progress' ? 'playing' : 'waiting');
           } else {
             throw err;
@@ -69,8 +70,8 @@ export default function MultiplayerMemory({ onBack, onComplete, initialRoomCode 
         }
       } else {
         setGameSession(session);
-        const myPlayerIndex = session.player_list.findIndex(p => p.user);
-        setMyPlayer(myPlayerIndex === 0 ? 'player1' : 'player2');
+        // Find position based on who's host
+        setMyPlayer('player1');
         setView(session.status === 'in-progress' ? 'playing' : 'waiting');
       }
     } catch (error) {
@@ -194,6 +195,7 @@ export default function MultiplayerMemory({ onBack, onComplete, initialRoomCode 
     try {
       const session = await gamesService.createGameRoom('memory-match-mp');
       setGameSession(session);
+      setMyPlayer('player1'); // Creator is always player 1
       setView('waiting');
       toast.success('Room created! Share the code with your friend.');
     } catch (error) {

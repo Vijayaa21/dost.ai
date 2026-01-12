@@ -82,14 +82,14 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
     setRoomCode(null);
     setSelectedGame(null);
     setShowGameSelection(false);
-    
+    onClose();
+  };
 
   const handleJoinGame = () => {
     if (roomCode) {
       navigate(`/games/join?room=${roomCode}`);
       handleClose();
     }
-  };onClose();
   };
 
   return (

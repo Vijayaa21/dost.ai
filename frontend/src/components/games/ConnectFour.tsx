@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Copy, Check, RefreshCw, Users, Loader2, Trophy } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import gamesService, { MultiplayerGameSession } from '../../services/gamesService';
 
 interface ConnectFourProps {
   onBack: () => void;
-  onComplete: (wasHelpful: boolean) => void;
+  onComplete?: (wasHelpful: boolean) => void;
   initialRoomCode?: string;
 }
 
@@ -17,7 +17,7 @@ const COLS = 7;
 type Cell = 'empty' | 'red' | 'yellow';
 type Board = Cell[][];
 
-export default function ConnectFour({ onBack, onComplete, initialRoomCode }: ConnectFourProps) {
+export default function ConnectFour({ onBack, initialRoomCode }: ConnectFourProps) {
   const [searchParams] = useSearchParams();
   const [gameSession, setGameSession] = useState<MultiplayerGameSession | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,14 +47,15 @@ export default function ConnectFour({ onBack, onComplete, initialRoomCode }: Con
         try {
           const joinedSession = await gamesService.joinGameRoom(roomCode);
           setGameSession(joinedSession);
-          const myPlayer = joinedSession.player_list.find(p => p.user);
-          setMyColor((myPlayer?.symbol === 'X' ? 'red' : 'yellow') as 'red' | 'yellow');
+          // Last joined player
+          const myPlayer = joinedSession.player_list[joinedSession.player_list.length - 1];
+          setMyColor(myPlayer?.symbol === 'X' ? 'red' : 'yellow');
           setView(joinedSession.status === 'in-progress' ? 'playing' : 'waiting');
         } catch (err: any) {
           if (err.response?.data?.error?.includes('already in this game')) {
             setGameSession(session);
-            const myPlayer = session.player_list.find(p => p.user);
-            setMyColor((myPlayer?.symbol === 'X' ? 'red' : 'yellow') as 'red' | 'yellow');
+            // First player is host
+            setMyColor(session.player_list[0]?.symbol === 'X' ? 'red' : 'yellow');
             setView(session.status === 'in-progress' ? 'playing' : 'waiting');
           } else {
             throw err;
@@ -62,8 +63,8 @@ export default function ConnectFour({ onBack, onComplete, initialRoomCode }: Con
         }
       } else {
         setGameSession(session);
-        const myPlayer = session.player_list.find(p => p.user);
-        setMyColor((myPlayer?.symbol === 'X' ? 'red' : 'yellow') as 'red' | 'yellow');
+        // Find based on position (host is first)
+        setMyColor(session.player_list[0]?.symbol === 'X' ? 'red' : 'yellow');
         setView(session.status === 'in-progress' ? 'playing' : 'waiting');
       }
     } catch (error) {
@@ -186,6 +187,7 @@ export default function ConnectFour({ onBack, onComplete, initialRoomCode }: Con
     try {
       const session = await gamesService.createGameRoom('connect-four');
       setGameSession(session);
+      setMyColor('red'); // Creator is always red (first player)
       setView('waiting');
       toast.success('Room created! Share the code with your friend.');
     } catch (error) {

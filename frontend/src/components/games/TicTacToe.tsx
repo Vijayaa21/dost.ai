@@ -154,7 +154,7 @@ export default function TicTacToe({ onBack, onComplete, initialRoomCode }: TicTa
     if (gameSession.game_state.board[position] !== ' ') return;
 
     try {
-      const updatedSession = await gamesService.makeMove(gameSession.room_code, position);
+      const updatedSession = await gamesService.makeMove(gameSession.room_code, { position });
       setGameSession(updatedSession);
       if (updatedSession.status === 'finished') {
         setView('finished');

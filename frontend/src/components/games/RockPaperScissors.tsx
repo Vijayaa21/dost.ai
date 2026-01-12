@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Copy, Check, RefreshCw, Users, Loader2, Trophy, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import gamesService, { MultiplayerGameSession } from '../../services/gamesService';
 
@@ -19,7 +19,7 @@ const choiceEmojis = {
   scissors: '✂️',
 };
 
-export default function RockPaperScissors({ onBack, onComplete, initialRoomCode }: RockPaperScissorsProps) {
+export default function RockPaperScissors({ onBack, initialRoomCode }: RockPaperScissorsProps) {
   const [searchParams] = useSearchParams();
   const [gameSession, setGameSession] = useState<MultiplayerGameSession | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,6 +31,7 @@ export default function RockPaperScissors({ onBack, onComplete, initialRoomCode 
   const [view, setView] = useState<'menu' | 'waiting' | 'playing' | 'result'>('menu');
   const [round, setRound] = useState(1);
   const [scores, setScores] = useState({ me: 0, opponent: 0 });
+  const [isPlayer1, setIsPlayer1] = useState<boolean | null>(null);
 
   useEffect(() => {
     const roomFromUrl = searchParams.get('room') || initialRoomCode;
@@ -49,10 +50,14 @@ export default function RockPaperScissors({ onBack, onComplete, initialRoomCode 
         try {
           const joinedSession = await gamesService.joinGameRoom(roomCode);
           setGameSession(joinedSession);
+          // I'm the player who just joined - first player is player1
+          setIsPlayer1(joinedSession.player_list.length === 1);
           setView(joinedSession.status === 'in-progress' ? 'playing' : 'waiting');
         } catch (err: any) {
           if (err.response?.data?.error?.includes('already in this game')) {
             setGameSession(session);
+            // If I'm already in and I'm the host, I'm player 1
+            setIsPlayer1(session.host === session.player_list[0]?.user_id);
             setView(session.status === 'in-progress' ? 'playing' : 'waiting');
           } else {
             throw err;
@@ -96,9 +101,9 @@ export default function RockPaperScissors({ onBack, onComplete, initialRoomCode 
   }, [gameSession, view, myChoice]);
 
   const evaluateRound = (state: any) => {
-    const isPlayer1 = gameSession?.player_list[0]?.user === state.currentPlayer;
-    const myChoiceVal = isPlayer1 ? state.p1Choice : state.p2Choice;
-    const oppChoiceVal = isPlayer1 ? state.p2Choice : state.p1Choice;
+    const amPlayer1 = isPlayer1 ?? false;
+    const myChoiceVal = amPlayer1 ? state.p1Choice : state.p2Choice;
+    const oppChoiceVal = amPlayer1 ? state.p2Choice : state.p1Choice;
 
     setOpponentChoice(oppChoiceVal);
 
@@ -123,6 +128,7 @@ export default function RockPaperScissors({ onBack, onComplete, initialRoomCode 
     try {
       const session = await gamesService.createGameRoom('rock-paper-scissors');
       setGameSession(session);
+      setIsPlayer1(true); // Creator is always player 1
       setView('waiting');
       toast.success('Room created! Share the code with your friend.');
     } catch (error) {
@@ -138,6 +144,7 @@ export default function RockPaperScissors({ onBack, onComplete, initialRoomCode 
     try {
       const session = await gamesService.joinGameRoom(joinCode);
       setGameSession(session);
+      setIsPlayer1(false); // Joiner is player 2
       setView('playing');
       toast.success('Joined the game!');
     } catch (error) {
@@ -154,7 +161,6 @@ export default function RockPaperScissors({ onBack, onComplete, initialRoomCode 
     try {
       // Send move to backend
       const state = gameSession.game_state as any || {};
-      const isPlayer1 = gameSession.player_list[0]?.user;
       const updatedState = isPlayer1 
         ? { ...state, p1Choice: choice }
         : { ...state, p2Choice: choice };
