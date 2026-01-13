@@ -1,9 +1,10 @@
 """
-AI Service for Dost AI - Handles communication with OpenAI/Gemini APIs.
-Enhanced with therapeutic conversation techniques.
+AI Service for Dost AI - Handles communication with OpenAI/Gemini/Groq APIs.
+Enhanced with therapeutic conversation techniques and fallback responses.
 """
 import os
 import re
+import random
 from django.conf import settings
 
 # Crisis detection patterns
@@ -153,6 +154,152 @@ COPING_RECOMMENDATIONS = {
     },
 }
 
+# Rule-based fallback responses when AI API fails
+FALLBACK_RESPONSES = {
+    'greetings': {
+        'patterns': ['hi', 'hello', 'hey', 'hii', 'heyy', 'heyyy', 'hiya', 'howdy', 'sup', 'yo'],
+        'responses': [
+            "Hey there! 💙 How are you feeling today?",
+            "Hi! I'm glad you're here. What's on your mind?",
+            "Hello! 💜 How's your heart doing today?",
+            "Hey! It's good to see you. How are things going?",
+            "Hi there! 💙 I'm here for you. What would you like to talk about?",
+        ]
+    },
+    'how_are_you': {
+        'patterns': ['how are you', 'how r u', 'how you doing', 'whats up', 'wassup', 'how do you feel'],
+        'responses': [
+            "I'm here and ready to listen to you 💙 But more importantly, how are *you* doing?",
+            "Thanks for asking! I'm always here for you. How are you feeling today?",
+            "I'm doing well, but I'd love to hear about you. What's going on in your world?",
+            "I appreciate you asking 💜 I'm here to support you. How's everything with you?",
+        ]
+    },
+    'good': {
+        'patterns': ['good', 'great', 'fine', 'okay', 'ok', 'doing well', 'not bad', 'alright', 'im good', 'i am good'],
+        'responses': [
+            "That's wonderful to hear! 😊 What's been making things good for you?",
+            "I'm glad you're doing okay! Anything in particular contributing to that?",
+            "Nice! 💙 Is there anything on your mind you'd like to share, or just enjoying the moment?",
+            "That's great! Sometimes it's nice to just check in when things are going well too 😊",
+        ]
+    },
+    'sad': {
+        'patterns': ['sad', 'down', 'unhappy', 'depressed', 'low', 'feeling down', 'not good', 'bad', 'terrible', 'awful'],
+        'responses': [
+            "I'm sorry you're feeling this way 💙 It takes courage to share that. What's weighing on you?",
+            "That sounds really tough. I'm here to listen. Would you like to tell me more about what's going on?",
+            "I hear you 💜 Sometimes we just need someone to sit with us in the hard moments. What's been happening?",
+            "It's okay to not be okay. Thank you for being honest with me. What's been bringing you down?",
+        ]
+    },
+    'anxious': {
+        'patterns': ['anxious', 'worried', 'nervous', 'stressed', 'panic', 'overwhelmed', 'scared', 'afraid', 'anxiety'],
+        'responses': [
+            "Anxiety can feel so overwhelming 💙 Take a breath with me. What's making you feel this way?",
+            "I hear you - that anxious feeling is really uncomfortable. What's on your mind right now?",
+            "It's okay to feel anxious. Your feelings are valid 💜 Can you tell me more about what's causing this?",
+            "Let's slow down together for a moment. What's the biggest worry on your mind right now?",
+        ]
+    },
+    'angry': {
+        'patterns': ['angry', 'mad', 'furious', 'frustrated', 'annoyed', 'irritated', 'pissed'],
+        'responses': [
+            "It sounds like something really got to you. That frustration is completely valid 💙 What happened?",
+            "Anger is a powerful emotion - it usually tells us something important. What triggered this feeling?",
+            "I can hear the frustration in your words 💜 Do you want to vent about what's bothering you?",
+            "That sounds really frustrating. Sometimes we just need to let it out. I'm here to listen.",
+        ]
+    },
+    'lonely': {
+        'patterns': ['lonely', 'alone', 'isolated', 'no friends', 'nobody', 'no one', 'disconnected'],
+        'responses': [
+            "Loneliness can be so painful 💙 I want you to know that you're not alone right now - I'm here with you.",
+            "That feeling of disconnection is really hard. Thank you for reaching out 💜 What's been going on?",
+            "I'm glad you're talking to me. Even in lonely moments, connection is possible. Tell me more?",
+            "Feeling alone is one of the hardest things. But you reached out, and that matters 💙 What's on your heart?",
+        ]
+    },
+    'tired': {
+        'patterns': ['tired', 'exhausted', 'drained', 'burnt out', 'no energy', 'sleepy', 'fatigue'],
+        'responses': [
+            "Being exhausted is so draining - emotionally and physically 💙 What's been taking your energy?",
+            "That sounds like a lot to carry. Sometimes rest is the most important thing. What's been wearing you out?",
+            "Burnout is real and it's hard 💜 Have you been able to take any time for yourself?",
+            "I hear you - exhaustion can make everything feel harder. What's been going on?",
+        ]
+    },
+    'confused': {
+        'patterns': ['confused', 'lost', 'unsure', 'don\'t know', 'uncertain', 'stuck'],
+        'responses': [
+            "It's okay to feel uncertain 💙 Sometimes clarity comes from talking things through. What's on your mind?",
+            "Being confused is uncomfortable, but it's also okay. What are you trying to figure out?",
+            "Feeling stuck can be frustrating 💜 Let's explore this together. What's making you feel lost?",
+            "Uncertainty is part of being human. I'm here to help you think through things. What's confusing you?",
+        ]
+    },
+    'grateful': {
+        'patterns': ['grateful', 'thankful', 'blessed', 'appreciate', 'thank you', 'thanks'],
+        'responses': [
+            "That's beautiful 💙 Gratitude is such a powerful feeling. What are you thankful for?",
+            "I love that you're feeling grateful! What's bringing up those feelings?",
+            "Appreciation is wonderful 💜 Tell me more about what's making you feel this way!",
+            "That warms my heart to hear 💙 What's been going well for you?",
+        ]
+    },
+    'default': {
+        'responses': [
+            "I hear you 💙 Tell me more about what's going on?",
+            "Thanks for sharing that with me. How does that make you feel?",
+            "I'm listening 💜 What else is on your mind?",
+            "That's interesting. Can you tell me more about that?",
+            "I appreciate you opening up. What would help you feel better right now?",
+            "I'm here for you 💙 Is there something specific you'd like to talk about?",
+            "Thanks for trusting me with this. What's the most important thing on your mind?",
+            "I want to understand better. Can you share a bit more about how you're feeling?",
+        ]
+    }
+}
+
+def get_fallback_response(user_message: str, emotion: str = 'neutral') -> str:
+    """Generate a rule-based response when AI APIs fail."""
+    message_lower = user_message.lower().strip()
+    
+    # Check for greetings first
+    for pattern in FALLBACK_RESPONSES['greetings']['patterns']:
+        if message_lower == pattern or message_lower.startswith(pattern + ' ') or message_lower.startswith(pattern + ','):
+            return random.choice(FALLBACK_RESPONSES['greetings']['responses'])
+    
+    # Check for "how are you" type messages
+    for pattern in FALLBACK_RESPONSES['how_are_you']['patterns']:
+        if pattern in message_lower:
+            return random.choice(FALLBACK_RESPONSES['how_are_you']['responses'])
+    
+    # Check emotion-based patterns
+    emotion_categories = ['good', 'sad', 'anxious', 'angry', 'lonely', 'tired', 'confused', 'grateful']
+    for category in emotion_categories:
+        if category in FALLBACK_RESPONSES:
+            for pattern in FALLBACK_RESPONSES[category]['patterns']:
+                if pattern in message_lower:
+                    return random.choice(FALLBACK_RESPONSES[category]['responses'])
+    
+    # If we detected an emotion from keywords, use appropriate response
+    if emotion in ['sad', 'anxious', 'angry', 'lonely', 'stressed']:
+        emotion_map = {
+            'sad': 'sad',
+            'anxious': 'anxious',
+            'angry': 'angry',
+            'lonely': 'lonely',
+            'stressed': 'anxious'
+        }
+        category = emotion_map.get(emotion, 'default')
+        if category in FALLBACK_RESPONSES and 'responses' in FALLBACK_RESPONSES[category]:
+            return random.choice(FALLBACK_RESPONSES[category]['responses'])
+    
+    # Default response
+    return random.choice(FALLBACK_RESPONSES['default']['responses'])
+
+
 def get_coping_recommendation(emotion: str, stress_level: str) -> dict | None:
     """Get coping exercise recommendation based on emotion and stress level."""
     # Only recommend for medium/high stress or negative emotions
@@ -274,8 +421,20 @@ def detect_conversation_impact(messages: list) -> dict:
 
 
 def get_ai_response(messages: list, user_tone: str = 'friendly', emotion_context: dict = None) -> str:
-    """Get response from AI provider (OpenAI or Gemini) with emotion awareness."""
+    """Get response from AI provider with fallback to rule-based responses."""
     provider = settings.AI_PROVIDER
+    
+    # Get the last user message for fallback
+    last_user_message = ""
+    detected_emotion = "neutral"
+    if messages:
+        for msg in reversed(messages):
+            if msg.get('role') == 'user':
+                last_user_message = msg.get('content', '')
+                break
+    
+    if emotion_context:
+        detected_emotion = emotion_context.get('emotion', 'neutral')
     
     # Customize system prompt based on user's preferred tone
     tone_adjustments = {
@@ -315,14 +474,41 @@ def get_ai_response(messages: list, user_tone: str = 'friendly', emotion_context
         
         system_prompt += emotion_info
     
-    try:
-        if provider == 'openai':
-            return _get_openai_response(messages, system_prompt)
-        else:
-            return _get_gemini_response(messages, system_prompt)
-    except Exception as e:
-        print(f"AI Error: {e}")
-        return "I'm here for you 💙 Sometimes I have trouble finding the right words, but please know that what you're feeling matters. Would you like to share more about what's on your mind?"
+    # Try AI providers in order of preference
+    providers_to_try = []
+    
+    # Add configured provider first
+    if provider == 'openai' and getattr(settings, 'OPENAI_API_KEY', ''):
+        providers_to_try.append('openai')
+    elif provider == 'gemini' and getattr(settings, 'GEMINI_API_KEY', ''):
+        providers_to_try.append('gemini')
+    
+    # Add Groq as free fallback (very generous free tier)
+    if getattr(settings, 'GROQ_API_KEY', ''):
+        providers_to_try.append('groq')
+    
+    # Add other providers as fallback
+    if 'gemini' not in providers_to_try and getattr(settings, 'GEMINI_API_KEY', ''):
+        providers_to_try.append('gemini')
+    if 'openai' not in providers_to_try and getattr(settings, 'OPENAI_API_KEY', ''):
+        providers_to_try.append('openai')
+    
+    # Try each provider
+    for prov in providers_to_try:
+        try:
+            if prov == 'openai':
+                return _get_openai_response(messages, system_prompt)
+            elif prov == 'gemini':
+                return _get_gemini_response(messages, system_prompt)
+            elif prov == 'groq':
+                return _get_groq_response(messages, system_prompt)
+        except Exception as e:
+            print(f"{prov.upper()} API Error: {e}")
+            continue
+    
+    # All AI providers failed - use rule-based fallback
+    print("All AI providers failed, using rule-based fallback")
+    return get_fallback_response(last_user_message, detected_emotion)
 
 
 def _get_openai_response(messages: list, system_prompt: str) -> str:
@@ -366,6 +552,42 @@ def _get_gemini_response(messages: list, system_prompt: str) -> str:
         contents=conversation_text
     )
     return response.text
+
+
+def _get_groq_response(messages: list, system_prompt: str) -> str:
+    """Get response from Groq API (free tier with generous limits)."""
+    import requests
+    
+    api_key = getattr(settings, 'GROQ_API_KEY', '')
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not configured")
+    
+    formatted_messages = [{"role": "system", "content": system_prompt}]
+    for msg in messages:
+        formatted_messages.append({
+            "role": msg['role'],
+            "content": msg['content']
+        })
+    
+    response = requests.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "model": "llama-3.3-70b-versatile",  # Free, fast, and good for conversation
+            "messages": formatted_messages,
+            "max_tokens": 250,
+            "temperature": 0.8
+        },
+        timeout=30
+    )
+    
+    if response.status_code != 200:
+        raise Exception(f"Groq API error: {response.status_code} - {response.text}")
+    
+    return response.json()['choices'][0]['message']['content']
 
 
 def get_chat_response(user_message: str, conversation_history: list, user_tone: str = 'friendly') -> dict:

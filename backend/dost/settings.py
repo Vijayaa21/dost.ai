@@ -162,6 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AI_PROVIDER = os.getenv('AI_PROVIDER', 'gemini')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')  # Free tier - get key at console.groq.com
 
 # Dost AI System Prompt - Enhanced Therapeutic Approach (Inspired by Wysa)
 DOST_SYSTEM_PROMPT = """You are Dost - an empathetic mental health companion who provides structured, therapeutic support.

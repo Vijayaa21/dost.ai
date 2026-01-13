@@ -214,9 +214,9 @@ export default function Insights() {
               {analysis?.trend_direction === 'improving' ? (
                 <TrendingUp className="w-5 h-5 text-green-500" />
               ) : analysis?.trend_direction === 'declining' ? (
-                <TrendingDown className="w-5 h-5 text-red-500" />
+                <TrendingDown className="w-5 h-5 text-amber-500" />
               ) : (
-                <Minus className="w-5 h-5 text-gray-500" />
+                <Minus className="w-5 h-5 text-blue-500" />
               )}
               Mood Trend
             </h2>
@@ -233,30 +233,54 @@ export default function Insights() {
             <div>
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-center">
-                  <p className="text-4xl font-bold text-gray-800">
+                  <p className={clsx(
+                    "text-4xl font-bold",
+                    analysis.average_mood >= 4 && "text-green-600",
+                    analysis.average_mood >= 3 && analysis.average_mood < 4 && "text-blue-600",
+                    analysis.average_mood < 3 && "text-amber-600"
+                  )}>
                     {analysis.average_mood.toFixed(1)}
                   </p>
-                  <p className="text-sm text-gray-500">Avg Mood</p>
+                  <p className="text-sm text-gray-500">Recent Avg</p>
                 </div>
                 <div className={clsx(
                   "px-4 py-2 rounded-full text-sm font-medium",
                   analysis.trend_direction === 'improving' && "bg-green-100 text-green-700",
-                  analysis.trend_direction === 'declining' && "bg-red-100 text-red-700",
-                  analysis.trend_direction === 'stable' && "bg-gray-100 text-gray-700"
+                  analysis.trend_direction === 'declining' && analysis.average_mood < 3 && "bg-amber-100 text-amber-700",
+                  analysis.trend_direction === 'declining' && analysis.average_mood >= 3 && "bg-blue-100 text-blue-700",
+                  analysis.trend_direction === 'stable' && analysis.average_mood >= 3.5 && "bg-green-100 text-green-700",
+                  analysis.trend_direction === 'stable' && analysis.average_mood < 3.5 && "bg-blue-100 text-blue-700"
                 )}>
-                  {analysis.trend_direction === 'improving' ? '📈 Improving' :
-                   analysis.trend_direction === 'declining' ? '📉 Needs attention' :
-                   '➡️ Stable'}
-                  {analysis.trend_percentage !== 0 && ` (${analysis.trend_percentage > 0 ? '+' : ''}${analysis.trend_percentage.toFixed(0)}%)`}
+                  {analysis.trend_direction === 'improving' ? '🌟 Improving!' :
+                   analysis.trend_direction === 'declining' && analysis.average_mood < 3 ? '💙 Hang in there' :
+                   analysis.trend_direction === 'declining' ? '📊 Slight dip' :
+                   analysis.average_mood >= 3.5 ? '✨ Doing great!' :
+                   '💪 Steady'}
+                  {analysis.trend_percentage !== 0 && Math.abs(analysis.trend_percentage) > 5 && 
+                   ` (${analysis.trend_percentage > 0 ? '+' : ''}${analysis.trend_percentage.toFixed(0)}%)`}
                 </div>
               </div>
               <p className="text-gray-600 mb-4">{analysis.summary}</p>
+
+              {/* Highlights */}
+              {analysis.highlights && analysis.highlights.length > 0 && (
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 mb-4">
+                  <h3 className="font-medium text-emerald-800 mb-2">✨ Highlights</h3>
+                  <ul className="text-sm text-emerald-700 space-y-1">
+                    {analysis.highlights.map((highlight, i) => (
+                      <li key={i}>{highlight}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               
               {analysis.recommendations.length > 0 && (
                 <div className="bg-violet-50 rounded-xl p-4">
                   <h3 className="font-medium text-violet-800 mb-2 flex items-center gap-2">
                     <Lightbulb className="w-4 h-4" />
-                    Recommendations
+                    {analysis.trend_direction === 'improving' || analysis.average_mood >= 3.5 
+                      ? 'Keep It Going!' 
+                      : 'Recommendations'}
                   </h3>
                   <ul className="text-sm text-violet-700 space-y-1">
                     {analysis.recommendations.map((rec, i) => (

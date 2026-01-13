@@ -136,7 +136,7 @@ class MoodAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
     
     @action(detail=False, methods=['post'])
     def generate(self, request):
-        """Generate a new mood analysis"""
+        """Generate a new mood analysis with focus on recent progress"""
         from mood.models import MoodEntry
         from datetime import date
         
@@ -145,7 +145,7 @@ class MoodAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
         mood_entries = MoodEntry.objects.filter(
             user=request.user,
             created_at__gte=week_ago
-        )
+        ).order_by('created_at')
         
         if mood_entries.count() < 3:
             return Response({
@@ -156,21 +156,88 @@ class MoodAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
         moods = [e.mood_score for e in mood_entries]
         avg_mood = sum(moods) / len(moods)
         
-        # Simple trend calculation
-        first_half = moods[:len(moods)//2] if len(moods) > 1 else moods
-        second_half = moods[len(moods)//2:] if len(moods) > 1 else moods
+        # Focus on RECENT progress (last 3 days vs earlier)
+        recent_entries = list(mood_entries)[-3:]  # Last 3 entries
+        earlier_entries = list(mood_entries)[:-3] if len(mood_entries) > 3 else []
         
-        first_avg = sum(first_half) / len(first_half) if first_half else avg_mood
-        second_avg = sum(second_half) / len(second_half) if second_half else avg_mood
+        recent_moods = [e.mood_score for e in recent_entries]
+        recent_avg = sum(recent_moods) / len(recent_moods) if recent_moods else avg_mood
         
-        if second_avg > first_avg + 0.3:
+        earlier_moods = [e.mood_score for e in earlier_entries]
+        earlier_avg = sum(earlier_moods) / len(earlier_moods) if earlier_moods else recent_avg
+        
+        # Determine trend based on recent days
+        if recent_avg >= 3.5:
+            # Recent days are good! Be positive
+            if recent_avg > earlier_avg + 0.2:
+                trend = 'improving'
+                trend_message = "🌟 Great progress! Your recent days are looking brighter."
+            elif recent_avg >= earlier_avg:
+                trend = 'stable'
+                trend_message = "✨ You're doing well! Keep up the positive momentum."
+            else:
+                trend = 'stable'
+                trend_message = "💪 Staying strong! Your recent moods are in a good place."
+        elif recent_avg > earlier_avg + 0.3:
             trend = 'improving'
-        elif second_avg < first_avg - 0.3:
+            trend_message = "📈 Things are looking up! Your recent days show improvement."
+        elif recent_avg < earlier_avg - 0.5:
             trend = 'declining'
+            trend_message = "💙 It's been a tough few days. Remember, it's okay to not be okay."
         else:
             trend = 'stable'
+            trend_message = "Your mood has been fairly consistent this week."
         
-        trend_pct = ((second_avg - first_avg) / first_avg * 100) if first_avg > 0 else 0
+        # Calculate trend percentage based on recent vs earlier
+        if earlier_avg > 0:
+            trend_pct = ((recent_avg - earlier_avg) / earlier_avg * 100)
+        else:
+            trend_pct = 0
+        
+        # Generate encouraging summary
+        if recent_avg >= 4:
+            summary = f"🎉 You're doing amazing! Your recent average is {recent_avg:.1f}/5. {trend_message}"
+        elif recent_avg >= 3:
+            summary = f"Your recent average mood is {recent_avg:.1f}/5. {trend_message}"
+        else:
+            summary = f"Your recent average is {recent_avg:.1f}/5. {trend_message} Small steps count!"
+        
+        # Generate smart recommendations
+        recommendations = []
+        if trend == 'improving':
+            recommendations = [
+                "Keep doing what you're doing - it's working! 🌟",
+                "Consider journaling about what's been helping",
+                "Celebrate your progress, even small wins matter",
+            ]
+        elif recent_avg >= 3.5:
+            recommendations = [
+                "You're in a good place! Maintain your self-care routine",
+                "Try to identify what's contributing to your positive mood",
+                "Share your good vibes with someone you care about",
+            ]
+        else:
+            recommendations = [
+                "Try one small act of self-care today",
+                "Reach out to someone you trust",
+                "Remember: difficult days are temporary",
+            ]
+        
+        # Generate highlights
+        highlights = []
+        if trend == 'improving':
+            highlights.append(f"📈 Mood improved by {abs(trend_pct):.0f}% recently!")
+        
+        if recent_avg >= 4:
+            highlights.append("⭐ Your recent moods are excellent!")
+        elif recent_avg >= 3:
+            highlights.append("💚 You're doing okay - that's worth celebrating")
+        
+        highlights.append(f"📊 Logged {mood_entries.count()} mood entries this week")
+        
+        # Best day
+        best_entry = max(mood_entries, key=lambda e: e.mood_score)
+        highlights.append(f"🌟 Best day: {best_entry.date.strftime('%A')} ({best_entry.mood_score}/5)")
         
         # Create analysis
         analysis = MoodAnalysis.objects.create(
@@ -178,18 +245,12 @@ class MoodAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
             period_type='weekly',
             start_date=week_ago.date(),
             end_date=date.today(),
-            average_mood=avg_mood,
+            average_mood=round(recent_avg, 2),  # Use recent average for display
             trend_direction=trend,
-            trend_percentage=trend_pct,
-            summary=f"Your average mood this week was {avg_mood:.1f}/5. The trend is {trend}.",
-            highlights=[
-                f"Logged {mood_entries.count()} mood entries",
-                f"Trend: {trend.title()}",
-            ],
-            recommendations=[
-                "Keep tracking your moods daily",
-                "Try journaling when you feel low",
-            ]
+            trend_percentage=round(trend_pct, 1),
+            summary=summary,
+            highlights=highlights,
+            recommendations=recommendations
         )
         
         return Response(MoodAnalysisSerializer(analysis).data)
