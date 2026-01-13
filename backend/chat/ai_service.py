@@ -1,5 +1,6 @@
 """
 AI Service for Dost AI - Handles communication with OpenAI/Gemini APIs.
+Enhanced with therapeutic conversation techniques.
 """
 import os
 import re
@@ -13,9 +14,9 @@ CRISIS_PATTERNS = [
     r'\b(overdose|take pills|hang myself)\b',
 ]
 
-CRISIS_RESPONSE = """I hear you, and I want you to know that what you're feeling matters. Please know that you're not alone in this.
+CRISIS_RESPONSE = """I hear you, and I want you to know that what you're feeling matters. This sounds really serious, and I care about your safety 💙
 
-If you're having thoughts of hurting yourself, please reach out to a crisis helpline right away:
+Please reach out to someone who can help you through this right now:
 
 🇮🇳 **India Crisis Helplines:**
 - **iCall**: 9152987821
@@ -23,18 +24,81 @@ If you're having thoughts of hurting yourself, please reach out to a crisis help
 - **NIMHANS**: 080-46110007
 - **AASRA**: 9820466726
 
-These are trained professionals who care and want to help. Would you like to talk about what's been making you feel this way?"""
+These are trained professionals who understand what you're going through. You don't have to face this alone.
+
+I'm here too. Would you like to tell me what's been bringing up these thoughts?"""
 
 EMOTION_KEYWORDS = {
-    'happy': ['happy', 'joy', 'excited', 'great', 'wonderful', 'amazing', 'good', 'blessed', 'glad', 'delighted', 'cheerful', 'pleased'],
-    'sad': ['sad', 'depressed', 'down', 'unhappy', 'miserable', 'hopeless', 'cry', 'tears', 'heartbroken', 'devastated', 'gloomy'],
-    'anxious': ['anxious', 'worried', 'nervous', 'panic', 'afraid', 'scared', 'fear', 'tense', 'uneasy', 'restless', 'on edge'],
-    'angry': ['angry', 'mad', 'furious', 'irritated', 'frustrated', 'annoyed', 'rage', 'pissed', 'upset', 'bitter'],
-    'stressed': ['stressed', 'overwhelmed', 'pressure', 'burden', 'exhausted', 'tired', 'drained', 'burnt out', 'swamped', 'struggling'],
-    'confused': ['confused', 'lost', 'uncertain', 'unsure', 'don\'t know', 'unclear', 'puzzled', 'bewildered'],
+    'happy': ['happy', 'joy', 'excited', 'great', 'wonderful', 'amazing', 'good', 'blessed', 'glad', 'delighted', 'cheerful', 'pleased', 'grateful', 'thankful'],
+    'sad': ['sad', 'depressed', 'down', 'unhappy', 'miserable', 'hopeless', 'cry', 'tears', 'heartbroken', 'devastated', 'gloomy', 'grief', 'loss', 'miss'],
+    'anxious': ['anxious', 'worried', 'nervous', 'panic', 'afraid', 'scared', 'fear', 'tense', 'uneasy', 'restless', 'on edge', 'dread', 'apprehensive'],
+    'angry': ['angry', 'mad', 'furious', 'irritated', 'frustrated', 'annoyed', 'rage', 'pissed', 'upset', 'bitter', 'resentful'],
+    'stressed': ['stressed', 'overwhelmed', 'pressure', 'burden', 'exhausted', 'tired', 'drained', 'burnt out', 'swamped', 'struggling', 'too much'],
+    'confused': ['confused', 'lost', 'uncertain', 'unsure', 'don\'t know', 'unclear', 'puzzled', 'bewildered', 'stuck', 'trapped'],
     'calm': ['calm', 'peaceful', 'relaxed', 'serene', 'content', 'at ease', 'composed', 'tranquil'],
     'hopeful': ['hopeful', 'optimistic', 'looking forward', 'positive', 'better', 'improving', 'progress', 'encouraged'],
-    'lonely': ['lonely', 'alone', 'isolated', 'disconnected', 'abandoned', 'empty', 'solitary'],
+    'lonely': ['lonely', 'alone', 'isolated', 'disconnected', 'abandoned', 'empty', 'solitary', 'nobody understands', 'no one cares'],
+    'ashamed': ['ashamed', 'embarrassed', 'guilty', 'shame', 'regret', 'stupid', 'worthless', 'failure', 'can\'t do anything right'],
+}
+
+# Therapeutic responses based on emotion
+EMOTION_THERAPEUTIC_CONTEXT = {
+    'anxious': {
+        'approach': 'ground them in present, normalize the anxiety, help identify what specifically they\'re worried about',
+        'techniques': ['grounding', 'breathing', 'cognitive reframing'],
+        'sample_openings': [
+            "Anxiety can feel so overwhelming. Let's slow down together.",
+            "That sounds really unsettling. Your body is trying to protect you, even if it doesn't feel that way.",
+        ]
+    },
+    'sad': {
+        'approach': 'create space for grief, validate without rushing to fix, explore the loss or disappointment',
+        'techniques': ['validation', 'compassionate presence', 'gentle exploration'],
+        'sample_openings': [
+            "I can hear the heaviness in what you're sharing.",
+            "It takes courage to acknowledge when we're hurting.",
+        ]
+    },
+    'angry': {
+        'approach': 'validate the anger as a messenger, explore what need isn\'t being met, help identify what\'s underneath',
+        'techniques': ['validation', 'needs identification', 'gentle exploration'],
+        'sample_openings': [
+            "It sounds like something really crossed a line for you.",
+            "That frustration makes complete sense given what happened.",
+        ]
+    },
+    'stressed': {
+        'approach': 'help break down the overwhelm, focus on one thing at a time, acknowledge the load they\'re carrying',
+        'techniques': ['chunking', 'prioritization', 'self-compassion'],
+        'sample_openings': [
+            "You're carrying a lot right now.",
+            "When everything feels urgent, it's hard to know where to start.",
+        ]
+    },
+    'lonely': {
+        'approach': 'remind them of connection, validate the pain of disconnection, explore what kind of connection they need',
+        'techniques': ['connection reminder', 'validation', 'needs exploration'],
+        'sample_openings': [
+            "Feeling disconnected is one of the hardest things.",
+            "I'm glad you're sharing this with me - you're not alone in this moment.",
+        ]
+    },
+    'ashamed': {
+        'approach': 'externalize the shame, challenge the inner critic, build self-compassion',
+        'techniques': ['self-compassion', 'cognitive reframing', 'normalize'],
+        'sample_openings': [
+            "That inner critic sounds really loud right now.",
+            "What you're feeling is so human. We all have moments like this.",
+        ]
+    },
+    'confused': {
+        'approach': 'help organize thoughts, validate uncertainty, explore what clarity would look like',
+        'techniques': ['reflection', 'exploration', 'clarity building'],
+        'sample_openings': [
+            "It's okay to not have all the answers right now.",
+            "Sitting with uncertainty is really uncomfortable.",
+        ]
+    },
 }
 
 # Coping exercise recommendations based on emotional state
@@ -215,22 +279,41 @@ def get_ai_response(messages: list, user_tone: str = 'friendly', emotion_context
     
     # Customize system prompt based on user's preferred tone
     tone_adjustments = {
-        'calm': "Be that chill friend who helps them feel grounded. Speak softly, use calming words, and create a peaceful vibe. Like sitting together in comfortable silence.",
-        'friendly': "Be your natural warm, chatty self! Like catching up with your best friend over chai. Casual, caring, and real.",
-        'minimal': "Keep it short and sweet - like texting a close friend. Brief but meaningful. No fluff, just genuine support.",
+        'calm': "Be that gentle, grounding presence. Speak softly, use calming words, and create a peaceful vibe. Help them feel safe and centered.",
+        'friendly': "Be your natural warm, supportive self. Like talking to a wise friend who really gets it. Caring, insightful, but still conversational.",
+        'minimal': "Keep responses brief but meaningful. Short sentences, clear empathy. Quality over quantity.",
     }
     
-    system_prompt = settings.DOST_SYSTEM_PROMPT + f"\n\nVibe check: {tone_adjustments.get(user_tone, tone_adjustments['friendly'])}"
+    system_prompt = settings.DOST_SYSTEM_PROMPT + f"\n\nTone for this conversation: {tone_adjustments.get(user_tone, tone_adjustments['friendly'])}"
     
-    # Add emotion context to system prompt if available
+    # Add enhanced emotion context to system prompt
     if emotion_context:
-        emotion_info = f"\n\nCurrent user emotional state: {emotion_context.get('emotion', 'neutral')}"
-        stress_info = f"\nStress level: {emotion_context.get('stress_level', 'unknown')}"
+        emotion = emotion_context.get('emotion', 'neutral')
+        emotion_info = f"\n\n**CURRENT EMOTIONAL STATE:** {emotion}"
+        
+        # Add therapeutic guidance based on detected emotion
+        if emotion in EMOTION_THERAPEUTIC_CONTEXT:
+            therapeutic_info = EMOTION_THERAPEUTIC_CONTEXT[emotion]
+            emotion_info += f"\n**Therapeutic Approach:** {therapeutic_info['approach']}"
+            emotion_info += f"\n**Techniques to consider:** {', '.join(therapeutic_info['techniques'])}"
+        
+        stress_level = emotion_context.get('stress_level', 'unknown')
+        emotion_info += f"\n**Stress level:** {stress_level}"
+        
+        if stress_level == 'high':
+            emotion_info += "\n**Note:** User is highly stressed - be extra gentle, keep responses focused, prioritize validation before anything else."
+        
         conversation_impact = emotion_context.get('conversation_impact', {})
         if conversation_impact:
-            emotion_info += f"\nConversation impact: {conversation_impact.get('trend', '')}"
+            trend = conversation_impact.get('trend', '')
+            emotion_info += f"\n**Conversation trend:** {trend}"
+            
+            if conversation_impact.get('impact') == 'concerning':
+                emotion_info += "\n**Note:** User may need extra support - focus on validation and creating safety."
+            elif conversation_impact.get('impact') == 'positive':
+                emotion_info += "\n**Note:** User seems to be responding well - continue current approach."
         
-        system_prompt += emotion_info + stress_info
+        system_prompt += emotion_info
     
     try:
         if provider == 'openai':
@@ -239,7 +322,7 @@ def get_ai_response(messages: list, user_tone: str = 'friendly', emotion_context
             return _get_gemini_response(messages, system_prompt)
     except Exception as e:
         print(f"AI Error: {e}")
-        return "I'm here for you. Sometimes I have trouble finding the right words, but please know that your feelings are valid. Would you like to share more about what's on your mind?"
+        return "I'm here for you 💙 Sometimes I have trouble finding the right words, but please know that what you're feeling matters. Would you like to share more about what's on your mind?"
 
 
 def _get_openai_response(messages: list, system_prompt: str) -> str:
@@ -256,10 +339,10 @@ def _get_openai_response(messages: list, system_prompt: str) -> str:
         })
     
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",  # Better for nuanced emotional responses
         messages=formatted_messages,
-        max_tokens=150,
-        temperature=0.7,
+        max_tokens=250,  # Allow slightly longer responses for therapeutic quality
+        temperature=0.8,  # Slightly more creative for natural conversation
     )
     
     return response.choices[0].message.content
@@ -271,8 +354,8 @@ def _get_gemini_response(messages: list, system_prompt: str) -> str:
     
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
     
-    # Format conversation history
-    conversation_text = f"System Instructions: {system_prompt}\n\n"
+    # Format conversation history with system prompt
+    conversation_text = f"System Instructions: {system_prompt}\n\nConversation:\n"
     for msg in messages:
         role = "User" if msg['role'] == 'user' else "Dost"
         conversation_text += f"{role}: {msg['content']}\n"

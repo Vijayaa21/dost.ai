@@ -15,6 +15,8 @@ export interface TriggerPattern {
   occurrence_count: number;
   suggested_coping: number[];
   custom_advice: string;
+  therapeutic_note?: string;  // New: therapeutic insight
+  all_advice?: string[];      // New: array of all coping tips
   is_active: boolean;
   is_dismissed: boolean;
   last_triggered: string | null;

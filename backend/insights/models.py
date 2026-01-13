@@ -50,6 +50,8 @@ class TriggerPattern(models.Model):
     # Coping suggestions
     suggested_coping = models.JSONField(default=list)  # List of coping tool IDs
     custom_advice = models.TextField(blank=True)
+    therapeutic_note = models.TextField(blank=True)  # Therapeutic insight about the pattern
+    all_advice = models.JSONField(default=list)  # Array of all coping tips
     
     # Status
     is_active = models.BooleanField(default=True)

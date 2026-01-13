@@ -112,16 +112,28 @@ class MoodStatsView(APIView):
             all_emotions.extend(entry.emotions)
         emotion_freq = dict(Counter(all_emotions).most_common(10))
         
-        # Weekly trend (last 7 entries)
-        weekly_entries = entries.order_by('-date')[:7]
-        weekly_trend = [
-            {
-                'date': entry.date.isoformat(),
-                'mood_score': entry.mood_score,
-                'emotions': entry.emotions
-            }
-            for entry in reversed(weekly_entries)
-        ]
+        # Weekly trend - rolling 7 days ending today (most recent 7 days)
+        seven_days_ago = today - timedelta(days=6)
+        weekly_entries_qs = MoodEntry.objects.filter(
+            user=user,
+            date__gte=seven_days_ago,
+            date__lte=today
+        ).order_by('date')
+        
+        # Create a dict for quick lookup
+        entries_by_date = {entry.date: entry for entry in weekly_entries_qs}
+        
+        # Build rolling week data (last 6 days + today)
+        weekly_trend = []
+        for i in range(7):
+            day_date = seven_days_ago + timedelta(days=i)
+            entry = entries_by_date.get(day_date)
+            weekly_trend.append({
+                'date': day_date.isoformat(),
+                'mood_score': entry.mood_score if entry else 0,
+                'emotions': entry.emotions if entry else [],
+                'day_label': day_date.strftime('%a').upper()
+            })
         
         return Response({
             "average_mood": round(avg_mood, 2),

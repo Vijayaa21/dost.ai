@@ -15,6 +15,7 @@ class TriggerPatternSerializer(serializers.ModelSerializer):
             'time_of_day', 'day_of_week', 'keywords',
             'confidence_score', 'occurrence_count',
             'suggested_coping', 'custom_advice',
+            'therapeutic_note', 'all_advice',
             'is_active', 'is_dismissed', 'last_triggered',
             'created_at', 'updated_at'
         ]

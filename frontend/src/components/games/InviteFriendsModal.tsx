@@ -37,9 +37,13 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
           setLoading(true);
           const code = await getInviteCode();
           setInviteCode(code);
-        } catch (error) {
+        } catch (error: any) {
           console.error("Failed to fetch invite code:", error);
-          toast.error("Could not load your invite link. Please try again.");
+          if (error.response?.status === 401) {
+            toast.error("Session expired. Please log in again.");
+          } else {
+            toast.error("Could not load your invite link. Please try again.");
+          }
           onClose();
         } finally {
           setLoading(false);
@@ -57,8 +61,13 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
       setSelectedGame(gameType);
       setShowGameSelection(false);
       toast.success('Game room created! Share the link with your friend.');
-    } catch (error) {
-      toast.error('Failed to create game room.');
+    } catch (error: any) {
+      console.error("Failed to create game room:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error('Failed to create game room. Please try again.');
+      }
     } finally {
       setCreatingGame(false);
     }

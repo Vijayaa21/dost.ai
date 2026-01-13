@@ -76,9 +76,12 @@ export default function Home() {
         // Get mood stats for chart
         const stats = await moodService.getMoodStats('week');
         if (stats?.weekly_trend) {
+          // Use the day_label from backend (rolling week ending today)
+          const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
           setMoodData(stats.weekly_trend.map((t: any) => ({
-            date: new Date(t.date).toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
-            score: t.mood_score
+            date: t.day_label || new Date(t.date).toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+            score: t.mood_score,
+            isToday: (t.day_label || new Date(t.date).toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()) === today
           })));
         }
       } catch {
@@ -122,7 +125,21 @@ export default function Home() {
     navigate(`/coping?exercise=${toolId}`);
   };
 
-  const weekDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+  // Generate rolling week days (last 6 days + today)
+  const getWeekDays = () => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      days.push({
+        label: date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+        date: date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+        isToday: i === 0
+      });
+    }
+    return days;
+  };
+  const weekDays = getWeekDays();
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -217,28 +234,51 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Simple Bar Chart */}
+            {/* Simple Bar Chart - Rolling week (last 6 days + today) */}
             <div className="h-32 flex items-end justify-between gap-2 mb-4">
-              {weekDays.map((day, i) => {
-                const entry = moodData.find(m => m.date === day);
-                const height = entry ? (entry.score / 5) * 100 : 0;
+              {moodData.length > 0 ? moodData.map((entry, i) => {
+                const height = entry.score ? (entry.score / 5) * 100 : 0;
+                const isToday = i === moodData.length - 1;
                 return (
-                  <div key={day} className="flex-1 flex flex-col items-center gap-2">
+                  <div key={`${entry.date}-${i}`} className="flex-1 flex flex-col items-center gap-2">
                     <div className="w-full bg-gray-100 rounded-t-lg relative" style={{ height: '100px' }}>
                       <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${height}%` }}
                         transition={{ delay: 0.5 + i * 0.1 }}
-                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-indigo-500 to-violet-400 rounded-t-lg"
+                        className={`absolute bottom-0 left-0 right-0 rounded-t-lg ${
+                          isToday 
+                            ? 'bg-gradient-to-t from-emerald-500 to-teal-400' 
+                            : 'bg-gradient-to-t from-indigo-500 to-violet-400'
+                        }`}
                       />
                     </div>
                   </div>
                 );
-              })}
+              }) : weekDays.map((dayInfo, i) => (
+                <div key={`empty-${dayInfo.label}-${i}`} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full bg-gray-100 rounded-t-lg relative" style={{ height: '100px' }} />
+                </div>
+              ))}
             </div>
             <div className="flex justify-between text-xs text-gray-400 font-medium">
-              {weekDays.map(day => (
-                <span key={day} className="flex-1 text-center">{day}</span>
+              {moodData.length > 0 ? moodData.map((entry, i) => {
+                const isToday = i === moodData.length - 1;
+                return (
+                  <span 
+                    key={`label-${entry.date}-${i}`} 
+                    className={`flex-1 text-center ${isToday ? 'text-emerald-600 font-semibold' : ''}`}
+                  >
+                    {isToday ? 'TODAY' : entry.date}
+                  </span>
+                );
+              }) : weekDays.map((dayInfo, i) => (
+                <span 
+                  key={`label-${dayInfo.label}-${i}`} 
+                  className={`flex-1 text-center ${dayInfo.isToday ? 'text-emerald-600 font-semibold' : ''}`}
+                >
+                  {dayInfo.isToday ? 'TODAY' : dayInfo.label}
+                </span>
               ))}
             </div>
           </motion.div>

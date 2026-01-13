@@ -431,12 +431,41 @@ export default function Insights() {
 
                 {/* Custom Advice */}
                 {selectedPattern.custom_advice && (
-                  <div className="bg-violet-50 rounded-xl p-4 mb-6">
+                  <div className="bg-violet-50 rounded-xl p-4 mb-4">
                     <h3 className="font-medium text-violet-800 mb-2 flex items-center gap-2">
                       <Lightbulb className="w-4 h-4" />
-                      Advice
+                      What Might Help
                     </h3>
                     <p className="text-sm text-violet-700">{selectedPattern.custom_advice}</p>
+                  </div>
+                )}
+
+                {/* Additional Advice Tips */}
+                {selectedPattern.all_advice && selectedPattern.all_advice.length > 1 && (
+                  <div className="bg-indigo-50 rounded-xl p-4 mb-4">
+                    <h3 className="font-medium text-indigo-800 mb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      More Coping Strategies
+                    </h3>
+                    <ul className="space-y-2">
+                      {selectedPattern.all_advice.slice(1).map((tip, idx) => (
+                        <li key={idx} className="text-sm text-indigo-700 flex items-start gap-2">
+                          <span className="text-indigo-400 mt-0.5">•</span>
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Therapeutic Note */}
+                {selectedPattern.therapeutic_note && (
+                  <div className="bg-emerald-50 rounded-xl p-4 mb-6 border border-emerald-100">
+                    <h3 className="font-medium text-emerald-800 mb-2 flex items-center gap-2">
+                      <Brain className="w-4 h-4" />
+                      Understanding This Pattern
+                    </h3>
+                    <p className="text-sm text-emerald-700 italic">{selectedPattern.therapeutic_note}</p>
                   </div>
                 )}
 
