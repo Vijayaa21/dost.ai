@@ -1,58 +1,65 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Sparkles, Heart } from 'lucide-react';
 import { moodService } from '../services/moodService';
+import { useTheme } from '../context/ThemeContext';
 import { MoodEntry } from '../types';
 import clsx from 'clsx';
 import toast from '../utils/toast';
 
-// Mood options matching the design
+// Mood options matching the design - enhanced with gradients
 const moodOptions = [
   { 
     score: 1, 
     emoji: '😞', 
     label: 'VERY LOW', 
-    color: 'bg-red-100',
-    textColor: 'text-red-500',
-    borderColor: 'border-red-300'
+    color: 'from-red-100 to-red-50',
+    textColor: 'text-red-600',
+    borderColor: 'border-red-400',
+    shadowColor: 'shadow-red-500/20'
   },
   { 
     score: 2, 
     emoji: '😕', 
     label: 'A BIT OFF', 
-    color: 'bg-orange-100',
-    textColor: 'text-orange-500',
-    borderColor: 'border-orange-300'
+    color: 'from-orange-100 to-orange-50',
+    textColor: 'text-orange-600',
+    borderColor: 'border-orange-400',
+    shadowColor: 'shadow-orange-500/20'
   },
   { 
     score: 3, 
     emoji: '🙂', 
     label: 'OKAY', 
-    color: 'bg-yellow-100',
+    color: 'from-yellow-100 to-amber-50',
     textColor: 'text-yellow-600',
-    borderColor: 'border-yellow-300'
+    borderColor: 'border-yellow-400',
+    shadowColor: 'shadow-yellow-500/20'
   },
   { 
     score: 4, 
     emoji: '😊', 
     label: 'GOOD', 
-    color: 'bg-green-100',
-    textColor: 'text-green-500',
-    borderColor: 'border-green-300'
+    color: 'from-green-100 to-emerald-50',
+    textColor: 'text-green-600',
+    borderColor: 'border-green-400',
+    shadowColor: 'shadow-green-500/20'
   },
   { 
     score: 5, 
     emoji: '✨', 
     label: 'AMAZING', 
-    color: 'bg-indigo-50',
-    textColor: 'text-indigo-500',
-    borderColor: 'border-indigo-300'
+    color: 'from-indigo-100 to-purple-50',
+    textColor: 'text-indigo-600',
+    borderColor: 'border-indigo-400',
+    shadowColor: 'shadow-indigo-500/20'
   },
 ];
 
 export default function MoodDashboard() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [todayMood, setTodayMood] = useState<MoodEntry | null>(null);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState('');
@@ -103,19 +110,34 @@ export default function MoodDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className={clsx(
+      "min-h-screen p-4 md:p-6 transition-colors duration-300",
+      isDark ? "bg-transparent" : "bg-gradient-to-br from-slate-50 via-amber-50 to-orange-50"
+    )}>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-6 md:mb-8"
+          className="text-center mb-8"
         >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+          <motion.div 
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/30"
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          >
+            <Heart className="w-8 h-8 text-white" />
+          </motion.div>
+          <h1 className={clsx(
+            "text-2xl md:text-3xl lg:text-4xl font-bold bg-clip-text text-transparent mb-3",
+            isDark 
+              ? "bg-gradient-to-r from-amber-400 to-orange-400" 
+              : "bg-gradient-to-r from-amber-600 to-orange-600"
+          )}>
             How's your mood right now?
           </h1>
-          <p className="text-gray-500 text-base md:text-lg">
-            Daily check-ins help you spot patterns over time.
+          <p className={clsx("text-base md:text-lg", isDark ? "text-slate-400" : "text-gray-500")}>
+            Daily check-ins help you spot patterns over time ✨
           </p>
         </motion.div>
 
@@ -124,9 +146,12 @@ export default function MoodDashboard() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6"
+            className={clsx(
+              "border rounded-2xl px-4 py-3 mb-6",
+              isDark ? "bg-red-900/30 border-red-700" : "bg-red-50 border-red-200"
+            )}
           >
-            <p className="text-red-600 text-sm">{error}</p>
+            <p className={clsx("text-sm", isDark ? "text-red-400" : "text-red-600")}>{error}</p>
           </motion.div>
         )}
 
@@ -135,9 +160,12 @@ export default function MoodDashboard() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6"
+            className={clsx(
+              "border rounded-2xl px-4 py-4 mb-6",
+              isDark ? "bg-green-900/30 border-green-700" : "bg-green-50 border-green-200"
+            )}
           >
-            <p className="text-green-600 text-sm text-center">✓ Mood saved successfully! Redirecting...</p>
+            <p className={clsx("text-sm text-center font-medium", isDark ? "text-green-400" : "text-green-600")}>✓ Mood saved successfully! Redirecting...</p>
           </motion.div>
         )}
 
@@ -146,23 +174,32 @@ export default function MoodDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex justify-center gap-2 md:gap-3 lg:gap-4 mb-6 md:mb-8 flex-wrap"
+          className="flex justify-center gap-3 md:gap-4 mb-8 flex-wrap"
         >
-          {moodOptions.map((mood) => (
+          {moodOptions.map((mood, index) => (
             <motion.button
               key={mood.score}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + index * 0.05 }}
               onClick={() => setSelectedMood(mood.score)}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08, y: -5 }}
               whileTap={{ scale: 0.95 }}
               className={clsx(
-                'flex flex-col items-center p-3 md:p-4 lg:p-6 rounded-xl md:rounded-2xl transition-all border-2',
+                'flex flex-col items-center p-4 md:p-5 lg:p-6 rounded-2xl transition-all border-2 bg-gradient-to-br',
                 mood.color,
                 selectedMood === mood.score 
-                  ? `${mood.borderColor} shadow-lg` 
-                  : 'border-transparent'
+                  ? `${mood.borderColor} shadow-xl ${mood.shadowColor}` 
+                  : 'border-transparent shadow-md hover:shadow-lg'
               )}
             >
-              <span className="text-2xl md:text-3xl lg:text-4xl mb-1 md:mb-2">{mood.emoji}</span>
+              <motion.span 
+                className="text-3xl md:text-4xl lg:text-5xl mb-2"
+                animate={selectedMood === mood.score ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 0.3 }}
+              >
+                {mood.emoji}
+              </motion.span>
               <span className={clsx(
                 'text-xs font-bold tracking-wide',
                 mood.textColor
@@ -178,17 +215,29 @@ export default function MoodDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6"
+          className={clsx(
+            "rounded-3xl p-6 shadow-xl mb-6",
+            isDark 
+              ? "bg-slate-800/80 border border-slate-700 shadow-amber-500/5" 
+              : "bg-white border border-amber-100 shadow-amber-500/5"
+          )}
         >
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="w-5 h-5 text-gray-600" />
-            <h2 className="font-semibold text-gray-800 text-lg">Reflect on your mood</h2>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+              <BookOpen className="w-4 h-4 text-white" />
+            </div>
+            <h2 className={clsx("font-bold text-lg", isDark ? "text-white" : "text-gray-800")}>Reflect on your mood</h2>
           </div>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="What contributed to this feeling? (Optional)"
-            className="w-full h-32 p-4 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700 placeholder-gray-400"
+            className={clsx(
+              "w-full h-32 p-4 border rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent",
+              isDark 
+                ? "bg-slate-700/50 border-slate-600 text-white placeholder-slate-500" 
+                : "bg-amber-50/50 border-amber-200 text-gray-700 placeholder-gray-400"
+            )}
           />
         </motion.div>
 
@@ -198,14 +247,18 @@ export default function MoodDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <button
+          <motion.button
+            whileHover={{ scale: selectedMood && !isSubmitting ? 1.02 : 1 }}
+            whileTap={{ scale: selectedMood && !isSubmitting ? 0.98 : 1 }}
             onClick={handleSubmit}
             disabled={!selectedMood || isSubmitting}
             className={clsx(
-              'w-full py-4 rounded-xl font-semibold text-lg transition-all',
+              'w-full py-4 rounded-2xl font-bold text-lg transition-all',
               selectedMood && !isSubmitting
-                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-xl shadow-amber-500/30'
+                : isDark 
+                  ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             )}
           >
             {isSubmitting ? (
@@ -217,9 +270,12 @@ export default function MoodDashboard() {
                 Saving...
               </span>
             ) : (
-              'Save Entry'
+              <span className="flex items-center justify-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Save Entry
+              </span>
             )}
-          </button>
+          </motion.button>
         </motion.div>
 
         {/* Previous Entry Info */}
@@ -228,9 +284,12 @@ export default function MoodDashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-center mt-6"
+            className={clsx(
+              "text-center mt-6 rounded-2xl p-4",
+              isDark ? "bg-slate-800/50" : "bg-white/50"
+            )}
           >
-            <p className="text-sm text-gray-500">
+            <p className={clsx("text-sm", isDark ? "text-slate-400" : "text-gray-500")}>
               You've already logged your mood today. Saving will update your entry.
             </p>
           </motion.div>

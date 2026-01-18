@@ -6,6 +6,7 @@ import {
   ThumbsUp, ThumbsDown, ChevronRight, Sparkles
 } from 'lucide-react';
 import { insightsService, TriggerPattern, MoodAnalysis, InsightNotification } from '../services/insightsService';
+import { useTheme } from '../context/ThemeContext';
 import { InsightsSkeleton } from '../components/Skeleton';
 import toast from '../utils/toast';
 import clsx from 'clsx';
@@ -30,6 +31,7 @@ const triggerIcons: Record<string, React.ReactNode> = {
 };
 
 export default function Insights() {
+  const { isDark } = useTheme();
   const [patterns, setPatterns] = useState<TriggerPattern[]>([]);
   const [notifications, setNotifications] = useState<InsightNotification[]>([]);
   const [analysis, setAnalysis] = useState<MoodAnalysis | null>(null);
@@ -108,28 +110,40 @@ export default function Insights() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className={clsx(
+      "min-h-screen p-4 md:p-6 transition-colors duration-300",
+      isDark ? "bg-transparent" : "bg-gradient-to-br from-slate-50 via-violet-50 to-indigo-50"
+    )}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-4 md:mb-6"
+          className="mb-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">
-                <Brain className="w-6 h-6 md:w-8 md:h-8 text-violet-500" />
+              <h1 className={clsx(
+                "text-2xl md:text-3xl font-bold bg-clip-text text-transparent flex items-center gap-2",
+                isDark 
+                  ? "bg-gradient-to-r from-violet-400 to-purple-400" 
+                  : "bg-gradient-to-r from-violet-600 to-purple-600"
+              )}>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-white" />
+                </div>
                 Your Insights
               </h1>
-              <p className="text-gray-500 mt-1 text-sm md:text-base">
+              <p className={clsx("mt-2 text-sm md:text-base", isDark ? "text-slate-400" : "text-gray-500")}>
                 AI-powered patterns and trends from your wellness journey
               </p>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleAnalyze}
               disabled={isAnalyzing}
-              className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white rounded-xl font-medium shadow-lg shadow-violet-500/30 disabled:opacity-50"
             >
               {isAnalyzing ? (
                 <>
@@ -142,7 +156,7 @@ export default function Insights() {
                   Analyze Patterns
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         </motion.div>
 
@@ -154,7 +168,7 @@ export default function Insights() {
             transition={{ delay: 0.1 }}
             className="mb-6"
           >
-            <h2 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <h2 className={clsx("text-lg font-bold mb-3 flex items-center gap-2", isDark ? "text-white" : "text-gray-800")}>
               <AlertCircle className="w-5 h-5 text-amber-500" />
               Notifications
             </h2>
@@ -166,14 +180,17 @@ export default function Insights() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
-                  className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-amber-400"
+                  className={clsx(
+                    "rounded-xl p-4 shadow-sm border-l-4 border-amber-400",
+                    isDark ? "bg-slate-800/80" : "bg-white"
+                  )}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-800">{notification.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                      <h3 className={clsx("font-medium", isDark ? "text-white" : "text-gray-800")}>{notification.title}</h3>
+                      <p className={clsx("text-sm mt-1", isDark ? "text-slate-400" : "text-gray-600")}>{notification.message}</p>
                       {typeof notification.action_data === 'object' && notification.action_data !== null && 'advice' in notification.action_data && (
-                        <p className="text-sm text-violet-600 mt-2 flex items-center gap-1">
+                        <p className="text-sm text-violet-500 mt-2 flex items-center gap-1">
                           <Lightbulb className="w-4 h-4" />
                           {String((notification.action_data as Record<string, unknown>).advice)}
                         </p>
@@ -182,14 +199,24 @@ export default function Insights() {
                     <div className="flex items-center gap-2 ml-4">
                       <button
                         onClick={() => handleNotificationFeedback(notification.id, true)}
-                        className="p-2 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-500 transition-colors"
+                        className={clsx(
+                          "p-2 rounded-lg transition-colors",
+                          isDark 
+                            ? "hover:bg-green-900/30 text-slate-500 hover:text-green-400" 
+                            : "hover:bg-green-50 text-gray-400 hover:text-green-500"
+                        )}
                         title="Helpful"
                       >
                         <ThumbsUp className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleNotificationFeedback(notification.id, false)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                        className={clsx(
+                          "p-2 rounded-lg transition-colors",
+                          isDark 
+                            ? "hover:bg-red-900/30 text-slate-500 hover:text-red-400" 
+                            : "hover:bg-red-50 text-gray-400 hover:text-red-500"
+                        )}
                         title="Not helpful"
                       >
                         <ThumbsDown className="w-5 h-5" />
@@ -207,10 +234,13 @@ export default function Insights() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-6 shadow-sm mb-6"
+          className={clsx(
+            "rounded-2xl p-6 shadow-sm mb-6",
+            isDark ? "bg-slate-800/80 border border-slate-700" : "bg-white"
+          )}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <h2 className={clsx("text-lg font-bold flex items-center gap-2", isDark ? "text-white" : "text-gray-800")}>
               {analysis?.trend_direction === 'improving' ? (
                 <TrendingUp className="w-5 h-5 text-green-500" />
               ) : analysis?.trend_direction === 'declining' ? (
@@ -222,7 +252,7 @@ export default function Insights() {
             </h2>
             <button
               onClick={handleGenerateAnalysis}
-              className="text-sm text-violet-600 hover:text-violet-700 flex items-center gap-1"
+              className="text-sm text-violet-500 hover:text-violet-400 flex items-center gap-1"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh
@@ -260,13 +290,16 @@ export default function Insights() {
                    ` (${analysis.trend_percentage > 0 ? '+' : ''}${analysis.trend_percentage.toFixed(0)}%)`}
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">{analysis.summary}</p>
+              <p className={clsx("mb-4", isDark ? "text-slate-300" : "text-gray-600")}>{analysis.summary}</p>
 
               {/* Highlights */}
               {analysis.highlights && analysis.highlights.length > 0 && (
-                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 mb-4">
-                  <h3 className="font-medium text-emerald-800 mb-2">✨ Highlights</h3>
-                  <ul className="text-sm text-emerald-700 space-y-1">
+                <div className={clsx(
+                  "rounded-xl p-4 mb-4",
+                  isDark ? "bg-emerald-900/30" : "bg-gradient-to-r from-emerald-50 to-teal-50"
+                )}>
+                  <h3 className={clsx("font-medium mb-2", isDark ? "text-emerald-400" : "text-emerald-800")}>✨ Highlights</h3>
+                  <ul className={clsx("text-sm space-y-1", isDark ? "text-emerald-300" : "text-emerald-700")}>
                     {analysis.highlights.map((highlight, i) => (
                       <li key={i}>{highlight}</li>
                     ))}
@@ -275,14 +308,17 @@ export default function Insights() {
               )}
               
               {analysis.recommendations.length > 0 && (
-                <div className="bg-violet-50 rounded-xl p-4">
-                  <h3 className="font-medium text-violet-800 mb-2 flex items-center gap-2">
+                <div className={clsx(
+                  "rounded-xl p-4",
+                  isDark ? "bg-violet-900/30" : "bg-violet-50"
+                )}>
+                  <h3 className={clsx("font-medium mb-2 flex items-center gap-2", isDark ? "text-violet-400" : "text-violet-800")}>
                     <Lightbulb className="w-4 h-4" />
                     {analysis.trend_direction === 'improving' || analysis.average_mood >= 3.5 
                       ? 'Keep It Going!' 
                       : 'Recommendations'}
                   </h3>
-                  <ul className="text-sm text-violet-700 space-y-1">
+                  <ul className={clsx("text-sm space-y-1", isDark ? "text-violet-300" : "text-violet-700")}>
                     {analysis.recommendations.map((rec, i) => (
                       <li key={i}>• {rec}</li>
                     ))}
@@ -292,7 +328,7 @@ export default function Insights() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">No analysis available yet</p>
+              <p className={clsx("mb-4", isDark ? "text-slate-400" : "text-gray-500")}>No analysis available yet</p>
               <button
                 onClick={handleGenerateAnalysis}
                 className="btn-primary"
@@ -309,7 +345,7 @@ export default function Insights() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <h2 className={clsx("text-lg font-bold mb-4 flex items-center gap-2", isDark ? "text-white" : "text-gray-800")}>
             <Tag className="w-5 h-5 text-violet-500" />
             Detected Patterns
           </h2>
@@ -326,33 +362,35 @@ export default function Insights() {
                     onClick={() => setSelectedPattern(pattern)}
                     className={clsx(
                       "text-left rounded-2xl p-5 shadow-sm border-2 transition-all",
-                      style.bg,
-                      "border-transparent hover:border-violet-300"
+                      isDark ? "bg-slate-800/80 border-slate-700 hover:border-violet-500/50" : `${style.bg} border-transparent hover:border-violet-300`
                     )}
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-3xl">{style.icon}</span>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-800">{pattern.pattern_name}</h3>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        <h3 className={clsx("font-bold", isDark ? "text-white" : "text-gray-800")}>{pattern.pattern_name}</h3>
+                        <p className={clsx("text-sm mt-1 line-clamp-2", isDark ? "text-slate-400" : "text-gray-600")}>
                           {pattern.description}
                         </p>
                         <div className="flex items-center gap-3 mt-3">
-                          <span className={clsx("text-xs px-2 py-1 rounded-full", style.bg, style.color)}>
+                          <span className={clsx(
+                            "text-xs px-2 py-1 rounded-full",
+                            isDark ? "bg-slate-700 text-slate-300" : `${style.bg} ${style.color}`
+                          )}>
                             {pattern.emotion_type_display}
                           </span>
-                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <span className={clsx("text-xs flex items-center gap-1", isDark ? "text-slate-500" : "text-gray-500")}>
                             {triggerIcons[pattern.trigger_type]}
                             {pattern.trigger_type_display}
                           </span>
                         </div>
                         {/* Confidence indicator */}
                         <div className="mt-3">
-                          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                          <div className={clsx("flex items-center justify-between text-xs mb-1", isDark ? "text-slate-500" : "text-gray-500")}>
                             <span>Confidence</span>
                             <span>{Math.round(pattern.confidence_score * 100)}%</span>
                           </div>
-                          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div className={clsx("h-1.5 rounded-full overflow-hidden", isDark ? "bg-slate-700" : "bg-gray-200")}>
                             <div 
                               className="h-full bg-violet-500 rounded-full"
                               style={{ width: `${pattern.confidence_score * 100}%` }}
@@ -360,17 +398,20 @@ export default function Insights() {
                           </div>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className={clsx("w-5 h-5", isDark ? "text-slate-500" : "text-gray-400")} />
                     </div>
                   </motion.button>
                 );
               })}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-              <Brain className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="font-medium text-gray-800 mb-2">No patterns detected yet</h3>
-              <p className="text-sm text-gray-500 mb-4">
+            <div className={clsx(
+              "rounded-2xl p-8 text-center shadow-sm",
+              isDark ? "bg-slate-800/80 border border-slate-700" : "bg-white"
+            )}>
+              <Brain className={clsx("w-12 h-12 mx-auto mb-4", isDark ? "text-slate-600" : "text-gray-300")} />
+              <h3 className={clsx("font-medium mb-2", isDark ? "text-white" : "text-gray-800")}>No patterns detected yet</h3>
+              <p className={clsx("text-sm mb-4", isDark ? "text-slate-400" : "text-gray-500")}>
                 Keep logging your moods and journaling. We'll analyze your data to find patterns.
               </p>
               <button onClick={handleAnalyze} className="btn-primary">

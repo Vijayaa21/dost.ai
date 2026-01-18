@@ -4,6 +4,7 @@ import { Send, Plus, MessageCircle, Trash2, Wind, Heart, Brain, Sparkles, Menu, 
 import { useNavigate } from 'react-router-dom';
 import { chatService } from '../services/chatService';
 import { Message, Conversation } from '../types';
+import { useTheme } from '../context/ThemeContext';
 import clsx from 'clsx';
 import { format } from 'date-fns';
 import toast from '../utils/toast';
@@ -36,6 +37,7 @@ const suggestedPrompts = [
 
 export default function Chat() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -173,7 +175,10 @@ export default function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className={clsx(
+      "min-h-screen p-4 md:p-6 transition-colors duration-300",
+      isDark ? "bg-transparent" : "bg-gradient-to-br from-slate-50 via-violet-50 to-purple-50"
+    )}>
       <div className="max-w-5xl mx-auto h-[calc(100vh-120px)]">
         {/* Header */}
         <motion.div
@@ -182,17 +187,29 @@ export default function Chat() {
           className="flex items-center justify-between mb-6"
         >
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">
+            <h1 className={clsx(
+              "text-2xl md:text-3xl font-bold bg-clip-text text-transparent flex items-center gap-2",
+              isDark 
+                ? "bg-gradient-to-r from-violet-400 to-purple-400" 
+                : "bg-gradient-to-r from-violet-600 to-purple-600"
+            )}>
               Chat with Dost <span className="text-2xl">💜</span>
             </h1>
-            <p className="text-gray-500 mt-1">Your safe space to share and be heard</p>
+            <p className={clsx("mt-1", isDark ? "text-slate-400" : "text-gray-500")}>Your safe space to share and be heard</p>
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setShowSidebar(!showSidebar)}
-            className="p-2.5 bg-white rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm"
+            className={clsx(
+              "p-2.5 rounded-xl border transition-all shadow-md",
+              isDark 
+                ? "bg-slate-800 border-slate-700 hover:border-violet-500 hover:bg-slate-700" 
+                : "bg-white border-violet-200 hover:border-violet-300 hover:bg-violet-50"
+            )}
           >
-            <Menu className="w-5 h-5 text-gray-600" />
-          </button>
+            <Menu className={clsx("w-5 h-5", isDark ? "text-violet-400" : "text-violet-600")} />
+          </motion.button>
         </motion.div>
 
         {/* Main Chat Container */}
@@ -200,7 +217,12 @@ export default function Chat() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 h-full flex overflow-hidden"
+          className={clsx(
+            "rounded-3xl shadow-xl h-full flex overflow-hidden",
+            isDark 
+              ? "bg-slate-800/80 border border-slate-700 shadow-violet-500/5" 
+              : "bg-white border border-violet-100 shadow-violet-500/10"
+          )}
         >
           {/* Sidebar - Conversations */}
           <AnimatePresence>
@@ -210,15 +232,24 @@ export default function Chat() {
                 animate={{ width: 320, opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="border-r border-gray-100 flex flex-col bg-gray-50 overflow-hidden"
+                className={clsx(
+                  "border-r flex flex-col overflow-hidden",
+                  isDark ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-100"
+                )}
               >
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-800">Conversations</h3>
+                <div className={clsx(
+                  "p-4 border-b flex items-center justify-between",
+                  isDark ? "border-slate-700" : "border-gray-100"
+                )}>
+                  <h3 className={clsx("font-semibold", isDark ? "text-white" : "text-gray-800")}>Conversations</h3>
                   <button
                     onClick={() => setShowSidebar(false)}
-                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                    className={clsx(
+                      "p-1.5 rounded-lg transition-colors",
+                      isDark ? "hover:bg-slate-700" : "hover:bg-gray-200"
+                    )}
                   >
-                    <X className="w-4 h-4 text-gray-500" />
+                    <X className={clsx("w-4 h-4", isDark ? "text-slate-400" : "text-gray-500")} />
                   </button>
                 </div>
                 <div className="p-3">
@@ -232,9 +263,9 @@ export default function Chat() {
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 pt-0">
                   {conversations.length === 0 ? (
-                    <div className="text-center text-gray-400 py-8">
-                      <MessageCircle className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                      <p className="text-sm">No conversations yet</p>
+                    <div className="text-center py-8">
+                      <MessageCircle className={clsx("w-10 h-10 mx-auto mb-2 opacity-30", isDark ? "text-slate-500" : "text-gray-400")} />
+                      <p className={clsx("text-sm", isDark ? "text-slate-500" : "text-gray-400")}>No conversations yet</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -243,27 +274,38 @@ export default function Chat() {
                           key={conv.id}
                           onClick={() => loadConversation(conv.id)}
                           className={clsx(
-                            'p-3 rounded-xl cursor-pointer group transition-all',
+                            'p-3 rounded-xl cursor-pointer group transition-all border',
                             currentConversation === conv.id
-                              ? 'bg-white border border-violet-200 shadow-sm'
-                              : 'hover:bg-white hover:shadow-sm border border-transparent'
+                              ? isDark 
+                                ? 'bg-slate-800 border-violet-500/50 shadow-sm'
+                                : 'bg-white border-violet-200 shadow-sm'
+                              : isDark
+                                ? 'hover:bg-slate-800 hover:shadow-sm border-transparent'
+                                : 'hover:bg-white hover:shadow-sm border-transparent'
                           )}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <p className={clsx(
                                 'font-medium truncate text-sm',
-                                currentConversation === conv.id ? 'text-violet-700' : 'text-gray-700'
+                                currentConversation === conv.id 
+                                  ? 'text-violet-500' 
+                                  : isDark ? 'text-slate-300' : 'text-gray-700'
                               )}>
                                 {conv.title || 'New conversation'}
                               </p>
-                              <p className="text-xs text-gray-400 mt-1">
+                              <p className={clsx("text-xs mt-1", isDark ? "text-slate-500" : "text-gray-400")}>
                                 {format(new Date(conv.updated_at), 'MMM d, h:mm a')}
                               </p>
                             </div>
                             <button
                               onClick={(e) => deleteConversation(conv.id, e)}
-                              className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                              className={clsx(
+                                "opacity-0 group-hover:opacity-100 p-1.5 rounded-lg transition-all",
+                                isDark 
+                                  ? "text-slate-500 hover:text-red-400 hover:bg-red-900/30" 
+                                  : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+                              )}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -280,15 +322,18 @@ export default function Chat() {
           {/* Chat Area */}
           <div className="flex-1 flex flex-col min-w-0">
             {/* Chat Header */}
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200">
+            <div className={clsx(
+              "px-6 py-4 border-b flex items-center gap-3",
+              isDark ? "border-slate-700" : "border-gray-100"
+            )}>
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
                 <Heart className="w-5 h-5 text-white fill-white" />
               </div>
               <div>
-                <h2 className="font-semibold text-gray-800">Dost</h2>
+                <h2 className={clsx("font-semibold", isDark ? "text-white" : "text-gray-800")}>Dost</h2>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                  <p className="text-sm text-gray-500">Always here for you</p>
+                  <p className={clsx("text-sm", isDark ? "text-slate-400" : "text-gray-500")}>Always here for you</p>
                 </div>
               </div>
             </div>
@@ -298,9 +343,12 @@ export default function Chat() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3"
+                className={clsx(
+                  "mx-4 mt-4 border rounded-xl px-4 py-3",
+                  isDark ? "bg-red-900/30 border-red-700" : "bg-red-50 border-red-200"
+                )}
               >
-                <p className="text-sm text-red-600">{error}</p>
+                <p className={clsx("text-sm", isDark ? "text-red-400" : "text-red-600")}>{error}</p>
               </motion.div>
             )}
 
@@ -314,14 +362,14 @@ export default function Chat() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center max-w-md"
                   >
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-xl shadow-violet-200">
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-xl shadow-violet-500/30">
                       <span className="text-4xl">🤗</span>
                     </div>
                     
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    <h2 className={clsx("text-2xl font-bold mb-2", isDark ? "text-white" : "text-gray-800")}>
                       Hey there! I'm Dost 👋
                     </h2>
-                    <p className="text-gray-500 mb-8 leading-relaxed">
+                    <p className={clsx("mb-8 leading-relaxed", isDark ? "text-slate-400" : "text-gray-500")}>
                       Your safe space to share, vent, or just talk. 
                       I'm here to listen without judgment.
                     </p>
@@ -337,11 +385,13 @@ export default function Chat() {
                           onClick={() => sendMessage(prompt.text)}
                           className={clsx(
                             'flex items-center gap-3 p-4 rounded-xl border transition-all text-left group hover:shadow-md',
-                            `bg-gradient-to-r ${prompt.color} ${prompt.border}`
+                            isDark 
+                              ? 'bg-slate-700/50 border-slate-600 hover:border-violet-500/50'
+                              : `bg-gradient-to-r ${prompt.color} ${prompt.border}`
                           )}
                         >
                           <span className="text-2xl">{prompt.emoji}</span>
-                          <span className="text-sm text-gray-700 font-medium">{prompt.text}</span>
+                          <span className={clsx("text-sm font-medium", isDark ? "text-slate-200" : "text-gray-700")}>{prompt.text}</span>
                         </motion.button>
                       ))}
                     </div>
@@ -372,7 +422,9 @@ export default function Chat() {
                             'max-w-[75%] rounded-2xl px-4 py-3',
                             message.role === 'user'
                               ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-br-md shadow-md'
-                              : 'bg-gray-50 text-gray-800 rounded-bl-md border border-gray-100'
+                              : isDark 
+                                ? 'bg-slate-700 text-slate-200 rounded-bl-md border border-slate-600'
+                                : 'bg-gray-50 text-gray-800 rounded-bl-md border border-gray-100'
                           )}
                         >
                           <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
@@ -396,7 +448,10 @@ export default function Chat() {
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mr-3 flex-shrink-0 shadow-md">
                         <Heart className="w-4 h-4 text-white fill-white" />
                       </div>
-                      <div className="bg-gray-50 border border-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
+                      <div className={clsx(
+                        "rounded-2xl rounded-bl-md px-4 py-3",
+                        isDark ? "bg-slate-700 border border-slate-600" : "bg-gray-50 border border-gray-100"
+                      )}>
                         <div className="flex gap-1">
                           <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
                           <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
@@ -416,21 +471,36 @@ export default function Chat() {
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mr-3 flex-shrink-0 shadow-md">
                         <Heart className="w-4 h-4 text-white fill-white" />
                       </div>
-                      <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl rounded-bl-md p-4 max-w-sm border border-violet-100">
-                        <p className="text-gray-700 font-medium mb-3 text-sm">{copingSuggestion.message}</p>
+                      <div className={clsx(
+                        "rounded-2xl rounded-bl-md p-4 max-w-sm border",
+                        isDark 
+                          ? "bg-gradient-to-br from-violet-900/50 to-purple-900/50 border-violet-700/50" 
+                          : "bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100"
+                      )}>
+                        <p className={clsx("font-medium mb-3 text-sm", isDark ? "text-slate-200" : "text-gray-700")}>{copingSuggestion.message}</p>
                         <div className="space-y-2">
                           {copingSuggestion.exercises.map((exercise) => (
                             <button
                               key={exercise.id}
                               onClick={() => navigate(`/coping?exercise=${exercise.id}&category=${copingSuggestion.category}`)}
-                              className="w-full flex items-center gap-3 p-3 bg-white rounded-xl hover:bg-violet-50 transition-all border border-violet-100 hover:border-violet-200 group shadow-sm"
+                              className={clsx(
+                                "w-full flex items-center gap-3 p-3 rounded-xl transition-all border group shadow-sm",
+                                isDark 
+                                  ? "bg-slate-800 hover:bg-slate-700 border-slate-600 hover:border-violet-500/50" 
+                                  : "bg-white hover:bg-violet-50 border-violet-100 hover:border-violet-200"
+                              )}
                             >
-                              <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 group-hover:bg-violet-200 transition-colors">
+                              <div className={clsx(
+                                "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                                isDark 
+                                  ? "bg-violet-900/50 text-violet-400 group-hover:bg-violet-800/50" 
+                                  : "bg-violet-100 text-violet-600 group-hover:bg-violet-200"
+                              )}>
                                 {categoryIcons[copingSuggestion.category] || <Wind className="w-4 h-4" />}
                               </div>
                               <div className="flex-1 text-left">
-                                <p className="font-medium text-gray-800 text-sm">{exercise.name}</p>
-                                <p className="text-xs text-gray-500">{exercise.duration}</p>
+                                <p className={clsx("font-medium text-sm", isDark ? "text-white" : "text-gray-800")}>{exercise.name}</p>
+                                <p className={clsx("text-xs", isDark ? "text-slate-400" : "text-gray-500")}>{exercise.duration}</p>
                               </div>
                               <span className="text-violet-500 text-xs font-medium">Try →</span>
                             </button>
@@ -438,7 +508,7 @@ export default function Chat() {
                         </div>
                         <button
                           onClick={() => setCopingSuggestion(null)}
-                          className="text-xs text-gray-400 hover:text-gray-600 mt-3 w-full text-center"
+                          className={clsx("text-xs mt-3 w-full text-center", isDark ? "text-slate-500 hover:text-slate-400" : "text-gray-400 hover:text-gray-600")}
                         >
                           Maybe later
                         </button>
@@ -452,15 +522,21 @@ export default function Chat() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-gray-100">
-              <div className="flex items-end gap-3 bg-gray-50 rounded-xl p-2 border border-gray-100">
+            <div className={clsx("p-4 border-t", isDark ? "border-slate-700" : "border-gray-100")}>
+              <div className={clsx(
+                "flex items-end gap-3 rounded-xl p-2 border",
+                isDark ? "bg-slate-700/50 border-slate-600" : "bg-gray-50 border-gray-100"
+              )}>
                 <textarea
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Share what's on your mind..."
-                  className="flex-1 bg-transparent resize-none px-3 py-2.5 focus:outline-none text-gray-700 placeholder-gray-400 min-h-[44px] max-h-32"
+                  className={clsx(
+                    "flex-1 bg-transparent resize-none px-3 py-2.5 focus:outline-none min-h-[44px] max-h-32",
+                    isDark ? "text-white placeholder-slate-500" : "text-gray-700 placeholder-gray-400"
+                  )}
                   rows={1}
                 />
                 <button
@@ -469,14 +545,16 @@ export default function Chat() {
                   className={clsx(
                     'p-3 rounded-xl transition-all flex-shrink-0',
                     input.trim() && !isLoading
-                      ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-200'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-500/30'
+                      : isDark 
+                        ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   )}
                 >
                   <Send className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-center text-xs text-gray-400 mt-3">
+              <p className={clsx("text-center text-xs mt-3", isDark ? "text-slate-500" : "text-gray-400")}>
                 Dost is here to support you, not replace professional help.
                 <span className="text-red-400 ml-1 cursor-pointer hover:underline" onClick={() => window.open('tel:9152987821')}>
                   In crisis? Get help →

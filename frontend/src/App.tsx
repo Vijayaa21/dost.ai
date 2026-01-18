@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
+import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 
 // Lazy load pages for code splitting
@@ -56,49 +57,51 @@ function App() {
   }
 
   return (
-    <Router>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/home" />} />
-          <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
-          <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/home" />} />
-          
-          {/* Onboarding */}
-          <Route 
-            path="/onboarding" 
-            element={
-              <PrivateRoute>
-                {user?.onboarding_completed ? <Navigate to="/home" /> : <Onboarding />}
-              </PrivateRoute>
-            } 
-          />
-          
-          {/* Protected routes with layout */}
-          <Route 
-            element={
-              <PrivateRoute>
-                <Layout />
-              </PrivateRoute>
-            }
-          >
-            <Route path="/home" element={<Home />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/mood" element={<MoodDashboard />} />
-            <Route path="/journal" element={<Journal />} />
-            <Route path="/coping" element={<CopingToolkit />} />
-            <Route path="/pet" element={<Pet />} />
-            <Route path="/insights" element={<Insights />} />
-            <Route path="/games" element={<EmotionGames />} />
-            <Route path="/games/join" element={<JoinGame />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-          
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Suspense>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/home" />} />
+            <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+            <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/home" />} />
+            
+            {/* Onboarding */}
+            <Route 
+              path="/onboarding" 
+              element={
+                <PrivateRoute>
+                  {user?.onboarding_completed ? <Navigate to="/home" /> : <Onboarding />}
+                </PrivateRoute>
+              } 
+            />
+            
+            {/* Protected routes with layout */}
+            <Route 
+              element={
+                <PrivateRoute>
+                  <Layout />
+                </PrivateRoute>
+              }
+            >
+              <Route path="/home" element={<Home />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/mood" element={<MoodDashboard />} />
+              <Route path="/journal" element={<Journal />} />
+              <Route path="/coping" element={<CopingToolkit />} />
+              <Route path="/pet" element={<Pet />} />
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/games" element={<EmotionGames />} />
+              <Route path="/games/join" element={<JoinGame />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+            
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </ThemeProvider>
   );
 }
 
