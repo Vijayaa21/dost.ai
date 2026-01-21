@@ -110,10 +110,7 @@ export default function Insights() {
   }
 
   return (
-    <div className={clsx(
-      "min-h-screen p-4 md:p-6 transition-colors duration-300",
-      isDark ? "bg-transparent" : "bg-gradient-to-br from-slate-50 via-violet-50 to-indigo-50"
-    )}>
+    <div className="min-h-screen p-4 md:p-6 transition-colors duration-300 relative z-10">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div

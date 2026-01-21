@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Pause, Wind, Eye, Dumbbell, Heart, Headphones, RotateCcw } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 import clsx from 'clsx';
 
 // Tool types
@@ -107,6 +108,7 @@ const muscleGroups = [
 export default function CopingToolkit() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTool, setActiveTool] = useState<CopingToolCard | null>(null);
+  const { isDark } = useTheme();
   
   // Breathing state
   const [breathingPhase, setBreathingPhase] = useState<'ready' | 'inhale' | 'hold' | 'exhale' | 'complete'>('ready');
@@ -700,12 +702,12 @@ export default function CopingToolkit() {
 
   // Main render
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 p-6">
+    <div className="min-h-screen p-6 relative z-10">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Coping Hub</h1>
-          <p className="text-gray-600">Select a tool to find your center.</p>
+          <h1 className={clsx("text-3xl font-bold mb-2", isDark ? "text-white" : "text-gray-800")}>Coping Hub</h1>
+          <p className={clsx(isDark ? "text-slate-300" : "text-gray-600")}>Select a tool to find your center.</p>
         </div>
 
         {/* Tools Grid */}
@@ -717,7 +719,12 @@ export default function CopingToolkit() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               onClick={() => setActiveTool(tool)}
-              className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all cursor-pointer group border border-gray-100"
+              className={clsx(
+                "rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all cursor-pointer group border",
+                isDark
+                  ? "bg-slate-800/50 border-slate-700 hover:bg-slate-700/50"
+                  : "bg-white border-gray-100"
+              )}
             >
               <div className="flex items-center gap-4">
                 {/* Icon/Image */}
@@ -730,11 +737,11 @@ export default function CopingToolkit() {
                 </div>
                 
                 <div className="flex-1">
-                  <div className={`inline-flex p-2 rounded-lg bg-gray-100 ${tool.color} mb-2`}>
+                  <div className={clsx("inline-flex p-2 rounded-lg mb-2", tool.color, isDark ? "bg-slate-700" : "bg-gray-100")}>
                     {tool.icon}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800">{tool.title}</h3>
-                  <p className="text-xs text-gray-500 tracking-wide">{tool.subtitle}</p>
+                  <h3 className={clsx("text-lg font-semibold", isDark ? "text-white" : "text-gray-800")}>{tool.title}</h3>
+                  <p className={clsx("text-xs tracking-wide", isDark ? "text-slate-400" : "text-gray-500")}>{tool.subtitle}</p>
                 </div>
               </div>
             </motion.div>

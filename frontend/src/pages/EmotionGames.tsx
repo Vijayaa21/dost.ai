@@ -125,7 +125,7 @@ export default function EmotionGames() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 p-4 md:p-6 relative overflow-hidden">
+    <div className="min-h-screen p-4 md:p-6 relative overflow-hidden z-10">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
@@ -208,8 +208,8 @@ export default function EmotionGames() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:gap-8">
+          <div className="w-full">
             <AnimatePresence mode="wait">
               {/* Step 1: Select Emotion */}
               {step === 'select-emotion' && (
@@ -219,11 +219,11 @@ export default function EmotionGames() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                 >
-                  <h2 className="text-xl md:text-2xl font-semibold text-white mb-6 text-center flex items-center justify-center gap-2">
+                  <h2 className="text-xl md:text-2xl font-semibold text-white mb-8 text-center flex items-center justify-center gap-2">
                     <span className="text-2xl">✨</span>
                     How are you feeling right now?
                   </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {emotionOptions.map((emotion, index) => (
                       <motion.button
                         key={emotion.id}
@@ -234,16 +234,16 @@ export default function EmotionGames() {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleEmotionSelect(emotion.id)}
                         className={clsx(
-                          'relative overflow-hidden rounded-2xl p-5 text-white text-center transition-all',
+                          'relative overflow-hidden rounded-3xl p-6 md:p-8 text-white text-center transition-all',
                           `bg-gradient-to-br ${emotion.color}`,
                           `shadow-xl ${emotion.bgGlow}`,
-                          'hover:shadow-2xl'
+                          'hover:shadow-2xl min-h-[160px] md:min-h-[200px]'
                         )}
                       >
                         {/* Glow effect */}
                         <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity" />
                         <motion.div 
-                          className="text-4xl md:text-5xl mb-2"
+                          className="text-6xl md:text-7xl mb-3"
                           animate={{ rotate: [0, -5, 5, 0] }}
                           transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
                         >
@@ -260,14 +260,14 @@ export default function EmotionGames() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="mt-12"
+                    className="mt-12 mb-8"
                   >
-                    <h3 className="text-xl font-semibold text-white mb-6 text-center flex items-center justify-center gap-2">
+                    <h3 className="text-2xl font-semibold text-white mb-8 text-center flex items-center justify-center gap-2">
                       <Star className="w-5 h-5 text-yellow-400" />
                       Or Browse All Games
                       <Star className="w-5 h-5 text-yellow-400" />
                     </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                       {builtInGames.map((game, index) => (
                         <motion.button
                           key={game.id}
@@ -277,12 +277,12 @@ export default function EmotionGames() {
                           whileHover={{ scale: 1.05, y: -3 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handlePlayGame(game)}
-                          className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-purple-400/50 hover:bg-white/15 transition-all text-left group"
+                          className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/10 hover:border-purple-400/50 hover:bg-white/15 transition-all text-left group min-h-[180px] md:min-h-[220px] flex flex-col justify-center"
                         >
-                          <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">{game.emoji}</div>
-                          <h4 className="font-semibold text-white text-sm">{game.name}</h4>
-                          <div className="flex items-center gap-1 mt-2 text-purple-300 text-xs">
-                            <Clock className="w-3 h-3" />
+                          <div className="text-5xl md:text-6xl mb-3 group-hover:scale-110 transition-transform">{game.emoji}</div>
+                          <h4 className="font-semibold text-white text-base md:text-lg">{game.name}</h4>
+                          <div className="flex items-center gap-1 mt-3 text-purple-300 text-sm">
+                            <Clock className="w-4 h-4" />
                             {game.duration}
                           </div>
                         </motion.button>
@@ -337,7 +337,7 @@ export default function EmotionGames() {
                     Recommended for you
                   </h3>
                   
-                  <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {recommendedGames.map((game, index) => (
                       <motion.div
                         key={game.id}
@@ -345,7 +345,7 @@ export default function EmotionGames() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ y: -5 }}
-                        className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 hover:border-purple-400/50 transition-all group"
+                        className="bg-white/10 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/10 hover:border-purple-400/50 transition-all group min-h-[220px] md:min-h-[260px] flex flex-col justify-between"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <motion.span 

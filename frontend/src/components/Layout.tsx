@@ -19,7 +19,9 @@ import {
   Code2,
   Sparkles,
   Sun,
-  Moon
+  Moon,
+  Linkedin,
+  Twitter
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
@@ -60,12 +62,7 @@ export default function Layout() {
   const isDark = theme === 'dark';
 
   return (
-    <div className={clsx(
-      "min-h-screen flex flex-col transition-colors duration-300",
-      isDark 
-        ? "bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950" 
-        : "bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50"
-    )}>
+    <div className="min-h-screen flex flex-col transition-colors duration-300 relative z-10">
       <div className="flex flex-1">
         {/* Desktop Sidebar - Fixed Position */}
         <aside className={clsx(
@@ -328,7 +325,7 @@ export default function Layout() {
               </p>
               <div className="space-y-3">
                 <a 
-                  href="https://github.com/VijayAdithyaBK/dost.ai" 
+                  href="https://github.com/Vijayaa21/dost.ai" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-slate-900 px-4 py-2.5 rounded-xl font-medium text-sm transition-all transform hover:scale-105 w-fit"
@@ -337,7 +334,7 @@ export default function Layout() {
                   Star on GitHub ⭐
                 </a>
                 <a 
-                  href="https://github.com/VijayAdithyaBK/dost.ai/blob/main/CONTRIBUTING.md" 
+                  href="https://github.com/Vijayaa21/dost.ai" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className={clsx(
@@ -356,11 +353,58 @@ export default function Layout() {
 
           {/* Divider */}
           <div className={clsx("border-t pt-6", isDark ? "border-slate-700" : "border-purple-200")}>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className={clsx("flex items-center gap-2", isDark ? "text-slate-400" : "text-gray-500")}>
                 <Heart className="w-4 h-4 text-red-400" />
                 <span className="text-sm">Made with care for your mental wellness</span>
               </div>
+              
+              {/* Social Media Links */}
+              <div className="flex items-center gap-4">
+                <a 
+                  href="https://www.linkedin.com/in/vijaya-mishra21/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={clsx(
+                    "p-2 rounded-lg transition-all transform hover:scale-110",
+                    isDark 
+                      ? "bg-slate-700/50 text-blue-400 hover:bg-blue-950/50" 
+                      : "bg-purple-100 text-blue-600 hover:bg-blue-100"
+                  )}
+                  title="Connect on LinkedIn"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://github.com/Vijayaa21/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={clsx(
+                    "p-2 rounded-lg transition-all transform hover:scale-110",
+                    isDark 
+                      ? "bg-slate-700/50 text-gray-300 hover:bg-slate-600" 
+                      : "bg-purple-100 text-gray-700 hover:bg-gray-200"
+                  )}
+                  title="Follow on GitHub"
+                >
+                  <Github className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://x.com/Vijayaa_21" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={clsx(
+                    "p-2 rounded-lg transition-all transform hover:scale-110",
+                    isDark 
+                      ? "bg-slate-700/50 text-sky-400 hover:bg-sky-950/50" 
+                      : "bg-purple-100 text-sky-500 hover:bg-sky-100"
+                  )}
+                  title="Follow on Twitter"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
+              </div>
+
               <p className={clsx("text-xs", isDark ? "text-slate-500" : "text-gray-400")}>
                 © 2026 Dost AI. All rights reserved. Your mental health companion.
               </p>

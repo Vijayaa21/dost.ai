@@ -141,10 +141,7 @@ export default function Journal() {
   };
 
   return (
-    <div className={clsx(
-      "min-h-screen p-4 md:p-6 transition-colors duration-300",
-      isDark ? "bg-transparent" : "bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-50"
-    )}>
+    <div className="min-h-screen p-4 md:p-6 transition-colors duration-300 relative z-10">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div 

@@ -117,7 +117,7 @@ export default function Pet() {
   const expression = petExpressions[pet.mood] || petExpressions.neutral;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen p-4 md:p-6 relative z-10">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
