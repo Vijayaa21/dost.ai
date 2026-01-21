@@ -1,50 +1,84 @@
-<svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#f8f0ff" />
-      <stop offset="100%" style="stop-color:#e0ccff" />
-    </linearGradient>
-    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#9d50bb" />
-      <stop offset="100%" style="stop-color:#6e48aa" />
-    </linearGradient>
-    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#ff9a8b" />
-      <stop offset="100%" style="stop-color:#ff6a88" />
-    </linearGradient>
-  </defs>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Gradients -->
+<linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#9d50bb" />
+<stop offset="100%" style="stop-color:#6e48aa" />
+</linearGradient>
 
-  <g transform="translate(250, 280) scale(1.2) translate(-250, -250)">
-    
-    <path d="M250 140 Q230 100 210 115 Q210 140 250 140 Z" fill="#8bc34a" />
-    <path d="M250 140 Q270 100 290 115 Q290 140 250 140 Z" fill="#aed581" />
-    <rect x="248" y="135" width="4" height="15" fill="#689f38" />
+<linearGradient id="leafGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" style="stop-color:#8bc34a" />
+  <stop offset="100%" style="stop-color:#aed581" />
+</linearGradient>
 
-    <path d="M170 230 A90 90 0 0 1 330 230" stroke="#9d50bb" stroke-width="25" fill="none" stroke-linecap="round" />
+<linearGradient id="heartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" style="stop-color:#ff9a8b" />
+  <stop offset="100%" style="stop-color:#ff6a88" />
+</linearGradient>
 
-    <rect x="150" y="180" width="200" height="160" rx="80" fill="url(#purpleGrad)" />
-    
-    <rect x="165" y="195" width="170" height="130" rx="65" fill="white" />
-    
-    <circle cx="210" cy="250" r="14" fill="#3a1c5e" />
-    <circle cx="290" cy="250" r="14" fill="#3a1c5e" />
-    <circle cx="214" cy="244" r="5" fill="white" />
-    <circle cx="294" cy="244" r="5" fill="white" />
 
-    <path d="M235 275 Q250 288 265 275" stroke="#3a1c5e" stroke-width="4" fill="none" stroke-linecap="round" />
+</defs>
 
-    <circle cx="145" cy="260" r="28" fill="url(#purpleGrad)" />
-    <circle cx="355" cy="260" r="28" fill="url(#purpleGrad)" />
-    <path d="M145 285 Q150 330 185 330" stroke="#3a1c5e" stroke-width="5" fill="none" />
-    <circle cx="190" cy="330" r="7" fill="#3a1c5e" />
+<!-- Circular Boundary (Double Ring) -->
 
-    <path d="M250 395 C250 395 210 360 210 335 C210 315 230 315 250 335 C270 315 290 315 290 335 C290 360 250 395 250 395 Z" fill="url(#heartGrad)" />
+<circle cx="250" cy="250" r="235" fill="none" stroke="url(#purpleGrad)" stroke-width="4" />
+<circle cx="250" cy="250" r="225" fill="none" stroke="url(#purpleGrad)" stroke-width="2" />
 
-    <text x="250" y="485" text-anchor="middle" font-family="Brush Script MT, cursive, Arial" font-size="100" font-weight="bold" fill="#7a44bb">Dost Ai</text>
-    
-    <text x="250" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" letter-spacing="1" font-weight="bold" fill="#ff8a80">MENTAL HEALTH COMPANION CHATBOT</text>
-    
-    <path d="M130 525 Q135 520 140 525 Q135 530 130 525" fill="#ff8a80" />
-    <path d="M360 525 Q365 520 370 525 Q365 530 360 525" fill="#ff8a80" />
-  </g>
+<!-- Leaves on Top -->
+
+<g transform="translate(250, 115)">
+<path d="M0 0 Q-25 -45 -55 -35 Q-55 -10 0 0" fill="url(#leafGrad)" />
+<path d="M0 0 Q25 -45 55 -35 Q55 -10 0 0" fill="url(#leafGrad)" />
+<rect x="-2" y="-5" width="4" height="20" fill="#689f38" rx="2" />
+</g>
+
+<!-- Robot Body/Head -->
+
+<g transform="translate(250, 205)">
+<!-- Headphones/Ears -->
+<path d="M-80 0 A80 80 0 0 1 80 0" fill="none" stroke="url(#purpleGrad)" stroke-width="15" stroke-linecap="round" />
+<circle cx="-85" cy="20" r="25" fill="url(#purpleGrad)" />
+<circle cx="85" cy="20" r="25" fill="url(#purpleGrad)" />
+
+<!-- Main Body Face -->
+<rect x="-75" y="-30" width="150" height="100" rx="20" fill="url(#purpleGrad)" />
+<rect x="-60" y="-15" width="120" height="70" rx="15" fill="white" />
+
+<!-- Eyes -->
+<circle cx="-35" cy="20" r="12" fill="#3a1c5e" />
+<circle cx="35" cy="20" r="12" fill="#3a1c5e" />
+
+<!-- Eye Sparkles -->
+<circle cx="-32" cy="15" r="4" fill="white" />
+<circle cx="38" cy="15" r="4" fill="white" />
+<circle cx="-38" cy="25" r="2" fill="white" opacity="0.6" />
+<circle cx="32" cy="25" r="2" fill="white" opacity="0.6" />
+
+<!-- Mouth -->
+<path d="M-8 35 Q0 42 8 35" stroke="#3a1c5e" stroke-width="3" fill="none" stroke-linecap="round" />
+
+
+</g>
+
+<!-- Arms and Heart -->
+
+<g transform="translate(250, 310)">
+<!-- Arms -->
+<path d="M-85 -85 Q-70 0 0 50" fill="none" stroke="#3a1c5e" stroke-width="3" opacity="0.6" />
+<path d="M85 -85 Q70 0 0 50" fill="none" stroke="#3a1c5e" stroke-width="3" opacity="0.6" />
+
+<!-- Hands -->
+<circle cx="-42" cy="45" r="8" fill="#3a1c5e" />
+<circle cx="42" cy="45" r="8" fill="#3a1c5e" />
+
+<!-- Heart -->
+<path d="M0 75 C0 75 -40 40 -40 15 C-40 -5 -20 -5 0 15 C20 -5 40 -5 40 15 C40 40 0 75 0 75 Z" fill="url(#heartGrad)" />
+
+
+</g>
+
+<!-- Typography -->
+
+<text x="250" y="415" text-anchor="middle" font-family="Brush Script MT, cursive" font-size="70" font-weight="bold" fill="#7a44bb">Dost Ai</text>
+
 </svg>

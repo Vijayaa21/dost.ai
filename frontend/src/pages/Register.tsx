@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import Logo from '../components/Logo';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -45,7 +46,7 @@ export default function Register() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-3">
-            <img src="/dost-logo.svg" alt="Dost AI" className="w-12 h-12" />
+            <Logo size="md" />
             <span className="text-2xl font-semibold text-primary-600">Dost AI</span>
           </Link>
           <p className="text-gray-600 mt-2">Create your account and meet your new dost!</p>

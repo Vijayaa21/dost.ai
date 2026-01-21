@@ -5,6 +5,7 @@ import { Loader2, ArrowRight } from 'lucide-react';
 import { authService } from '../services/authService';
 import { useAuthStore } from '../store/authStore';
 import clsx from 'clsx';
+import Logo from '../components/Logo';
 
 const toneOptions = [
   { value: 'calm', label: '🌊 Calm', description: 'Gentle, soothing responses' },
@@ -92,7 +93,7 @@ export default function Onboarding() {
               className="text-center"
             >
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary-100 flex items-center justify-center">
-                <img src="/dost-logo.svg" alt="Dost" className="w-12 h-12" />
+                <Logo size="md" />
               </div>
               <h1 className="text-2xl font-bold text-gray-800 mb-4">
                 Welcome to Dost AI! 💙

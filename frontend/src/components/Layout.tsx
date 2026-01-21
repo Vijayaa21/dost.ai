@@ -27,6 +27,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import clsx from 'clsx';
+import Logo from './Logo';
 
 const navItems = [
   { path: '/home', icon: BarChart3, label: 'Dashboard' },
@@ -77,9 +78,7 @@ export default function Layout() {
             isDark ? "border-slate-700/50" : "border-gray-100"
           )}>
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                <img src="/dost-logo.svg" alt="Dost AI" className="w-7 h-7 filter brightness-0 invert" />
-              </div>
+              <Logo size="md" />
               <div>
                 <span className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">Dost AI</span>
                 <p className={clsx("text-xs", isDark ? "text-slate-500" : "text-gray-400")}>Mental Wellness</p>
@@ -160,9 +159,7 @@ export default function Layout() {
         )}>
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                <img src="/dost-logo.svg" alt="Dost AI" className="w-6 h-6 filter brightness-0 invert" />
-              </div>
+              <Logo size="sm" />
               <span className={clsx("text-lg font-bold", isDark ? "text-white" : "text-gray-800")}>Dost AI</span>
             </div>
             <div className="flex items-center gap-2">
@@ -250,7 +247,7 @@ export default function Layout() {
             {/* Brand Section */}
             <div className="md:col-span-1">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/dost-logo.svg" alt="Dost AI" className="w-16 h-16" />
+                <Logo size="lg" />
                 <div>
                   <h3 className={clsx(
                     "text-2xl font-bold bg-clip-text text-transparent",
