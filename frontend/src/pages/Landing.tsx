@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageCircle, BarChart3, BookOpen, Heart, Shield, Clock, Sparkles, ArrowRight, Star } from 'lucide-react';
+import { MessageCircle, BarChart3, BookOpen, Heart, Shield, Clock, Sparkles, ArrowRight, Star, Github, AlertCircle, Linkedin, Twitter, Code2, Headphones, ShieldCheck, Users } from 'lucide-react';
 import Logo from '../components/Logo';
 
 const features = [
@@ -63,6 +63,39 @@ const testimonials = [
     text: "Finally, a safe space to express my thoughts without fear of judgment.",
     author: "Anonymous User",
     rating: 5,
+  },
+];
+
+const services = [
+  {
+    icon: Headphones,
+    title: '1:1 Supportive Chat',
+    description: 'Caring, judgment-free conversations whenever you need to talk.',
+  },
+  {
+    icon: BarChart3,
+    title: 'Mood Insights',
+    description: 'Daily logs, patterns, and reflections to understand how you feel.',
+  },
+  {
+    icon: BookOpen,
+    title: 'Guided Journaling',
+    description: 'Prompted writing flows to help you untangle thoughts with ease.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Privacy-first',
+    description: 'Your data stays yours. Clear, delete, or export anytime.',
+  },
+  {
+    icon: Heart,
+    title: 'Coping Toolkit',
+    description: 'Grounding, breathing, and CBT-inspired exercises you can use fast.',
+  },
+  {
+    icon: Clock,
+    title: 'Always On',
+    description: 'Available 24/7 so support is never out of reach.',
   },
 ];
 
@@ -284,6 +317,97 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Services Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-violet-50/60">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-sm font-semibold mb-4">
+              Services built for care
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">What you get with Dost</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              All the essentials to feel heard, supported, and guided on your mental wellness journey.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((service, index) => (
+              <motion.div
+                key={service.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08 }}
+                className="p-6 rounded-2xl bg-white shadow-lg shadow-purple-50 border border-purple-100/60 hover:shadow-xl hover:-translate-y-1 transition-all"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-purple-200 mb-4">
+                  <service.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">{service.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{service.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-100 text-violet-700 text-sm font-semibold w-fit">
+                About Dost AI
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Built with empathy, guided by safety</h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Dost AI is your always-on companion for emotional wellbeing. We blend supportive language models with
+                practical mental health tools, keeping privacy at the center of every interaction.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
+                  <div className="flex items-center gap-2 mb-2 text-violet-700 font-semibold"><Users className="w-4 h-4" /> Community-first</div>
+                  <p className="text-sm text-gray-600">Shaped by user feedback and real-world needs.</p>
+                </div>
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+                  <div className="flex items-center gap-2 mb-2 text-emerald-700 font-semibold"><ShieldCheck className="w-4 h-4" /> Privacy & Safety</div>
+                  <p className="text-sm text-gray-600">Clear controls to delete, export, or reset anytime.</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="p-8 rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 text-white shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold mb-4">Why people choose Dost</h3>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-start gap-3"><span className="mt-1">💜</span> Empathetic responses tuned to support, not judge.</li>
+                <li className="flex items-start gap-3"><span className="mt-1">🛡️</span> Private by design with clear data controls.</li>
+                <li className="flex items-start gap-3"><span className="mt-1">⏱️</span> Fast access to coping tools when emotions spike.</li>
+                <li className="flex items-start gap-3"><span className="mt-1">📈</span> Insightful trends to help you notice patterns early.</li>
+              </ul>
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <Link to="/register" className="flex-1 text-center bg-white text-purple-700 font-semibold py-3 rounded-xl hover:bg-violet-50 transition-colors">Create free account</Link>
+                <Link to="/login" className="flex-1 text-center border border-white/60 text-white font-semibold py-3 rounded-xl hover:bg-white/10 transition-colors">Login</Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
@@ -361,25 +485,141 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Contact Section */}
+      <section className="py-16 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
+          <div className="space-y-4">
+            <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-purple-100 text-sm font-semibold w-fit">
+              Need to talk to us?
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold">We're here to help</h2>
+            <p className="text-slate-200 leading-relaxed">
+              Questions about Dost, data privacy, or partnerships? Reach out and we’ll respond quickly.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="flex items-center gap-2 mb-2 font-semibold text-white"><Headphones className="w-4 h-4" /> Support</div>
+                <p className="text-sm text-slate-200">support@dost.ai</p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="flex items-center gap-2 mb-2 font-semibold text-white"><Shield className="w-4 h-4" /> Privacy</div>
+                <p className="text-sm text-slate-200">privacy@dost.ai</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-300">Crisis helpline (24/7): <a href="tel:9152987821" className="text-pink-200 hover:text-pink-100 underline">9152987821</a></p>
+          </div>
+
+          <div className="p-6 md:p-8 rounded-2xl bg-white text-slate-900 shadow-2xl">
+            <h3 className="text-2xl font-bold mb-4">Message us</h3>
+            <form className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Name</label>
+                <input className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-200" placeholder="Your name" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Email</label>
+                <input className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-200" placeholder="you@example.com" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Message</label>
+                <textarea rows={3} className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-200" placeholder="How can we help?" />
+              </div>
+              <button type="button" className="w-full bg-gradient-to-r from-violet-500 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-violet-600 hover:to-purple-700 transition-colors">Send message</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-12">
+      <footer className="bg-gradient-to-br from-slate-100 via-purple-50 to-indigo-100 border-t border-purple-200 py-14">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <Logo size="sm" />
-              <span className="text-xl font-bold text-gray-800">Dost AI</span>
-            </div>
-            
-            <div className="text-center text-gray-500 text-sm">
-              <p className="mb-1">
-                <strong>Note:</strong> Dost AI is not a replacement for professional mental health care.
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <Logo size="md" />
+                <div>
+                  <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-pink-600">Dost AI</h3>
+                  <p className="text-xs text-gray-500">Your Mental Wellness Companion</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                Empathetic conversations, mood tracking, journaling, and guided coping strategies. We are here for you, every step of the way. 💜
               </p>
-              <p>
-                Crisis helplines: iCall (9152987821) | Vandrevala Foundation (1860-2662-345)
-              </p>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <span>Powered by AI, built with care</span>
+              </div>
             </div>
-            
-            <p className="text-sm text-gray-400">© 2026 Dost AI. Made with 💜</p>
+
+            {/* Resources */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2 text-gray-800">
+                <Heart className="w-4 h-4 text-pink-600" />
+                Resources
+              </h4>
+              <ul className="space-y-3 text-sm text-gray-600">
+                <li><a href="#" className="hover:text-purple-600 transition-colors flex items-center gap-2">About Dost AI</a></li>
+                <li><a href="#" className="hover:text-purple-600 transition-colors flex items-center gap-2">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-purple-600 transition-colors flex items-center gap-2">Terms of Service</a></li>
+                <li>
+                  <a href="tel:9152987821" className="text-red-500 hover:text-red-400 transition-colors flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    Crisis Helpline (24/7)
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Open Source & Social */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2 text-gray-800">
+                <Github className="w-4 h-4" />
+                Open Source
+              </h4>
+              <p className="text-sm text-gray-600 mb-4">Help us make mental wellness accessible to everyone.</p>
+              <div className="space-y-3">
+                <a
+                  href="https://github.com/Vijayaa21/dost.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-slate-900 px-4 py-2.5 rounded-xl font-medium text-sm transition-all transform hover:scale-105 w-fit"
+                >
+                  <Star className="w-4 h-4" />
+                  Star on GitHub ⭐
+                </a>
+                <a
+                  href="https://github.com/Vijayaa21/dost.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all w-fit bg-slate-900 text-white hover:bg-slate-800"
+                >
+                  <Code2 className="w-4 h-4" />
+                  Contribute
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3 mt-4">
+                <a href="https://www.linkedin.com/in/vijaya-mishra21/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white text-gray-600 shadow hover:text-purple-600 transition-colors">
+                  <Linkedin className="w-4 h-4" />
+                </a>
+                <a href="https://github.com/Vijayaa21/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white text-gray-600 shadow hover:text-purple-600 transition-colors">
+                  <Github className="w-4 h-4" />
+                </a>
+                <a href="https://x.com/Vijayaa_21" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white text-gray-600 shadow hover:text-purple-600 transition-colors">
+                  <Twitter className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+            <p>© 2026 Dost AI. Made with 💜</p>
+            <div className="text-center">
+              <p className="font-semibold text-gray-700">Note:</p>
+              <p>Dost AI is not a replacement for professional mental health care.</p>
+              <p>Crisis helplines: iCall (9152987821) | Vandrevala Foundation (1860-2662-345)</p>
+            </div>
           </div>
         </div>
       </footer>
