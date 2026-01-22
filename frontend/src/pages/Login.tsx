@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2, Github, Heart, AlertCircle, Star, Code2, Linkedin, Twitter, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { useTheme, getCardClass, getInputClass, getGradientTextClass } from '../context/ThemeContext';
+import { useTheme, getCardClass, getInputClass } from '../context/ThemeContext';
 import Logo from '../components/Logo';
 import AnimatedBackground from '../components/AnimatedBackground';
 
@@ -46,7 +46,7 @@ export default function Login() {
               className="hidden lg:flex flex-col items-center justify-between p-12 text-center relative"
             >
               <div className="flex-1 flex flex-col items-center justify-center gap-6">
-                <Logo size="xl" />
+                <Logo size="lg" />
                 <div>
                   <p className={isDark ? "text-slate-300" : "text-gray-600"}>Login to continue your journey with our platform.</p>
                 </div>

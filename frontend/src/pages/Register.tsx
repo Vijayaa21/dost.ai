@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2, Github, Heart, AlertCircle, Star, Code2, Linkedin, Twitter, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { useTheme, getCardClass, getInputClass, getGradientTextClass } from '../context/ThemeContext';
+import { useTheme, getCardClass, getInputClass } from '../context/ThemeContext';
 import Logo from '../components/Logo';
 import AnimatedBackground from '../components/AnimatedBackground';
 
@@ -61,7 +61,7 @@ export default function Register() {
               <div className="flex-1 flex flex-col items-center justify-center gap-6">
                 <p className={isDark ? "text-slate-300" : "text-gray-600"}>Create your account and start your journey with us.</p>
 
-                <Logo size="xl" />
+                <Logo size="lg" />
                 <div>
                   <p className={isDark ? "text-lg leading-relaxed text-slate-200" : "text-lg leading-relaxed text-gray-700"}>
               Empathetic conversations, mood tracking, and guided coping tools. Your safe, always-on companion for emotional wellbeing.
