@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Gamepad2, 
@@ -98,6 +98,12 @@ export default function EmotionGames() {
   };
 
   const selectedEmotionData = emotionOptions.find(e => e.id === selectedEmotion);
+
+  useEffect(() => {
+    if (step === 'playing') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    }
+  }, [step]);
 
   // Render the selected game
   if (step === 'playing' && selectedGame) {

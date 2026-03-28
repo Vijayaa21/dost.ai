@@ -108,31 +108,31 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
           onClick={handleClose}
         >
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 relative"
+            className="bg-white/90 rounded-3xl shadow-xl max-w-lg w-full p-8 relative border border-[#f2ded4]"
             onClick={(e) => e.stopPropagation()}
           >
             <button 
               onClick={handleClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className="absolute top-4 right-4 text-[#9c7a70] hover:text-[#5c3d36]"
             >
               <X size={24} />
             </button>
 
             <div className="flex flex-col items-center text-center">
-              <div className="p-4 bg-blue-100 rounded-full mb-4">
-                <Share2 size={32} className="text-blue-500" />
+              <div className="p-4 bg-[#f6e7de] rounded-2xl mb-4">
+                <Share2 size={30} className="text-[#d97c6f]" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-[#5c3d36] mb-2">
                 {roomCode ? 'Game Room Ready!' : 'Invite Friends to Play'}
               </h2>
-              <p className="text-gray-500 mb-6">
+              <p className="text-[#8d6a60] mb-6">
                 {roomCode 
                   ? 'Share this link with your friend. When they click it, they\'ll join your game directly!'
                   : 'Create a game room and share the link, or just invite them to become friends.'}
@@ -142,7 +142,7 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
                 <button
                   onClick={() => setShowGameSelection(true)}
                   disabled={loading}
-                  className="w-full mb-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full mb-4 bg-gradient-to-r from-[#d97c6f] to-[#c86b60] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   <Gamepad2 size={20} />
                   Create Game & Invite
@@ -151,7 +151,7 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
 
               {showGameSelection && !roomCode && (
                 <div className="mb-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">Choose a game:</p>
+                  <p className="text-sm font-semibold text-[#5c3d36] mb-3">Choose a game:</p>
                   <div className="grid grid-cols-2 gap-3">
                     {gameOptions.map((game) => (
                       <motion.button
@@ -160,22 +160,22 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleCreateGameInvite(game.id as GameType)}
                         disabled={creatingGame}
-                        className="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border-2 border-purple-200 hover:border-purple-400 transition-all disabled:opacity-50"
+                        className="p-4 bg-gradient-to-br from-[#fff7eb] to-[#f6e7de] rounded-xl border-2 border-[#f2ded4] hover:border-[#d99f8f] transition-all disabled:opacity-50"
                       >
                         <div className="text-3xl mb-2">{game.emoji}</div>
-                        <div className="text-sm font-semibold text-gray-700">{game.name}</div>
+                        <div className="text-sm font-semibold text-[#5c3d36]">{game.name}</div>
                       </motion.button>
                     ))}
                   </div>
                   {creatingGame && (
-                    <div className="mt-3 flex items-center justify-center gap-2 text-gray-600">
+                    <div className="mt-3 flex items-center justify-center gap-2 text-[#8d6a60]">
                       <Loader2 className="animate-spin" size={16} />
                       <span className="text-sm">Creating room...</span>
                     </div>
                   )}
                   <button
                     onClick={() => setShowGameSelection(false)}
-                    className="mt-3 text-sm text-gray-500 hover:text-gray-700 underline"
+                    className="mt-3 text-sm text-[#8d6a60] hover:text-[#5c3d36] underline"
                   >
                     Cancel
                   </button>
@@ -183,13 +183,13 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
               )}
 
               <div className="w-full">
-                <p className="text-xs text-gray-400 mb-2 text-left">
+                <p className="text-xs text-[#9c7a70] mb-2 text-left">
                   {roomCode ? 'Game invite link:' : 'Or share friend invite link:'}
                 </p>
-                <div className="w-full h-14 bg-gray-100 border border-gray-200 rounded-lg p-2 flex items-center gap-2">
+                <div className="w-full h-14 bg-[#fff7eb] border border-[#f2ded4] rounded-xl p-2 flex items-center gap-2">
                   {loading ? (
                     <div className="w-full flex items-center justify-center">
-                      <Loader2 className="animate-spin text-gray-400" />
+                      <Loader2 className="animate-spin text-[#d99f8f]" />
                     </div>
                   ) : (
                     <>
@@ -197,14 +197,14 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
                         type="text" 
                         readOnly 
                         value={inviteLink}
-                        className="bg-transparent w-full text-gray-600 text-sm outline-none"
+                        className="bg-transparent w-full text-[#8d6a60] text-sm outline-none"
                       />
                       <button 
                         onClick={handleCopy}
                         className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
                           copied 
                             ? 'bg-green-500 text-white' 
-                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            : 'bg-[#d97c6f] hover:bg-[#c86b60] text-white'
                         }`}
                       >
                         {copied ? <Check size={16} /> : <Copy size={16} />}
@@ -218,18 +218,18 @@ export default function InviteFriendsModal({ isOpen, onClose }: InviteFriendsMod
                 <div className="mt-6 space-y-3">
                   <button
                     onClick={handleJoinGame}
-                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-[#d97c6f] to-[#c86b60] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                   >
                     <Gamepad2 size={20} />
                     Join Game Now
                   </button>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-[#8d6a60]">
                     Or share the link above with your friend to play together!
                   </p>
                 </div>
               )}
               
-              <p className="text-xs text-gray-400 mt-4">
+              <p className="text-xs text-[#9c7a70] mt-4">
                 {roomCode 
                   ? 'Room code: ' + roomCode.slice(0, 12)
                   : 'New users will become your friend after signing up.'}

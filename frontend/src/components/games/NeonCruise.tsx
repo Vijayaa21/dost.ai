@@ -54,11 +54,11 @@ export default function NeonCruise({ onBack, onComplete }: NeonCruiseProps) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Road lines (speed up animation with level)
-      const currentLevel = Math.floor(state.frames / 300) + 1;
+      const currentLevel = Math.floor(state.frames / 450) + 1;
       ctx.strokeStyle = '#1e293b';
       ctx.lineWidth = 4;
       ctx.setLineDash([40, 40]);
-      ctx.lineDashOffset = state.frames * -(20 + currentLevel * 5);
+      ctx.lineDashOffset = state.frames * -(14 + currentLevel * 3);
       [130, 220, 310].forEach(x => {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -101,8 +101,8 @@ export default function NeonCruise({ onBack, onComplete }: NeonCruiseProps) {
       ctx.fillRect(state.car.x + state.car.w - 20, 570, 12, 6);
 
       // Calculate speed based on level (currentLevel already defined above)
-      const baseSpeed = 10 + currentLevel * 2; // Speed increases with level
-      const spawnRate = Math.max(15, 30 - currentLevel * 3); // Spawn faster at higher levels
+      const baseSpeed = 7 + currentLevel * 1.4;
+      const spawnRate = Math.max(22, 34 - currentLevel * 2);
 
       // Spawn obstacles
       if (state.frames % spawnRate === 0) {
@@ -111,7 +111,7 @@ export default function NeonCruise({ onBack, onComplete }: NeonCruiseProps) {
           y: -120,
           w: 55,
           h: 70,
-          speed: baseSpeed + Math.random() * 3,
+          speed: baseSpeed + Math.random() * 2,
         });
       }
 
@@ -167,7 +167,7 @@ export default function NeonCruise({ onBack, onComplete }: NeonCruiseProps) {
       const newScore = Math.floor(state.frames / 5);
       setScore(newScore);
 
-      if (state.frames > 1500) {
+      if (state.frames > 1800) {
         setIsWon(true);
         setGameOver(true);
         if (newScore > highScore) {

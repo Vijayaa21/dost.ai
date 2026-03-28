@@ -68,33 +68,33 @@ export default function FriendsList() {
   if (loading) {
     return (
       <div className="flex justify-center items-center p-8">
-        <Loader2 className="animate-spin text-purple-500" size={32} />
+        <Loader2 className="animate-spin text-[#d97c6f]" size={32} />
       </div>
     );
   }
 
   return (
     <div className="p-1">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4 px-3">Your Friends</h3>
+      <h3 className="text-xl font-semibold text-[#5c3d36] mb-4 px-3">Your Friends</h3>
       {friends.length === 0 ? (
-        <div className="text-center py-10 px-4 bg-gray-50 rounded-2xl border border-dashed">
-          <User className="mx-auto text-gray-400 mb-3" size={40}/>
-          <h4 className="font-semibold text-gray-700">No friends yet</h4>
-          <p className="text-sm text-gray-500 mt-1">Use the "Invite Friends" button to add friends and play together!</p>
+        <div className="text-center py-10 px-4 bg-[#fff7eb] rounded-2xl border border-dashed border-[#f2ded4]">
+          <User className="mx-auto text-[#d99f8f] mb-3" size={40}/>
+          <h4 className="font-semibold text-[#5c3d36]">No friends yet</h4>
+          <p className="text-sm text-[#8d6a60] mt-1">Use the "Invite Friends" button to add friends and play together!</p>
         </div>
       ) : (
         <ul className="space-y-3">
           {friends.map(friend => {
             const challenge = getActiveChallenge(friend.id);
             return (
-              <li key={friend.id} className="p-3 bg-white rounded-xl shadow-sm border border-gray-100">
+              <li key={friend.id} className="p-3 bg-white/90 rounded-xl shadow-sm border border-[#f2ded4]">
                 <div className="flex items-center">
                   <img 
                     src={friend.avatar || `https://api.dicebear.com/8.x/initials/svg?seed=${friend.username}`} 
                     alt={friend.username}
-                    className="w-10 h-10 rounded-full mr-3 border-2 border-white ring-2 ring-purple-200"
+                    className="w-10 h-10 rounded-full mr-3 border-2 border-white ring-2 ring-[#f0b8a7]"
                   />
-                  <span className="font-medium text-gray-800 flex-1">{friend.username}</span>
+                  <span className="font-medium text-[#5c3d36] flex-1">{friend.username}</span>
                   
                   {challenge ? (
                     <button
@@ -102,7 +102,7 @@ export default function FriendsList() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                         copiedId === friend.id 
                           ? 'bg-green-500 text-white' 
-                          : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'
+                          : 'bg-[#f6e7de] text-[#c86b60] hover:bg-[#f0d9ce]'
                       }`}
                     >
                       {copiedId === friend.id ? <Check size={14} /> : <Copy size={14} />}
@@ -112,7 +112,7 @@ export default function FriendsList() {
                     <button
                       onClick={() => handleChallenge(friend.id, friend.username)}
                       disabled={challenging === friend.id}
-                      className="px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg text-xs font-semibold hover:shadow-md transition-all disabled:opacity-50 flex items-center gap-1.5"
+                      className="px-3 py-1.5 bg-gradient-to-r from-[#d97c6f] to-[#c86b60] text-white rounded-lg text-xs font-semibold hover:shadow-md transition-all disabled:opacity-50 flex items-center gap-1.5"
                     >
                       {challenging === friend.id ? (
                         <Loader2 className="animate-spin" size={14} />
@@ -124,7 +124,7 @@ export default function FriendsList() {
                   )}
                 </div>
                 {challenge && (
-                  <p className="text-xs text-gray-500 mt-2 pl-13">
+                  <p className="text-xs text-[#8d6a60] mt-2 pl-13">
                     Waiting for {friend.username} to join...
                   </p>
                 )}

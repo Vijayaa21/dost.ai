@@ -22,6 +22,7 @@ const fruits = ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🥝', '🍉', 
 const bombs = ['💣'];
 
 export default function FruitSlice({ onBack, onComplete }: FruitSliceProps) {
+  const totalLives = 4;
   const [gameItems, setGameItems] = useState<Fruit[]>([]);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -41,14 +42,14 @@ export default function FruitSlice({ onBack, onComplete }: FruitSliceProps) {
   const createFruit = useCallback(() => {
     if (!containerRef.current) return null;
     const rect = containerRef.current.getBoundingClientRect();
-    const isBomb = Math.random() < 0.1; // 10% chance of bomb
+    const isBomb = Math.random() < 0.05; // 5% chance of bomb
     
     return {
       id: itemIdRef.current++,
       x: Math.random() * (rect.width - 150) + 75,
       y: rect.height + 80,
-      vx: (Math.random() - 0.5) * 2.5,
-      vy: -(Math.random() * 8 + 16), // Much higher launch for better visibility
+      vx: (Math.random() - 0.5) * 1.6,
+      vy: -(Math.random() * 6 + 12),
       emoji: isBomb ? bombs[0] : fruits[Math.floor(Math.random() * fruits.length)],
       sliced: false,
       rotation: Math.random() * 360,
@@ -67,7 +68,7 @@ export default function FruitSlice({ onBack, onComplete }: FruitSliceProps) {
         if (fruit) newFruits.push(fruit);
       }
       setGameItems(prev => [...prev, ...newFruits]);
-    }, 1200);
+    }, 1500);
 
     return () => clearInterval(spawnInterval);
   }, [gameStarted, gameOver, createFruit]);
@@ -76,7 +77,7 @@ export default function FruitSlice({ onBack, onComplete }: FruitSliceProps) {
   useEffect(() => {
     if (!gameStarted || gameOver) return;
 
-    const gravity = 0.4;
+    const gravity = 0.32;
     const updateInterval = setInterval(() => {
       setGameItems(prev => {
         const updated = prev.map(item => ({
@@ -130,7 +131,7 @@ export default function FruitSlice({ onBack, onComplete }: FruitSliceProps) {
           Math.pow(x - item.x - 50, 2) + Math.pow(y - item.y - 50, 2)
         );
         
-        if (distance < 70) { // Bigger hit area for larger fruits
+        if (distance < 85) { // Bigger hit area for easier slicing
           if (item.emoji === '💣') {
             // Hit bomb - game over
             setLives(0);
@@ -180,7 +181,7 @@ export default function FruitSlice({ onBack, onComplete }: FruitSliceProps) {
     setGameStarted(true);
     setGameOver(false);
     setScore(0);
-    setLives(3);
+    setLives(totalLives);
     setCombo(0);
     setGameItems([]);
   };
@@ -289,7 +290,7 @@ export default function FruitSlice({ onBack, onComplete }: FruitSliceProps) {
         </button>
         <div className="flex items-center gap-4">
           <div className="bg-white/20 backdrop-blur px-4 py-2 rounded-full text-white font-bold">
-            {'❤️'.repeat(lives)}{'🖤'.repeat(3 - lives)}
+            {'❤️'.repeat(lives)}{'🖤'.repeat(Math.max(0, totalLives - lives))}
           </div>
           <div className="bg-white/20 backdrop-blur px-4 py-2 rounded-full text-white font-bold">
             🎯 {score}
