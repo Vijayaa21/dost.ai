@@ -8,6 +8,17 @@ import clsx from 'clsx';
 // Tool types
 type ToolType = 'breathing' | 'grounding' | 'muscle' | 'sounds' | 'gratitude';
 
+type SoundProfile = 'rain' | 'brown' | 'forest' | 'waves';
+
+interface SoundOption {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  profile: SoundProfile;
+  audioUrl: string;
+}
+
 interface CopingToolCard {
   id: string;
   type: ToolType;
@@ -26,8 +37,8 @@ const copingTools: CopingToolCard[] = [
     title: '4-7-8 Breathing',
     subtitle: 'INSTANT CALM FOR RACING HEARTS',
     icon: <Wind className="w-5 h-5" />,
-    color: 'text-cyan-500',
-    bgGradient: 'from-cyan-500 to-blue-600',
+    color: 'text-amber-600',
+    bgGradient: 'from-amber-400 to-orange-500',
   },
   {
     id: 'sounds',
@@ -35,8 +46,8 @@ const copingTools: CopingToolCard[] = [
     title: 'Zen Soundscapes',
     subtitle: 'AUDIO TEXTURES TO FADE THE WORLD',
     icon: <Headphones className="w-5 h-5" />,
-    color: 'text-teal-500',
-    bgGradient: 'from-teal-600 to-emerald-700',
+    color: 'text-emerald-600',
+    bgGradient: 'from-emerald-500 to-teal-600',
   },
   {
     id: 'grounding-54321',
@@ -44,8 +55,8 @@ const copingTools: CopingToolCard[] = [
     title: '5-4-3-2-1 Grounding',
     subtitle: 'ANCHOR YOURSELF IN REALITY',
     icon: <Eye className="w-5 h-5" />,
-    color: 'text-orange-500',
-    bgGradient: 'from-orange-400 to-amber-500',
+    color: 'text-orange-600',
+    bgGradient: 'from-orange-400 to-rose-400',
   },
   {
     id: 'muscle-relaxation',
@@ -53,8 +64,8 @@ const copingTools: CopingToolCard[] = [
     title: 'Muscle Relaxation',
     subtitle: 'RELEASE THE WEIGHT YOU CARRY',
     icon: <Dumbbell className="w-5 h-5" />,
-    color: 'text-purple-500',
-    bgGradient: 'from-purple-500 to-indigo-600',
+    color: 'text-rose-600',
+    bgGradient: 'from-rose-500 to-red-500',
   },
   {
     id: 'gratitude',
@@ -71,26 +82,63 @@ const copingTools: CopingToolCard[] = [
     title: 'Box Breathing',
     subtitle: 'BALANCE YOUR NERVOUS SYSTEM',
     icon: <Wind className="w-5 h-5" />,
-    color: 'text-indigo-500',
-    bgGradient: 'from-indigo-500 to-purple-600',
+    color: 'text-amber-600',
+    bgGradient: 'from-amber-500 to-rose-500',
   },
 ];
 
+const copingMeta: Record<string, { duration: string; focus: string; intent: string }> = {
+  'breathing-478': { duration: '4 min', focus: 'Slow the heart', intent: 'Ease anxiety quickly with paced breath.' },
+  'breathing-box': { duration: '3 min', focus: 'Balance the mind', intent: 'Create steady rhythm and clarity.' },
+  'grounding-54321': { duration: '5 min', focus: 'Anchor now', intent: 'Return attention to your senses.' },
+  'muscle-relaxation': { duration: '6 min', focus: 'Release tension', intent: 'Unwind muscle groups gently.' },
+  gratitude: { duration: '4 min', focus: 'Lift mood', intent: 'Collect small wins and warmth.' },
+  sounds: { duration: 'Any time', focus: 'Soften noise', intent: 'Set a calm backdrop for rest.' },
+};
+
 // Sound options
-const soundOptions = [
-  { id: 'rain', name: 'Soft Rain', icon: '💧' },
-  { id: 'brown', name: 'Deep Brown', icon: '🌊' },
-  { id: 'forest', name: 'Forest Ambience', icon: '🌲' },
-  { id: 'waves', name: 'Ocean Waves', icon: '🌊' },
+const soundOptions: SoundOption[] = [
+  {
+    id: 'rain',
+    name: 'Soft Rain',
+    icon: '💧',
+    description: 'Airy, shimmering rain fall',
+    profile: 'rain',
+    audioUrl: '/audio/desifreemusic-relaxing-sleep-music-with-soft-ambient-rain-369762.mp3',
+  },
+  {
+    id: 'brown',
+    name: 'Deep Brown',
+    icon: '🌊',
+    description: 'Low, grounding rumble',
+    profile: 'brown',
+    audioUrl: '/audio/meditativetiger-deep-focus-lofi-ambient-brown-noise-therapy-507895.mp3',
+  },
+  {
+    id: 'forest',
+    name: 'Forest Drift',
+    icon: '🌲',
+    description: 'Earthy hush with gentle chirps',
+    profile: 'forest',
+    audioUrl: '/audio/38534292-golden-forest-with-birds-and-running-stream-sounds-171319.mp3',
+  },
+  {
+    id: 'waves',
+    name: 'Ocean Waves',
+    icon: '🌊',
+    description: 'Slow swells for steady calm',
+    profile: 'waves',
+    audioUrl: '/audio/38534292-golden-forest-with-birds-and-running-stream-sounds-171319.mp3',
+  },
 ];
 
 // Grounding steps
 const groundingSteps = [
-  { count: 5, sense: 'SEE', prompt: 'Name 5 things you can see around you', color: 'from-blue-500 to-cyan-500' },
-  { count: 4, sense: 'TOUCH', prompt: 'Name 4 things you can physically feel', color: 'from-green-500 to-emerald-500' },
-  { count: 3, sense: 'HEAR', prompt: 'Name 3 things you can hear right now', color: 'from-yellow-500 to-orange-500' },
-  { count: 2, sense: 'SMELL', prompt: 'Name 2 things you can smell', color: 'from-purple-500 to-pink-500' },
-  { count: 1, sense: 'TASTE', prompt: 'Name 1 thing you can taste', color: 'from-rose-500 to-red-500' },
+  { count: 5, sense: 'SEE', prompt: 'Name 5 things you can see around you', color: 'from-amber-400 to-orange-500' },
+  { count: 4, sense: 'TOUCH', prompt: 'Name 4 things you can physically feel', color: 'from-emerald-400 to-teal-500' },
+  { count: 3, sense: 'HEAR', prompt: 'Name 3 things you can hear right now', color: 'from-orange-400 to-rose-400' },
+  { count: 2, sense: 'SMELL', prompt: 'Name 2 things you can smell', color: 'from-rose-400 to-pink-500' },
+  { count: 1, sense: 'TASTE', prompt: 'Name 1 thing you can taste', color: 'from-red-400 to-rose-500' },
 ];
 
 // Muscle groups for PMR
@@ -130,6 +178,18 @@ export default function CopingToolkit() {
   
   // Sound state
   const [playingSound, setPlayingSound] = useState<string | null>(null);
+  const [soundVolume, setSoundVolume] = useState(0.22);
+  const [soundWarmth, setSoundWarmth] = useState(0.6);
+  const [sleepTimerMinutes, setSleepTimerMinutes] = useState<number | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const sleepTimerRef = useRef<number | null>(null);
+  const soundNodesRef = useRef<{
+    audio?: HTMLAudioElement;
+    sourceNode?: MediaElementAudioSourceNode;
+    filter?: BiquadFilterNode;
+    masterGain?: GainNode;
+    baseFilterFrequency?: number;
+  } | null>(null);
   
   // Gratitude state
   const [gratitudeItems, setGratitudeItems] = useState<string[]>([]);
@@ -161,7 +221,12 @@ export default function CopingToolkit() {
     resetBreathing();
     resetGrounding();
     resetMuscle();
-    setPlayingSound(null);
+    stopSound();
+  };
+
+  const openToolById = (toolId: string) => {
+    const tool = copingTools.find((item) => item.id === toolId);
+    if (tool) setActiveTool(tool);
   };
 
   // ========== BREATHING EXERCISE ==========
@@ -290,11 +355,128 @@ export default function CopingToolkit() {
   };
 
   // ========== SOUNDS ==========
+  const ensureAudioContext = () => {
+    if (!audioCtxRef.current) {
+      const AudioContextConstructor = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextConstructor) return null;
+      audioCtxRef.current = new AudioContextConstructor();
+    }
+    return audioCtxRef.current;
+  };
+
+  const stopSound = () => {
+    const nodes = soundNodesRef.current;
+    if (!nodes) return;
+
+    if (nodes.audio) {
+      nodes.audio.pause();
+      nodes.audio.currentTime = 0;
+    }
+    if (nodes.sourceNode) nodes.sourceNode.disconnect();
+    if (nodes.filter) nodes.filter.disconnect();
+    if (nodes.masterGain) nodes.masterGain.disconnect();
+    if (sleepTimerRef.current) {
+      window.clearTimeout(sleepTimerRef.current);
+      sleepTimerRef.current = null;
+    }
+
+    soundNodesRef.current = null;
+    setPlayingSound(null);
+  };
+
+  const startSound = async (soundId: string) => {
+    stopSound();
+    const option = soundOptions.find((sound) => sound.id === soundId);
+    if (!option) return;
+
+    const context = ensureAudioContext();
+    if (!context) return;
+    await context.resume();
+
+    const audio = new Audio(option.audioUrl);
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.crossOrigin = 'anonymous';
+
+    const sourceNode = context.createMediaElementSource(audio);
+    const filter = context.createBiquadFilter();
+    const masterGain = context.createGain();
+
+    filter.type = 'lowpass';
+    filter.frequency.value = 720;
+    masterGain.gain.value = Math.min(soundVolume, 0.6);
+
+    sourceNode.connect(filter);
+    filter.connect(masterGain);
+    masterGain.connect(context.destination);
+
+    const nodes: NonNullable<typeof soundNodesRef.current> = {
+      audio,
+      sourceNode,
+      filter,
+      masterGain,
+      baseFilterFrequency: filter.frequency.value,
+    };
+
+    if (option.profile === 'rain') {
+      filter.type = 'lowpass';
+      filter.frequency.value = 520;
+      nodes.baseFilterFrequency = 520;
+    }
+
+    if (option.profile === 'brown') {
+      filter.type = 'lowpass';
+      filter.frequency.value = 180;
+      nodes.baseFilterFrequency = 180;
+    }
+
+    if (option.profile === 'waves') {
+      filter.type = 'lowpass';
+      filter.frequency.value = 160;
+      nodes.baseFilterFrequency = 160;
+    }
+
+    if (option.profile === 'forest') {
+      filter.type = 'lowpass';
+      filter.frequency.value = 320;
+      nodes.baseFilterFrequency = 320;
+    }
+
+    soundNodesRef.current = nodes;
+    setPlayingSound(soundId);
+    try {
+      await audio.play();
+    } catch (error) {
+      stopSound();
+    }
+  };
+
+  const applyWarmth = () => {
+    const nodes = soundNodesRef.current;
+    if (!nodes?.filter || !nodes.baseFilterFrequency) return;
+    const baseFrequency = nodes.baseFilterFrequency;
+    const warmthBoost = 1 + soundWarmth * 0.8;
+    nodes.filter.frequency.value = Math.min(baseFrequency * warmthBoost, 1200);
+  };
+
+  const setSleepTimer = (minutes: number | null) => {
+    if (sleepTimerRef.current) {
+      window.clearTimeout(sleepTimerRef.current);
+      sleepTimerRef.current = null;
+    }
+    setSleepTimerMinutes(minutes);
+    if (minutes && playingSound) {
+      sleepTimerRef.current = window.setTimeout(() => {
+        stopSound();
+      }, minutes * 60 * 1000);
+    }
+  };
+
   const toggleSound = (soundId: string) => {
     if (playingSound === soundId) {
-      setPlayingSound(null);
+      stopSound();
     } else {
-      setPlayingSound(soundId);
+      void startSound(soundId);
     }
   };
 
@@ -304,6 +486,27 @@ export default function CopingToolkit() {
     setGratitudeItems([...gratitudeItems, gratitudeInput.trim()]);
     setGratitudeInput('');
   };
+
+  useEffect(() => {
+    if (soundNodesRef.current?.masterGain) {
+      soundNodesRef.current.masterGain.gain.value = Math.min(soundVolume, 0.6);
+    }
+  }, [soundVolume]);
+
+  useEffect(() => {
+    applyWarmth();
+  }, [soundWarmth, playingSound]);
+
+  useEffect(() => {
+    if (!sleepTimerMinutes || !playingSound) return;
+    setSleepTimer(sleepTimerMinutes);
+  }, [sleepTimerMinutes, playingSound]);
+
+  useEffect(() => {
+    return () => {
+      stopSound();
+    };
+  }, []);
 
   // ========== RENDER TOOL MODALS ==========
   const renderBreathingExercise = () => {
@@ -329,7 +532,7 @@ export default function CopingToolkit() {
                 animate={{ scale: 1, opacity: 1 }}
                 className="w-64 h-64 mx-auto rounded-full bg-white/90 flex items-center justify-center mb-8 shadow-2xl"
               >
-                <span className="text-4xl font-bold text-indigo-900">Ready?</span>
+                <span className="text-4xl font-bold text-amber-900">Ready?</span>
               </motion.div>
               <h2 className="text-3xl font-bold text-white mb-2">
                 {activeTool?.id === 'breathing-478' ? '4-7-8 Method' : 'Box Breathing'}
@@ -337,7 +540,7 @@ export default function CopingToolkit() {
               <p className="text-white/80 mb-8">Release the noise, focus on the flow.</p>
               <button
                 onClick={startBreathing}
-                className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-full hover:bg-white/90 transition-all shadow-lg"
+                className="px-8 py-3 bg-white text-amber-700 font-semibold rounded-full hover:bg-white/90 transition-all shadow-lg"
               >
                 Start Now
               </button>
@@ -351,13 +554,13 @@ export default function CopingToolkit() {
               >
                 <div className="text-center">
                   <span className="text-5xl">✨</span>
-                  <p className="text-xl font-bold text-indigo-900 mt-2">Well done!</p>
+                  <p className="text-xl font-bold text-amber-900 mt-2">Well done!</p>
                 </div>
               </motion.div>
               <p className="text-white/80 mb-8">You completed {totalCycles} cycles</p>
               <button
                 onClick={resetBreathing}
-                className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-full hover:bg-white/90 flex items-center gap-2 mx-auto"
+                className="px-8 py-3 bg-white text-amber-700 font-semibold rounded-full hover:bg-white/90 flex items-center gap-2 mx-auto"
               >
                 <RotateCcw className="w-5 h-5" />
                 Do Again
@@ -371,8 +574,8 @@ export default function CopingToolkit() {
                 className="w-64 h-64 mx-auto rounded-full bg-white/90 flex items-center justify-center mb-8 shadow-2xl"
               >
                 <div className="text-center">
-                  <span className="text-6xl font-bold text-indigo-900">{breathingCount}</span>
-                  <p className="text-lg text-indigo-600 capitalize font-medium">{breathingPhase}</p>
+                  <span className="text-6xl font-bold text-amber-900">{breathingCount}</span>
+                  <p className="text-lg text-amber-700 capitalize font-medium">{breathingPhase}</p>
                 </div>
               </motion.div>
               <p className="text-white/60 mb-4">Cycle {currentCycle} of {totalCycles}</p>
@@ -558,8 +761,8 @@ export default function CopingToolkit() {
               >
                 <div className="text-center">
                   <span className="text-4xl">{muscle.emoji}</span>
-                  <p className="text-4xl font-bold text-purple-900 mt-2">{muscleCount}</p>
-                  <p className="text-purple-600 capitalize text-sm">{musclePhase}</p>
+                  <p className="text-4xl font-bold text-rose-900 mt-2">{muscleCount}</p>
+                  <p className="text-rose-600 capitalize text-sm">{musclePhase}</p>
                 </div>
               </motion.div>
               
@@ -588,48 +791,124 @@ export default function CopingToolkit() {
           <X className="w-6 h-6 text-white" />
         </button>
         
-        <div className="text-center max-w-md mx-auto px-6">
-          <h2 className="text-3xl font-bold text-white mb-2">Zen Sounds</h2>
-          <p className="text-white/70 mb-8">Audio textures to reset your environment.</p>
-          
-          <div className="space-y-4">
-            {soundOptions.map((sound) => (
-              <button
-                key={sound.id}
-                onClick={() => toggleSound(sound.id)}
-                className={clsx(
-                  'w-full p-5 rounded-2xl flex items-center gap-4 transition-all',
-                  playingSound === sound.id
-                    ? 'bg-white/30 border-2 border-white'
-                    : 'bg-white/10 border-2 border-white/20 hover:bg-white/20'
-                )}
-              >
-                <span className="text-2xl">{sound.icon}</span>
-                <span className="text-white font-semibold text-lg">{sound.name}</span>
-                {playingSound === sound.id && (
-                  <div className="ml-auto flex items-center gap-2">
-                    <div className="flex gap-1">
-                      {[1, 2, 3].map((i) => (
-                        <motion.div
-                          key={i}
-                          animate={{ height: [8, 20, 8] }}
-                          transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
-                          className="w-1 bg-white rounded-full"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </button>
-            ))}
+        <div className="max-w-4xl w-full px-6 mx-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-white mb-2">Zen Sounds</h2>
+            <p className="text-white/70">Let the room soften around you.</p>
           </div>
-          
-          <p className="text-white/50 text-sm mt-8">
-            🎧 Best with headphones
-          </p>
-          <p className="text-white/40 text-xs mt-2">
-            (Audio files coming soon - visual demo)
-          </p>
+
+          <div className="grid gap-6 lg:grid-cols-2 items-center justify-items-end">
+            <div className="rounded-3xl border border-white/20 bg-white/10 p-6 text-right w-full">
+              <div className="flex items-center justify-between text-white/80 text-sm">
+                <span>{playingSound ? `Now playing: ${soundOptions.find((sound) => sound.id === playingSound)?.name}` : 'Choose a soundscape'}</span>
+                <button
+                  onClick={() => stopSound()}
+                  className="px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs"
+                >
+                  Stop
+                </button>
+              </div>
+
+              <div className="mt-6 grid gap-5">
+                <div>
+                  <label className="block text-xs text-white/60 mb-2">Volume</label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={0.7}
+                    step={0.01}
+                    value={soundVolume}
+                    onChange={(event) => setSoundVolume(Number(event.target.value))}
+                    className="w-full accent-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-white/60 mb-2">Warmth</label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={soundWarmth}
+                    onChange={(event) => setSoundWarmth(Number(event.target.value))}
+                    className="w-full accent-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-white/60 mb-2">Sleep timer</label>
+                  <div className="flex flex-wrap gap-2 justify-end">
+                    {[5, 10, 15, 30].map((minutes) => (
+                      <button
+                        key={minutes}
+                        onClick={() => setSleepTimer(minutes)}
+                        className={clsx(
+                          'px-3 py-1 rounded-full text-xs transition-colors',
+                          sleepTimerMinutes === minutes
+                            ? 'bg-white text-slate-900'
+                            : 'bg-white/10 text-white hover:bg-white/20'
+                        )}
+                      >
+                        {minutes} min
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setSleepTimer(null)}
+                      className={clsx(
+                        'px-3 py-1 rounded-full text-xs transition-colors',
+                        sleepTimerMinutes === null
+                          ? 'bg-white text-slate-900'
+                          : 'bg-white/10 text-white hover:bg-white/20'
+                      )}
+                    >
+                      Off
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 rounded-2xl bg-white/10 border border-white/10 p-4">
+                <p className="text-white/70 text-sm">Tip</p>
+                <p className="text-white text-sm mt-1">Lower volume + higher warmth feels like a soft blanket of sound.</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 w-full">
+              {soundOptions.map((sound) => (
+                <button
+                  key={sound.id}
+                  onClick={() => toggleSound(sound.id)}
+                  className={clsx(
+                    'w-full p-5 rounded-2xl flex items-center gap-4 transition-all text-right border-2',
+                    playingSound === sound.id
+                      ? 'bg-white/30 border-white shadow-lg shadow-white/10'
+                      : 'bg-white/10 border-white/20 hover:bg-white/20'
+                  )}
+                >
+                  <div className="flex-1">
+                    <p className="text-white font-semibold text-lg">{sound.name}</p>
+                    <p className="text-white/60 text-sm">{sound.description}</p>
+                  </div>
+                  <span className="text-2xl">{sound.icon}</span>
+                  {playingSound === sound.id && (
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        {[1, 2, 3].map((i) => (
+                          <motion.div
+                            key={i}
+                            animate={{ height: [8, 20, 8] }}
+                            transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
+                            className="w-1 bg-white rounded-full"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </button>
+              ))}
+
+              <p className="text-white/60 text-sm text-right">🎧 Best with headphones</p>
+            </div>
+          </div>
         </div>
       </motion.div>
     );
@@ -703,32 +982,110 @@ export default function CopingToolkit() {
   // Main render
   return (
     <div className="min-h-screen p-6 relative z-10">
-      <div className="max-w-4xl mx-auto">
+      <div
+        className={clsx(
+          'absolute inset-0 -z-10',
+          isDark
+            ? 'bg-gradient-to-br from-stone-950 via-amber-950/40 to-stone-900'
+            : 'bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50'
+        )}
+      />
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className={clsx("text-3xl font-bold mb-2", isDark ? "text-white" : "text-gray-800")}>Coping Hub</h1>
-          <p className={clsx(isDark ? "text-slate-300" : "text-gray-600")}>Select a tool to find your center.</p>
+        <div className="grid lg:grid-cols-[1.3fr,0.7fr] gap-6 mb-10">
+          <div
+            className={clsx(
+              'rounded-3xl p-6 border shadow-sm',
+              isDark ? 'bg-slate-900/70 border-slate-700' : 'bg-white border-amber-100'
+            )}
+          >
+            <span className={clsx('text-xs font-semibold uppercase tracking-[0.3em]', isDark ? 'text-amber-200/80' : 'text-amber-700')}>
+              Coping Hub
+            </span>
+            <h1 className={clsx('text-3xl md:text-4xl font-bold mt-3', isDark ? 'text-white' : 'text-slate-800')}>
+              Find your center in minutes
+            </h1>
+            <p className={clsx('mt-3 text-sm md:text-base', isDark ? 'text-slate-300' : 'text-slate-600')}>
+              Pick a tool that matches your moment. Short, focused exercises designed to calm the body and clear the mind.
+            </p>
+            <div className="flex flex-wrap gap-2 mt-6">
+              <button
+                onClick={() => openToolById('breathing-478')}
+                className={clsx(
+                  'px-4 py-2 rounded-full text-sm font-semibold transition-colors',
+                  isDark ? 'bg-amber-400/20 text-amber-200 hover:bg-amber-400/30' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                )}
+              >
+                Start 4-7-8
+              </button>
+              <button
+                onClick={() => openToolById('sounds')}
+                className={clsx(
+                  'px-4 py-2 rounded-full text-sm font-semibold transition-colors',
+                  isDark ? 'bg-emerald-400/20 text-emerald-200 hover:bg-emerald-400/30' : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                )}
+              >
+                Zen sounds
+              </button>
+              <button
+                onClick={() => openToolById('grounding-54321')}
+                className={clsx(
+                  'px-4 py-2 rounded-full text-sm font-semibold transition-colors',
+                  isDark ? 'bg-rose-400/20 text-rose-200 hover:bg-rose-400/30' : 'bg-rose-100 text-rose-700 hover:bg-rose-200'
+                )}
+              >
+                Grounding reset
+              </button>
+            </div>
+          </div>
+
+          <div
+            className={clsx(
+              'rounded-3xl p-6 border shadow-sm flex flex-col justify-between',
+              isDark ? 'bg-slate-900/70 border-slate-700' : 'bg-white border-amber-100'
+            )}
+          >
+            <div>
+              <p className={clsx('text-xs uppercase tracking-[0.3em] font-semibold', isDark ? 'text-rose-200/70' : 'text-rose-600')}>
+                Quick Reset
+              </p>
+              <h2 className={clsx('text-2xl font-semibold mt-3', isDark ? 'text-white' : 'text-slate-800')}>
+                3-minute calm ritual
+              </h2>
+              <p className={clsx('mt-2 text-sm', isDark ? 'text-slate-300' : 'text-slate-600')}>
+                Pair slow breath with a soundscape for rapid nervous system relief.
+              </p>
+            </div>
+            <button
+              onClick={() => openToolById('breathing-box')}
+              className={clsx(
+                'mt-6 px-4 py-2 rounded-full text-sm font-semibold transition-colors',
+                isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-900 text-white hover:bg-slate-800'
+              )}
+            >
+              Begin box breathing
+            </button>
+          </div>
         </div>
 
         {/* Tools Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {copingTools.map((tool, index) => (
             <motion.div
               key={tool.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.08 }}
               onClick={() => setActiveTool(tool)}
               className={clsx(
-                "rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all cursor-pointer group border",
+                'rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer group border',
                 isDark
-                  ? "bg-slate-800/50 border-slate-700 hover:bg-slate-700/50"
-                  : "bg-white border-gray-100"
+                  ? 'bg-slate-900/60 border-slate-700 hover:bg-slate-800/70'
+                  : 'bg-white border-amber-100'
               )}
             >
-              <div className="flex items-center gap-4">
-                {/* Icon/Image */}
-                <div className={`w-24 h-24 rounded-xl bg-gradient-to-br ${tool.bgGradient} flex items-center justify-center text-white text-4xl shadow-lg group-hover:scale-105 transition-transform`}>
+              <div className="flex items-start gap-4">
+                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${tool.bgGradient} flex items-center justify-center text-white text-3xl shadow-lg group-hover:scale-105 transition-transform`}>
                   {tool.type === 'breathing' && '🌬️'}
                   {tool.type === 'sounds' && '🎧'}
                   {tool.type === 'grounding' && '🌿'}
@@ -737,11 +1094,28 @@ export default function CopingToolkit() {
                 </div>
                 
                 <div className="flex-1">
-                  <div className={clsx("inline-flex p-2 rounded-lg mb-2", tool.color, isDark ? "bg-slate-700" : "bg-gray-100")}>
+                  <div className={clsx('inline-flex p-2 rounded-lg mb-3', tool.color, isDark ? 'bg-slate-800' : 'bg-amber-50')}>
                     {tool.icon}
                   </div>
-                  <h3 className={clsx("text-lg font-semibold", isDark ? "text-white" : "text-gray-800")}>{tool.title}</h3>
-                  <p className={clsx("text-xs tracking-wide", isDark ? "text-slate-400" : "text-gray-500")}>{tool.subtitle}</p>
+                  <h3 className={clsx('text-lg font-semibold', isDark ? 'text-white' : 'text-slate-800')}>{tool.title}</h3>
+                  <p className={clsx('text-xs tracking-wide', isDark ? 'text-slate-400' : 'text-slate-500')}>{tool.subtitle}</p>
+                  <p className={clsx('text-sm mt-3', isDark ? 'text-slate-300' : 'text-slate-600')}>
+                    {copingMeta[tool.id]?.intent ?? 'Tap to begin a focused session and follow guided steps.'}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <span className={clsx(
+                      'px-3 py-1 rounded-full text-xs font-semibold',
+                      isDark ? 'bg-white/10 text-white' : 'bg-amber-100 text-amber-800'
+                    )}>
+                      {copingMeta[tool.id]?.duration ?? 'Quick'}
+                    </span>
+                    <span className={clsx(
+                      'px-3 py-1 rounded-full text-xs font-semibold',
+                      isDark ? 'bg-white/10 text-white' : 'bg-rose-100 text-rose-700'
+                    )}>
+                      {copingMeta[tool.id]?.focus ?? 'Reset'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>

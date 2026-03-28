@@ -241,8 +241,8 @@ export default function Layout() {
       <footer className={clsx(
         "py-12 md:ml-64 transition-colors duration-300 border-t",
         isDark 
-          ? "bg-[#241713]/95 border-[#3b2a24] text-[#f6d2c3]" 
-          : "bg-gradient-to-br from-[#fff7eb] via-[#f6e7de] to-[#f3e0d6] border-[#f2ded4] text-[#5c3d36]"
+          ? "bg-gradient-to-b from-[#2a1c18] via-[#241713] to-[#1f1411] border-[#3b2a24] text-[#f6d2c3]" 
+          : "bg-gradient-to-br from-[#fff0e4] via-[#fff7eb] to-[#fdf3ed] border-[#f2ded4] text-[#5c3d36]"
       )}>
         <div className="max-w-6xl mx-auto px-6">
           {/* Main Footer Content */}
