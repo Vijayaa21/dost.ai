@@ -21,16 +21,34 @@ const Insights = lazy(() => import('./pages/Insights'));
 const EmotionGames = lazy(() => import('./pages/EmotionGames'));
 const JoinGame = lazy(() => import('./pages/JoinGame'));
 
-// Loading fallback component
-function PageLoader() {
+function LoadingScreen({ label = 'Preparing your space' }: { label?: string }) {
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, #fff7eb 55%, #fdf3ed 100%)' }}>
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 mx-auto" style={{ borderColor: '#d97c6f' }}></div>
-        <p className="mt-3 text-gray-500 text-sm">Loading...</p>
+    <div
+      className="min-h-screen flex items-center justify-center px-6"
+      style={{ background: 'radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, #fff7eb 55%, #fdf3ed 100%)' }}
+    >
+      <div className="w-full max-w-md rounded-3xl border border-[#f2ded4] bg-white/80 shadow-lg px-6 py-8 text-center">
+        <div className="mx-auto mb-4 h-12 w-12 rounded-2xl bg-gradient-to-br from-[#d97c6f] to-[#c86b60] shadow-md" />
+        <p className="text-sm uppercase tracking-[0.3em] text-[#b38377]">Dost AI</p>
+        <h2 className="mt-3 text-2xl font-semibold text-[#5c3d36]">{label}</h2>
+        <div className="mt-5 flex items-center justify-center gap-2">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-2 w-2 rounded-full bg-[#d99f8f]"
+              style={{ animation: `pulse 1.2s ${i * 0.2}s infinite ease-in-out` }}
+            />
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-[#8d6a60]">Gentle moments are loading...</p>
       </div>
     </div>
   );
+}
+
+// Loading fallback component
+function PageLoader() {
+  return <LoadingScreen label="Loading your next step" />;
 }
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -47,15 +65,7 @@ function AppContent() {
 
   // Show loading spinner while checking auth state
   if (!isInitialized) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, #fff7eb 55%, #fdf3ed 100%)' }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: '#d97c6f' }}></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    
-    );
+    return <LoadingScreen label="Warming up your dashboard" />;
   }
 
   return (

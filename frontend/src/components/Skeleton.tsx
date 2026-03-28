@@ -15,7 +15,7 @@ export function Skeleton({
   height,
   animation = 'pulse',
 }: SkeletonProps) {
-  const baseClasses = 'bg-gray-200';
+  const baseClasses = 'bg-[#f3e0d6]/80';
   
   const variantClasses = {
     text: 'rounded',
@@ -122,7 +122,7 @@ export function JournalSkeleton() {
 
 export function DashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6" style={{ background: 'radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, #fff7eb 55%, #fdf3ed 100%)' }}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -136,7 +136,7 @@ export function DashboardSkeleton() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div key={i} className="bg-white/90 rounded-2xl p-6 shadow-sm border border-[#f2ded4]">
               <Skeleton variant="circular" className="w-12 h-12 mb-4" />
               <Skeleton variant="text" className="h-8 w-16 mb-2" />
               <Skeleton variant="text" className="h-4 w-24" />
@@ -156,10 +156,10 @@ export function DashboardSkeleton() {
 
 export function PetSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6" style={{ background: 'radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, #fff7eb 55%, #fdf3ed 100%)' }}>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Pet Card */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+        <div className="bg-white/90 rounded-2xl p-8 shadow-sm border border-[#f2ded4] text-center">
           <Skeleton variant="circular" className="w-32 h-32 mx-auto mb-4" />
           <Skeleton variant="text" className="h-8 w-40 mx-auto mb-2" />
           <Skeleton variant="text" className="h-5 w-24 mx-auto mb-6" />
@@ -190,7 +190,7 @@ export function PetSkeleton() {
 
 export function InsightsSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6" style={{ background: 'radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, #fff7eb 55%, #fdf3ed 100%)' }}>
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div>
@@ -201,7 +201,7 @@ export function InsightsSkeleton() {
         {/* Pattern Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div key={i} className="bg-white/90 rounded-2xl p-6 shadow-sm border border-[#f2ded4]">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton variant="circular" className="w-10 h-10" />
                 <Skeleton variant="text" className="h-5 w-32" />
@@ -214,11 +214,11 @@ export function InsightsSkeleton() {
         </div>
 
         {/* Notifications */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/90 rounded-2xl p-6 shadow-sm border border-[#f2ded4]">
           <Skeleton variant="text" className="h-6 w-32 mb-4" />
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+              <div key={i} className="flex items-center gap-4 p-4 bg-[#fff7eb] rounded-xl">
                 <Skeleton variant="circular" className="w-8 h-8" />
                 <div className="flex-1">
                   <Skeleton variant="text" className="h-5 w-48 mb-1" />
