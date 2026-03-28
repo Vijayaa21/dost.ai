@@ -13,8 +13,8 @@ import clsx from 'clsx';
 const petExpressions: Record<string, { emoji: string; color: string; bg: string }> = {
   ecstatic: { emoji: '🥳', color: 'text-yellow-500', bg: 'from-yellow-100 to-orange-100' },
   happy: { emoji: '😊', color: 'text-green-500', bg: 'from-green-100 to-emerald-100' },
-  neutral: { emoji: '😐', color: 'text-blue-500', bg: 'from-blue-100 to-cyan-100' },
-  sad: { emoji: '😢', color: 'text-purple-500', bg: 'from-purple-100 to-pink-100' },
+  neutral: { emoji: '😐', color: 'text-[#c86b60]', bg: 'from-[#fff7eb] to-[#f6e7de]' },
+  sad: { emoji: '😢', color: 'text-[#b05b52]', bg: 'from-[#f6e7de] to-[#f0d9ce]' },
   very_sad: { emoji: '😭', color: 'text-gray-500', bg: 'from-gray-100 to-slate-100' },
 };
 
@@ -184,7 +184,7 @@ export default function Pet() {
                 />
                 <button
                   onClick={handleUpdateName}
-                  className="px-4 py-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700"
+                  className="px-4 py-2 bg-[#d97c6f] text-white rounded-xl hover:bg-[#c86b60]"
                 >
                   Save
                 </button>
@@ -192,7 +192,7 @@ export default function Pet() {
             ) : (
               <button
                 onClick={() => setShowNameEdit(true)}
-                className="text-2xl font-bold text-gray-800 hover:text-violet-600 transition-colors"
+                className="text-2xl font-bold text-gray-800 hover:text-[#c86b60] transition-colors"
               >
                 {pet.name}
               </button>
@@ -218,7 +218,7 @@ export default function Pet() {
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${pet.level_progress}%` }}
-                className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
+                className="h-full bg-gradient-to-r from-[#d97c6f] to-[#c86b60] rounded-full"
               />
             </div>
           </div>

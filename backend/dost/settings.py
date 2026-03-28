@@ -5,6 +5,7 @@ Django settings for dost project.
 import os
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -83,11 +84,17 @@ CHANNEL_LAYERS = {
 }
 
 # Database
+SQLITE_DB_URL = f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}"
+DB_CONN_MAX_AGE = int(os.getenv('DB_CONN_MAX_AGE', '600'))
+DB_SSL_REQUIRE = os.getenv('DB_SSL_REQUIRE', 'True').lower() == 'true'
+DATABASE_URL = os.getenv('DATABASE_URL')
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        DATABASE_URL or SQLITE_DB_URL,
+        conn_max_age=DB_CONN_MAX_AGE,
+        ssl_require=DB_SSL_REQUIRE if DATABASE_URL else False,
+    )
 }
 
 # Custom user model

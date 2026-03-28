@@ -1,6 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --warm-cream: #fff7eb;
+  --warm-rose: #f6d2c3;
+  --warm-clay: #d97c6f;
+  --warm-cocoa: #5c3d36;
+  --warm-ink: #3a2a24;
+  --warm-sand: #f1e2d4;
+  --surface: #ffffff;
+}
 
 @layer base {
   * {
@@ -8,7 +20,15 @@
   }
   
   body {
-    @apply bg-gray-50 text-gray-800 font-sans antialiased;
+    font-family: 'Manrope', system-ui, sans-serif;
+    color: var(--warm-ink);
+    background: radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, var(--warm-cream) 55%, #fdf3ed 100%);
+    @apply antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Fraunces', 'Manrope', serif;
+    color: var(--warm-cocoa);
   }
   
   html {
@@ -18,19 +38,28 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-xl transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98];
+      @apply text-white font-medium py-2 px-4 rounded-xl transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98];
+      background: linear-gradient(135deg, #d97c6f 0%, #c86b60 100%);
+      box-shadow: 0 10px 18px -12px rgba(217, 124, 111, 0.6);
   }
   
   .btn-secondary {
-    @apply bg-lavender-100 hover:bg-lavender-200 text-lavender-700 font-medium py-2 px-4 rounded-xl transition-all duration-200;
+      @apply font-medium py-2 px-4 rounded-xl transition-all duration-200;
+      background: #f2e2d7;
+      color: #8f5a4c;
   }
   
   .btn-outline {
-    @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-50 font-medium py-2 px-4 rounded-xl transition-all duration-200;
+      @apply border-2 font-medium py-2 px-4 rounded-xl transition-all duration-200;
+      border-color: #d97c6f;
+      color: #c86b60;
+      background: rgba(255, 247, 235, 0.6);
   }
   
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
+      @apply rounded-2xl shadow-sm border p-6;
+      background: var(--surface);
+      border-color: #f2ded4;
   }
   
   .card-hover {
@@ -38,15 +67,23 @@
   }
   
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-xl border outline-none transition-all duration-200;
+    border-color: #f0d9ce;
+    background: #fffaf4;
+    color: var(--warm-ink);
+    box-shadow: inset 0 0 0 1px rgba(242, 222, 212, 0.4);
   }
   
   .chat-bubble-user {
-    @apply bg-primary-500 text-white rounded-2xl rounded-br-md px-4 py-3 max-w-[80%] ml-auto;
+    @apply text-white rounded-2xl rounded-br-md px-4 py-3 max-w-[80%] ml-auto;
+    background: linear-gradient(135deg, #d97c6f 0%, #c86b60 100%);
   }
   
   .chat-bubble-assistant {
-    @apply bg-white text-gray-800 rounded-2xl rounded-bl-md px-4 py-3 max-w-[80%] shadow-sm border border-gray-100;
+    @apply rounded-2xl rounded-bl-md px-4 py-3 max-w-[80%] shadow-sm border;
+    background: #fffdf8;
+    color: var(--warm-ink);
+    border-color: #f2ded4;
   }
   
   .mood-emoji {
@@ -54,11 +91,19 @@
   }
   
   .nav-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-lavender-50 hover:text-primary-600 transition-all duration-200;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200;
+    color: #7a584e;
+  }
+
+  .nav-link:hover {
+    background: #f6e7de;
+    color: #5c3d36;
   }
   
   .nav-link-active {
-    @apply bg-primary-50 text-primary-600 font-medium;
+    @apply font-medium;
+    background: #fbece4;
+    color: #b85b50;
   }
 }
 
@@ -72,12 +117,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c7d2fe;
+  background: #e6bdae;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a5b4fc;
+  background: #d99f8f;
 }
 
 /* Typing animation */
@@ -90,7 +135,7 @@
 .typing-indicator span {
   width: 8px;
   height: 8px;
-  background: #a5b4fc;
+  background: #d99f8f;
   border-radius: 50%;
   animation: typing 1.4s infinite ease-in-out;
 }
@@ -119,22 +164,22 @@
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background: linear-gradient(90deg, #f6e7de 25%, #fff7eb 50%, #f6e7de 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
 /* Gradient backgrounds */
 .gradient-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #d97c6f 0%, #c86b60 100%);
 }
 
 .gradient-calm {
-  background: linear-gradient(135deg, #89CFF0 0%, #98D8C8 100%);
+  background: linear-gradient(135deg, #f0c9b7 0%, #f7e6d8 100%);
 }
 
 .gradient-warm {
-  background: linear-gradient(135deg, #F7CAC9 0%, #FFF8E7 100%);
+  background: linear-gradient(135deg, #f6d2c3 0%, #fff7eb 100%);
 }
 
 /* Mobile-friendly touch targets */
@@ -179,7 +224,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid #d97c6f;
   outline-offset: 2px;
 }
 

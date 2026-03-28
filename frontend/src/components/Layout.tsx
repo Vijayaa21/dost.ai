@@ -69,8 +69,8 @@ export default function Layout() {
         <aside className={clsx(
           "hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen z-40 border-r transition-colors duration-300",
           isDark 
-            ? "bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700/50" 
-            : "bg-gradient-to-b from-white via-white to-slate-50 border-gray-100"
+            ? "bg-gradient-to-b from-[#2a1c18] via-[#241713] to-[#1f1411] border-[#3b2a24]/60" 
+            : "bg-gradient-to-b from-[#fffaf4] via-white to-[#fff3ed] border-[#f2ded4]"
         )}>
           {/* Logo */}
           <div className={clsx(
@@ -80,8 +80,11 @@ export default function Layout() {
             <div className="flex items-center gap-3">
               <Logo size="md" />
               <div>
-                <span className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">Dost AI</span>
-                <p className={clsx("text-xs", isDark ? "text-slate-500" : "text-gray-400")}>Mental Wellness</p>
+                <span className={clsx(
+                  "text-lg font-bold bg-clip-text text-transparent",
+                  isDark ? "bg-gradient-to-r from-[#f6d2c3] to-[#d97c6f]" : "bg-gradient-to-r from-[#c86b60] to-[#8d4943]"
+                )}>Dost AI</span>
+                <p className={clsx("text-xs", isDark ? "text-[#b39a93]" : "text-[#9c7a70]")}>Mental Wellness</p>
               </div>
             </div>
             
@@ -93,8 +96,8 @@ export default function Layout() {
               className={clsx(
                 "p-2 rounded-xl transition-all",
                 isDark 
-                  ? "bg-slate-700 hover:bg-slate-600 text-yellow-400" 
-                  : "bg-gray-100 hover:bg-gray-200 text-slate-600"
+                  ? "bg-[#3b2a24] hover:bg-[#4a342d] text-[#f6d2c3]" 
+                  : "bg-[#f6e7de] hover:bg-[#f1ded3] text-[#8d4943]"
               )}
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -111,10 +114,10 @@ export default function Layout() {
                   clsx(
                     'flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium',
                     isActive 
-                      ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30' 
+                      ? 'bg-gradient-to-r from-[#d97c6f] to-[#c86b60] text-white shadow-lg shadow-[#d97c6f]/30' 
                       : isDark
-                        ? 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                        ? 'text-[#d8c5bf] hover:bg-[#3b2a24]/60 hover:text-white'
+                        : 'text-[#7a584e] hover:bg-[#f6e7de] hover:text-[#5c3d36]'
                   )
                 }
               >
@@ -127,13 +130,13 @@ export default function Layout() {
           {/* Crisis Support & Logout */}
           <div className={clsx(
             "border-t p-4 transition-colors",
-            isDark ? "border-slate-700/50 bg-gradient-to-t from-red-950/30 to-transparent" : "border-gray-100 bg-gradient-to-t from-red-50/50 to-transparent"
+            isDark ? "border-[#3b2a24]/60 bg-gradient-to-t from-[#3a1f19]/60 to-transparent" : "border-[#f2ded4] bg-gradient-to-t from-[#ffe5dc] to-transparent"
           )}>
             <button
               onClick={() => window.open('tel:9152987821')}
               className={clsx(
                 "flex items-center gap-3 px-4 py-3 rounded-xl w-full transition-all font-medium mb-2",
-                isDark ? "text-red-400 hover:bg-red-950/50" : "text-red-500 hover:bg-red-50"
+                isDark ? "text-[#f3a793] hover:bg-[#3a1f19]" : "text-[#c25448] hover:bg-[#ffe5dc]"
               )}
             >
               <AlertCircle className="w-5 h-5" />
@@ -143,7 +146,7 @@ export default function Layout() {
               onClick={handleLogout}
               className={clsx(
                 "flex items-center gap-3 px-4 py-3 rounded-xl w-full transition-all font-medium",
-                isDark ? "text-slate-400 hover:bg-slate-700/50" : "text-gray-500 hover:bg-gray-100"
+                isDark ? "text-[#cbb3ad] hover:bg-[#3b2a24]" : "text-[#7a584e] hover:bg-[#f6e7de]"
               )}
             >
               <LogOut className="w-5 h-5" />
@@ -155,26 +158,26 @@ export default function Layout() {
         {/* Mobile Header */}
         <div className={clsx(
           "md:hidden fixed top-0 left-0 right-0 z-50 border-b transition-colors",
-          isDark ? "bg-slate-900/95 backdrop-blur-lg border-slate-700/50" : "bg-white/95 backdrop-blur-lg border-gray-100"
+          isDark ? "bg-[#2a1c18]/95 backdrop-blur-lg border-[#3b2a24]/60" : "bg-[#fffaf4]/95 backdrop-blur-lg border-[#f2ded4]"
         )}>
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <Logo size="sm" />
-              <span className={clsx("text-lg font-bold", isDark ? "text-white" : "text-gray-800")}>Dost AI</span>
+              <span className={clsx("text-lg font-bold", isDark ? "text-[#f6d2c3]" : "text-[#5c3d36]")}>Dost AI</span>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleTheme}
                 className={clsx(
                   "p-2 rounded-lg transition-colors",
-                  isDark ? "text-yellow-400 bg-slate-800" : "text-slate-600 bg-gray-100"
+                  isDark ? "text-[#f6d2c3] bg-[#3b2a24]" : "text-[#8d4943] bg-[#f6e7de]"
                 )}
               >
                 {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={clsx("p-2", isDark ? "text-slate-300" : "text-gray-600")}
+                className={clsx("p-2", isDark ? "text-[#d8c5bf]" : "text-[#7a584e]")}
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -190,7 +193,7 @@ export default function Layout() {
             exit={{ opacity: 0, y: -10 }}
             className={clsx(
               "md:hidden fixed top-14 left-0 right-0 z-40 p-4 border-b transition-colors",
-              isDark ? "bg-slate-900/95 backdrop-blur-lg border-slate-700/50" : "bg-white border-gray-100"
+              isDark ? "bg-[#2a1c18]/95 backdrop-blur-lg border-[#3b2a24]/60" : "bg-[#fffaf4] border-[#f2ded4]"
             )}
           >
             <nav className="space-y-1">
@@ -203,10 +206,10 @@ export default function Layout() {
                     clsx(
                       'flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium',
                       isActive 
-                        ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white' 
+                        ? 'bg-gradient-to-r from-[#d97c6f] to-[#c86b60] text-white' 
                         : isDark
-                          ? 'text-slate-300 hover:bg-slate-800'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          ? 'text-[#d8c5bf] hover:bg-[#3b2a24]'
+                          : 'text-[#7a584e] hover:bg-[#f6e7de]'
                     )
                   }
                 >
@@ -218,7 +221,7 @@ export default function Layout() {
                 onClick={handleLogout}
                 className={clsx(
                   "flex items-center gap-3 px-4 py-3 rounded-xl w-full font-medium",
-                  isDark ? "text-red-400 hover:bg-red-950/50" : "text-red-500 hover:bg-red-50"
+                  isDark ? "text-[#f3a793] hover:bg-[#3a1f19]" : "text-[#c25448] hover:bg-[#ffe5dc]"
                 )}
               >
                 <LogOut className="w-5 h-5" />
@@ -238,8 +241,8 @@ export default function Layout() {
       <footer className={clsx(
         "py-12 md:ml-64 transition-colors duration-300 border-t",
         isDark 
-          ? "bg-slate-900/95 border-slate-800 text-white" 
-          : "bg-gradient-to-br from-slate-100 via-purple-50 to-indigo-100 border-purple-200 text-gray-800"
+          ? "bg-[#241713]/95 border-[#3b2a24] text-[#f6d2c3]" 
+          : "bg-gradient-to-br from-[#fff7eb] via-[#f6e7de] to-[#f3e0d6] border-[#f2ded4] text-[#5c3d36]"
       )}>
         <div className="max-w-6xl mx-auto px-6">
           {/* Main Footer Content */}
@@ -252,12 +255,12 @@ export default function Layout() {
                   <h3 className={clsx(
                     "text-2xl font-bold bg-clip-text text-transparent",
                     isDark 
-                      ? "bg-gradient-to-r from-purple-400 to-pink-400" 
-                      : "bg-gradient-to-r from-purple-600 to-pink-600"
+                      ? "bg-gradient-to-r from-[#f6d2c3] to-[#d97c6f]" 
+                      : "bg-gradient-to-r from-[#c86b60] to-[#8d4943]"
                   )}>
                     Dost AI
                   </h3>
-                  <span className={clsx("text-xs", isDark ? "text-slate-400" : "text-gray-500")}>Your Mental Wellness Companion</span>
+                  <span className={clsx("text-xs", isDark ? "text-[#bfa79f]" : "text-[#9c7a70]")}>Your Mental Wellness Companion</span>
                 </div>
               </div>
               <p className={clsx("text-sm leading-relaxed mb-4", isDark ? "text-slate-300" : "text-gray-600")}>
@@ -266,7 +269,7 @@ export default function Layout() {
                 We're here for you, every step of the way. 💜
               </p>
               <div className={clsx("flex items-center gap-2 text-xs", isDark ? "text-slate-400" : "text-gray-500")}>
-                <Sparkles className={clsx("w-4 h-4", isDark ? "text-purple-400" : "text-purple-600")} />
+                <Sparkles className={clsx("w-4 h-4", isDark ? "text-[#f0b8a7]" : "text-[#c86b60]")} />
                 <span>Powered by AI, Built with Care</span>
               </div>
             </div>
@@ -281,7 +284,7 @@ export default function Layout() {
                 <li>
                   <a href="#" className={clsx(
                     "transition-colors flex items-center gap-2",
-                    isDark ? "text-slate-300 hover:text-purple-400" : "text-gray-600 hover:text-purple-600"
+                    isDark ? "text-slate-300 hover:text-[#f0b8a7]" : "text-gray-600 hover:text-[#c86b60]"
                   )}>
                     About Dost AI
                   </a>
@@ -289,7 +292,7 @@ export default function Layout() {
                 <li>
                   <a href="#" className={clsx(
                     "transition-colors flex items-center gap-2",
-                    isDark ? "text-slate-300 hover:text-purple-400" : "text-gray-600 hover:text-purple-600"
+                    isDark ? "text-slate-300 hover:text-[#f0b8a7]" : "text-gray-600 hover:text-[#c86b60]"
                   )}>
                     Privacy Policy
                   </a>
@@ -297,7 +300,7 @@ export default function Layout() {
                 <li>
                   <a href="#" className={clsx(
                     "transition-colors flex items-center gap-2",
-                    isDark ? "text-slate-300 hover:text-purple-400" : "text-gray-600 hover:text-purple-600"
+                    isDark ? "text-slate-300 hover:text-[#f0b8a7]" : "text-gray-600 hover:text-[#c86b60]"
                   )}>
                     Terms of Service
                   </a>
@@ -338,7 +341,7 @@ export default function Layout() {
                     "flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all w-fit",
                     isDark 
                       ? "bg-slate-700 hover:bg-slate-600 text-white" 
-                      : "bg-purple-100 hover:bg-purple-200 text-purple-800"
+                      : "bg-[#f6e7de] hover:bg-[#f0d9ce] text-[#8d4943]"
                   )}
                 >
                   <Code2 className="w-4 h-4" />
@@ -349,7 +352,7 @@ export default function Layout() {
           </div>
 
           {/* Divider */}
-          <div className={clsx("border-t pt-6", isDark ? "border-slate-700" : "border-purple-200")}>
+          <div className={clsx("border-t pt-6", isDark ? "border-slate-700" : "border-[#f2ded4]")}>
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className={clsx("flex items-center gap-2", isDark ? "text-slate-400" : "text-gray-500")}>
                 <Heart className="w-4 h-4 text-red-400" />
@@ -365,8 +368,8 @@ export default function Layout() {
                   className={clsx(
                     "p-2 rounded-lg transition-all transform hover:scale-110",
                     isDark 
-                      ? "bg-slate-700/50 text-blue-400 hover:bg-blue-950/50" 
-                      : "bg-purple-100 text-blue-600 hover:bg-blue-100"
+                      ? "bg-slate-700/50 text-[#f0b8a7] hover:bg-[#3b2a24]" 
+                      : "bg-[#f6e7de] text-[#c86b60] hover:bg-[#f0d9ce]"
                   )}
                   title="Connect on LinkedIn"
                 >
@@ -380,7 +383,7 @@ export default function Layout() {
                     "p-2 rounded-lg transition-all transform hover:scale-110",
                     isDark 
                       ? "bg-slate-700/50 text-gray-300 hover:bg-slate-600" 
-                      : "bg-purple-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-[#f6e7de] text-[#5c3d36] hover:bg-[#f0d9ce]"
                   )}
                   title="Follow on GitHub"
                 >
@@ -393,8 +396,8 @@ export default function Layout() {
                   className={clsx(
                     "p-2 rounded-lg transition-all transform hover:scale-110",
                     isDark 
-                      ? "bg-slate-700/50 text-sky-400 hover:bg-sky-950/50" 
-                      : "bg-purple-100 text-sky-500 hover:bg-sky-100"
+                      ? "bg-slate-700/50 text-[#f0b8a7] hover:bg-[#3b2a24]" 
+                      : "bg-[#f6e7de] text-[#c86b60] hover:bg-[#f0d9ce]"
                   )}
                   title="Follow on Twitter"
                 >

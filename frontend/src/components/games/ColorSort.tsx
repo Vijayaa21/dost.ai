@@ -21,10 +21,10 @@ export default function ColorSort({ onBack, onComplete }: ColorSortProps) {
 
   const possibleColors = [
     '#ef4444', // red
-    '#3b82f6', // blue
+    '#d97c6f', // clay
     '#22c55e', // green
     '#eab308', // yellow
-    '#a855f7', // purple
+    '#f0b8a7', // rose
     '#ec4899', // pink
     '#06b6d4', // cyan
     '#f97316', // orange

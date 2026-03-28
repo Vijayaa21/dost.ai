@@ -56,7 +56,7 @@
 ### Backend
 - **Framework**: Django 4.2 + Django Rest Framework
 - **Authentication**: JWT (SimpleJWT)
-- **Database**: SQLite (dev) / PostgreSQL (prod)
+- **Database**: SQLite (local fallback) / Neon Serverless PostgreSQL
 - **AI**: OpenAI API / Google Gemini API
 - **Real-time**: Django Channels
 
@@ -175,6 +175,11 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 AI_PROVIDER=gemini
 OPENAI_API_KEY=your-openai-key
 GEMINI_API_KEY=your-gemini-key
+
+# Database (Neon Serverless Postgres)
+DATABASE_URL=postgresql://<user>:<password>@<neon-host>/<database>?sslmode=require
+DB_SSL_REQUIRE=True
+DB_CONN_MAX_AGE=600
 
 # CORS
 CORS_ALLOWED_ORIGINS=http://localhost:5173

@@ -48,6 +48,8 @@ export default function Chat() {
   const [copingSuggestion, setCopingSuggestion] = useState<CopingSuggestion | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const shouldAutoScrollRef = useRef(true);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -58,8 +60,19 @@ export default function Chat() {
     scrollToBottom();
   }, [messages]);
 
+  const handleMessagesScroll = () => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    shouldAutoScrollRef.current = distanceFromBottom < 64;
+  };
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (!container || !shouldAutoScrollRef.current) return;
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
   };
 
   const loadConversations = async () => {
@@ -350,7 +363,11 @@ export default function Chat() {
             )}
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto">
+            <div
+              ref={messagesContainerRef}
+              onScroll={handleMessagesScroll}
+              className="flex-1 overflow-y-auto"
+            >
               {messages.length === 0 ? (
                 /* Empty State - Welcome Screen */
                 <div className="h-full flex flex-col items-center justify-center p-6">

@@ -73,7 +73,7 @@ export function ChatSkeleton() {
       {/* User message */}
       <div className="flex gap-3 justify-end">
         <div className="flex-1 space-y-2 flex flex-col items-end">
-          <Skeleton variant="rounded" className="h-12 w-1/2 bg-indigo-100" />
+          <Skeleton variant="rounded" className="h-12 w-1/2 bg-[#f6e7de]" />
         </div>
       </div>
       {/* Assistant message */}

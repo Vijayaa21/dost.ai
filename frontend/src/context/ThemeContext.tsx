@@ -60,19 +60,19 @@ export const themeClasses = {
   
   // Gradient text
   gradientText: {
-    dark: 'bg-gradient-to-r from-sky-300 via-sky-400 to-cyan-300 bg-clip-text text-transparent',
-    light: 'bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-400 bg-clip-text text-transparent',
+    dark: 'bg-gradient-to-r from-[#f0b8a7] via-[#d99f8f] to-[#d97c6f] bg-clip-text text-transparent',
+    light: 'bg-gradient-to-r from-[#d99f8f] via-[#d97c6f] to-[#c86b60] bg-clip-text text-transparent',
   },
   
   // Input fields
   input: {
-    dark: 'bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-sky-400 focus:ring-sky-400/20',
-    light: 'bg-white border-gray-300 text-gray-800 placeholder-gray-400 focus:border-sky-400 focus:ring-sky-400/20',
+    dark: 'bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-[#d97c6f] focus:ring-[#d97c6f]/20',
+    light: 'bg-white border-gray-300 text-gray-800 placeholder-gray-400 focus:border-[#d97c6f] focus:ring-[#f6e7de]/60',
   },
   
   // Buttons
   button: {
-    primary: 'bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white shadow-lg shadow-sky-400/30',
+    primary: 'bg-gradient-to-r from-[#d97c6f] to-[#c86b60] hover:from-[#c86b60] hover:to-[#b05b52] text-white shadow-lg shadow-[#d97c6f]/30',
     secondary: {
       dark: 'bg-slate-700 hover:bg-slate-600 text-slate-200',
       light: 'bg-gray-100 hover:bg-gray-200 text-gray-700',

@@ -13,17 +13,17 @@ const colors = [
   '#EAB308', // yellow
   '#22C55E', // green
   '#06B6D4', // cyan
-  '#3B82F6', // blue
-  '#8B5CF6', // violet
+  '#D97C6F', // clay
+  '#F0B8A7', // rose
   '#EC4899', // pink
   '#000000', // black
-  '#FFFFFF', // white
+  '#FFF7EB', // cream
 ];
 
 export default function ColorCanvas({ onBack, onComplete }: ColorCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [color, setColor] = useState('#3B82F6');
+  const [color, setColor] = useState('#D97C6F');
   const [brushSize, setBrushSize] = useState(8);
   const [isEraser, setIsEraser] = useState(false);
   const lastPoint = useRef<{ x: number; y: number } | null>(null);
@@ -41,8 +41,8 @@ export default function ColorCanvas({ onBack, onComplete }: ColorCanvasProps) {
     canvas.height = rect.height * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     
-    // White background
-    ctx.fillStyle = '#FFFFFF';
+    // Warm background
+    ctx.fillStyle = '#FFF7EB';
     ctx.fillRect(0, 0, rect.width, rect.height);
   }, []);
 
@@ -77,7 +77,7 @@ export default function ColorCanvas({ onBack, onComplete }: ColorCanvasProps) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = brushSize;
-    ctx.strokeStyle = isEraser ? '#FFFFFF' : color;
+    ctx.strokeStyle = isEraser ? '#FFF7EB' : color;
 
     if (lastPoint.current) {
       ctx.beginPath();
@@ -105,7 +105,7 @@ export default function ColorCanvas({ onBack, onComplete }: ColorCanvasProps) {
     if (!canvas || !ctx) return;
     
     const rect = canvas.getBoundingClientRect();
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = '#FFF7EB';
     ctx.fillRect(0, 0, rect.width, rect.height);
   };
 

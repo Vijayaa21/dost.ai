@@ -72,8 +72,8 @@ export default function NeonCruise({ onBack, onComplete }: NeonCruiseProps) {
 
       // Draw car with glow
       ctx.shadowBlur = 25;
-      ctx.shadowColor = '#6366f1';
-      ctx.fillStyle = '#6366f1';
+      ctx.shadowColor = '#d97c6f';
+      ctx.fillStyle = '#d97c6f';
       
       // Car body
       ctx.beginPath();
@@ -83,7 +83,7 @@ export default function NeonCruise({ onBack, onComplete }: NeonCruiseProps) {
       ctx.shadowBlur = 0;
 
       // Car details
-      ctx.fillStyle = '#818cf8';
+      ctx.fillStyle = '#f0b8a7';
       ctx.fillRect(state.car.x + 10, 490, 15, 20); // Left window
       ctx.fillRect(state.car.x + state.car.w - 25, 490, 15, 20); // Right window
 

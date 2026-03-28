@@ -55,9 +55,9 @@ export default function AnimatedBackground() {
 
       // Set background based on theme
       if (isDark) {
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.2)';
+        ctx.fillStyle = 'rgba(36, 24, 20, 0.22)';
       } else {
-        ctx.fillStyle = 'rgba(248, 250, 252, 0.2)';
+        ctx.fillStyle = 'rgba(255, 247, 235, 0.22)';
       }
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -80,13 +80,13 @@ export default function AnimatedBackground() {
         // Draw node
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = isDark ? '#0ea5e9' : '#0369a1';
+        ctx.fillStyle = isDark ? '#f0b8a7' : '#d97c6f';
         ctx.fill();
 
         // Draw glow
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius + 3, 0, Math.PI * 2);
-        ctx.strokeStyle = isDark ? 'rgba(14, 165, 233, 0.4)' : 'rgba(3, 105, 161, 0.3)';
+        ctx.strokeStyle = isDark ? 'rgba(240, 184, 167, 0.35)' : 'rgba(217, 124, 111, 0.3)';
         ctx.lineWidth = 2;
         ctx.stroke();
       });
@@ -104,8 +104,8 @@ export default function AnimatedBackground() {
             ctx.moveTo(nodesRef.current[i].x, nodesRef.current[i].y);
             ctx.lineTo(nodesRef.current[j].x, nodesRef.current[j].y);
             ctx.strokeStyle = isDark
-              ? `rgba(14, 165, 233, ${opacity})`
-              : `rgba(3, 105, 161, ${opacity})`;
+              ? `rgba(240, 184, 167, ${opacity})`
+              : `rgba(217, 124, 111, ${opacity})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -132,8 +132,8 @@ export default function AnimatedBackground() {
       style={{
         zIndex: -1,
         background: isDark
-          ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%)'
-          : 'linear-gradient(135deg, #f8fafc 0%, #f3e8ff 50%, #e0f2fe 100%)',
+          ? 'linear-gradient(135deg, #1e1411 0%, #2a1c18 45%, #3b2a24 100%)'
+          : 'linear-gradient(135deg, #fff7eb 0%, #f7e6d8 50%, #f6d2c3 100%)',
       }}
     />
   );

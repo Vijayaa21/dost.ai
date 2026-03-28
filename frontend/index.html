@@ -5,14 +5,75 @@
     <link rel="icon" type="image/svg+xml" href="/dost-logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Dost AI - Your mental health companion. 24/7 emotional support, mood tracking, and guided coping strategies." />
-    <meta name="theme-color" content="#ec4899" />
+    <meta name="theme-color" content="#d97c6f" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      html, body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Manrope', system-ui, sans-serif;
+        color: #3a2a24;
+        background: radial-gradient(1200px 800px at 10% -10%, #fff0e4 0%, #fff7eb 55%, #fdf3ed 100%);
+      }
+
+      #root {
+        min-height: 100vh;
+      }
+
+      .app-preload {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .app-preload-card {
+        text-align: center;
+        background: rgba(255, 247, 235, 0.9);
+        border: 1px solid #f0d9ce;
+        border-radius: 20px;
+        padding: 24px 28px;
+        box-shadow: 0 10px 24px -18px rgba(217, 124, 111, 0.6);
+      }
+
+      .app-preload-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgba(217, 124, 111, 0.25);
+        border-top-color: #d97c6f;
+        border-radius: 999px;
+        margin: 0 auto 12px;
+        animation: spin 1s linear infinite;
+      }
+
+      .app-preload-text {
+        font-size: 0.95rem;
+        color: #8d4943;
+        letter-spacing: 0.2px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
     <title>Dost AI - Mental Health Companion</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="app-preload">
+        <div class="app-preload-card">
+          <div class="app-preload-spinner"></div>
+          <div class="app-preload-text">Warming up Dost AI...</div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

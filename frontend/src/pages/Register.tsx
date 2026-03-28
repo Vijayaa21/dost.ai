@@ -46,9 +46,10 @@ export default function Register() {
         <div className={getCardClass(isDark, "rounded-3xl shadow-2xl backdrop-blur-xl overflow-hidden")}> 
           <div className="grid lg:grid-cols-2 relative">
             {/* Vertical glowing divider */}
-            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-purple-500 transform -translate-x-1/2" style={{
-              boxShadow: '0 0 15px rgba(168, 85, 247, 0.8), 0 0 30px rgba(168, 85, 247, 0.4)'
-            }} />
+            <div
+              className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-[#d99f8f] transform -translate-x-1/2"
+              style={{ boxShadow: '0 0 16px rgba(217, 124, 111, 0.6), 0 0 32px rgba(217, 124, 111, 0.25)' }}
+            />
             
             {/* Illustration / Brand side */}
             <motion.div
@@ -59,7 +60,7 @@ export default function Register() {
             >
 
               <div className="flex-1 flex flex-col items-center justify-center gap-6">
-                <p className={isDark ? "text-slate-300" : "text-gray-600"}>Create your account and start your journey with us.</p>
+                <p className={isDark ? "text-slate-300" : "text-gray-600"}>Create your account and start your journey.</p>
 
                 <Logo size="lg" />
                 <div>
@@ -70,7 +71,7 @@ export default function Register() {
               </div>
               
               <div className={isDark ? "text-xs text-slate-400" : "text-xs text-gray-500"}>
-                © 2026 Dost AI — <Link to="#" className="hover:text-purple-400 transition-colors">Privacy</Link> · <Link to="#" className="hover:text-purple-400 transition-colors">Terms</Link> · <Link to="#" className="hover:text-purple-400 transition-colors">Contact</Link>
+                © 2026 Dost AI — <Link to="#" className="hover:text-[#c86b60] transition-colors">Privacy</Link> · <Link to="#" className="hover:text-[#c86b60] transition-colors">Terms</Link> · <Link to="#" className="hover:text-[#c86b60] transition-colors">Contact</Link>
               </div>
             </motion.div>
 
@@ -81,7 +82,10 @@ export default function Register() {
               className="flex flex-col justify-center p-12"
             >
               
-            <h2 className={isDark ? "text-3xl text-center font-bold text-white mb-2" : "text-3xl font-bold text-gray-900 mb-2"}>Join Us!</h2>
+              <h2 className={isDark ? "text-3xl text-center font-bold text-white mb-2" : "text-3xl font-bold text-gray-900 mb-2"}>Join Us!</h2>
+              <p className={isDark ? "text-center text-slate-400 mb-6" : "text-center text-gray-500 mb-6"}>
+                Start building small daily habits with Dost AI.
+              </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
@@ -141,7 +145,7 @@ export default function Register() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className={isDark ? "absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200" : "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#c86b60]"}
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -185,7 +189,7 @@ export default function Register() {
 
               <div className="mt-6 text-center">
                 <p className={isDark ? "text-slate-400 text-sm" : "text-gray-600 text-sm"}>
-                  Already have an account? <Link to="/login" className="text-purple-500 hover:text-purple-600 font-medium">Login</Link>
+                  Already have an account? <Link to="/login" className="text-[#c86b60] hover:text-[#b05b52] font-medium">Login</Link>
                 </p>
               </div>
             </motion.div>

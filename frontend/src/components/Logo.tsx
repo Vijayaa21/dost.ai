@@ -7,17 +7,23 @@ interface LogoProps {
 
 export default function Logo({ className, size = 'md' }: LogoProps) {
   const sizeMap = {
-    sm: 'w-8 h-8',
-    md: 'w-12 h-12',
-    lg: 'w-16 h-16',
+    sm: 'w-9 h-9',
+    md: 'w-14 h-14',
+    lg: 'w-18 h-18',
   };
 
   return (
-    <div className={clsx('flex items-center justify-center', sizeMap[size], className)}>
+    <div
+      className={clsx(
+        'flex items-center justify-center rounded-2xl p-1',
+        sizeMap[size],
+        className
+      )}
+    >
       <img 
         src="/dost-logo.svg" 
         alt="Dost AI - Mental Health Companion" 
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain drop-shadow-sm"
       />
     </div>
   );

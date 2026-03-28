@@ -153,10 +153,10 @@ export default function Journal() {
             <h1 className={clsx(
               "text-2xl md:text-3xl font-bold bg-clip-text text-transparent flex items-center gap-2",
               isDark 
-                ? "bg-gradient-to-r from-emerald-400 to-teal-400" 
-                : "bg-gradient-to-r from-emerald-600 to-teal-600"
+                ? "bg-gradient-to-r from-[#f0b8a7] to-[#d97c6f]" 
+                : "bg-gradient-to-r from-[#c86b60] to-[#8d4943]"
             )}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#d97c6f] to-[#c86b60] flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
               Journal
@@ -184,28 +184,28 @@ export default function Journal() {
           <div className={clsx(
             "rounded-2xl p-5 shadow-lg text-center",
             isDark 
-              ? "bg-slate-800/80 border border-slate-700 shadow-emerald-500/5" 
-              : "bg-white border border-emerald-100 shadow-emerald-500/5"
+              ? "bg-slate-800/80 border border-slate-700 shadow-[#d97c6f]/10" 
+              : "bg-white border border-[#f2ded4] shadow-[#d97c6f]/10"
           )}>
             <p className={clsx(
               "text-3xl md:text-4xl font-bold bg-clip-text text-transparent",
               isDark 
-                ? "bg-gradient-to-r from-emerald-400 to-teal-400" 
-                : "bg-gradient-to-r from-emerald-600 to-teal-600"
+                ? "bg-gradient-to-r from-[#f0b8a7] to-[#d97c6f]" 
+                : "bg-gradient-to-r from-[#c86b60] to-[#8d4943]"
             )}>{stats?.total_entries || 0}</p>
             <p className={clsx("text-sm mt-1", isDark ? "text-slate-400" : "text-gray-500")}>Total Entries</p>
           </div>
           <div className={clsx(
             "rounded-2xl p-5 shadow-lg text-center",
             isDark 
-              ? "bg-slate-800/80 border border-slate-700 shadow-orange-500/5" 
-              : "bg-white border border-orange-100 shadow-orange-500/5"
+              ? "bg-slate-800/80 border border-slate-700 shadow-[#d99f8f]/10" 
+              : "bg-white border border-[#f2ded4] shadow-[#d99f8f]/10"
           )}>
             <p className={clsx(
               "text-3xl md:text-4xl font-bold bg-clip-text text-transparent",
               isDark 
-                ? "bg-gradient-to-r from-orange-400 to-amber-400" 
-                : "bg-gradient-to-r from-orange-500 to-amber-500"
+                ? "bg-gradient-to-r from-[#f0b8a7] to-[#d99f8f]" 
+                : "bg-gradient-to-r from-[#c86b60] to-[#d99f8f]"
             )}>{stats?.writing_streak || 0}</p>
             <p className={clsx("text-sm mt-1", isDark ? "text-slate-400" : "text-gray-500")}>Day Streak 🔥</p>
           </div>
@@ -227,8 +227,8 @@ export default function Journal() {
             className={clsx(
               "w-full pl-12 pr-4 py-4 rounded-2xl border outline-none transition-all shadow-sm",
               isDark 
-                ? "bg-slate-800/80 border-slate-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-white placeholder-slate-500" 
-                : "bg-white border-gray-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 text-gray-700 placeholder-gray-400"
+                ? "bg-slate-800/80 border-slate-700 focus:border-[#d97c6f] focus:ring-2 focus:ring-[#d97c6f]/20 text-white placeholder-slate-500" 
+                : "bg-white border-[#f0d9ce] focus:border-[#d97c6f] focus:ring-2 focus:ring-[#f6e7de] text-gray-700 placeholder-gray-400"
             )}
           />
         </motion.div>

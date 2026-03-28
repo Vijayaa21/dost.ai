@@ -44,9 +44,9 @@ import {
 // Emotion options for selection with improved styling
 const emotionOptions = [
   { id: 'anger', label: 'Angry', emoji: '😤', color: 'from-red-500 to-orange-600', bgGlow: 'shadow-red-500/30', description: 'Release tension' },
-  { id: 'sadness', label: 'Sad', emoji: '😢', color: 'from-blue-500 to-indigo-600', bgGlow: 'shadow-blue-500/30', description: 'Find comfort' },
-  { id: 'anxiety', label: 'Anxious', emoji: '😰', color: 'from-purple-500 to-pink-600', bgGlow: 'shadow-purple-500/30', description: 'Calm down' },
-  { id: 'loneliness', label: 'Lonely', emoji: '🥺', color: 'from-cyan-500 to-blue-600', bgGlow: 'shadow-cyan-500/30', description: 'Feel connected' },
+  { id: 'sadness', label: 'Sad', emoji: '😢', color: 'from-[#d99f8f] to-[#c86b60]', bgGlow: 'shadow-[#d99f8f]/30', description: 'Find comfort' },
+  { id: 'anxiety', label: 'Anxious', emoji: '😰', color: 'from-[#d97c6f] to-[#b05b52]', bgGlow: 'shadow-[#d97c6f]/30', description: 'Calm down' },
+  { id: 'loneliness', label: 'Lonely', emoji: '🥺', color: 'from-[#f0b8a7] to-[#d97c6f]', bgGlow: 'shadow-[#f0b8a7]/30', description: 'Feel connected' },
   { id: 'boredom', label: 'Bored', emoji: '😑', color: 'from-slate-500 to-gray-600', bgGlow: 'shadow-slate-500/30', description: 'Get stimulated' },
   { id: 'love', label: 'Loving', emoji: '🥰', color: 'from-pink-500 to-rose-600', bgGlow: 'shadow-pink-500/30', description: 'Express care' },
   { id: 'joy', label: 'Happy', emoji: '😄', color: 'from-yellow-500 to-amber-600', bgGlow: 'shadow-yellow-500/30', description: 'Celebrate!' },
@@ -166,7 +166,7 @@ export default function EmotionGames() {
         >
           <div className="flex justify-center items-center gap-3 mb-4">
             <motion.div 
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-purple-500/30"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d97c6f] to-[#c86b60] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-[#d97c6f]/30"
               whileHover={{ scale: 1.05 }}
             >
               <Gamepad2 className="w-5 h-5" />
@@ -179,7 +179,7 @@ export default function EmotionGames() {
               onClick={() => setInviteModalOpen(true)}
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-white/20 transition-all"
             >
-              <Users className="w-4 h-4 text-cyan-400" />
+              <Users className="w-4 h-4 text-[#f0b8a7]" />
               Invite Friends
             </motion.button>
           </div>
@@ -187,21 +187,21 @@ export default function EmotionGames() {
             Play Your Feelings Away
             <span className="inline-block ml-2">🎮</span>
           </h1>
-          <p className="text-purple-200 text-base md:text-lg max-w-xl mx-auto px-4">
+          <p className="text-[#f6e7de] text-base md:text-lg max-w-xl mx-auto px-4">
             Games designed to help you process emotions in a healthy way. Choose how you're feeling and we'll find the perfect game for you.
           </p>
           
           {/* Stats Bar */}
           <div className="flex justify-center gap-6 mt-6">
-            <div className="flex items-center gap-2 text-purple-300 text-sm">
+            <div className="flex items-center gap-2 text-[#f0d9ce] text-sm">
               <Trophy className="w-4 h-4 text-yellow-400" />
               <span>{builtInGames.length} Games</span>
             </div>
-            <div className="flex items-center gap-2 text-purple-300 text-sm">
-              <Zap className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center gap-2 text-[#f0d9ce] text-sm">
+              <Zap className="w-4 h-4 text-[#f0b8a7]" />
               <span>8 Emotions</span>
             </div>
-            <div className="flex items-center gap-2 text-purple-300 text-sm">
+            <div className="flex items-center gap-2 text-[#f0d9ce] text-sm">
               <Heart className="w-4 h-4 text-pink-400" />
               <span>Therapeutic</span>
             </div>
@@ -234,16 +234,16 @@ export default function EmotionGames() {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleEmotionSelect(emotion.id)}
                         className={clsx(
-                          'relative overflow-hidden rounded-3xl p-6 md:p-8 text-white text-center transition-all',
+                          'relative overflow-hidden rounded-3xl p-5 md:p-6 text-white text-center transition-all',
                           `bg-gradient-to-br ${emotion.color}`,
                           `shadow-xl ${emotion.bgGlow}`,
-                          'hover:shadow-2xl min-h-[160px] md:min-h-[200px]'
+                          'hover:shadow-2xl min-h-[140px] md:min-h-[170px]'
                         )}
                       >
                         {/* Glow effect */}
                         <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity" />
                         <motion.div 
-                          className="text-6xl md:text-7xl mb-3"
+                          className="text-5xl md:text-6xl mb-3"
                           animate={{ rotate: [0, -5, 5, 0] }}
                           transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
                         >
@@ -277,11 +277,11 @@ export default function EmotionGames() {
                           whileHover={{ scale: 1.05, y: -3 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handlePlayGame(game)}
-                          className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/10 hover:border-purple-400/50 hover:bg-white/15 transition-all text-left group min-h-[180px] md:min-h-[220px] flex flex-col justify-center"
+                          className="bg-white/10 backdrop-blur-sm rounded-3xl p-5 border border-white/10 hover:border-[#f0b8a7]/60 hover:bg-white/15 transition-all text-left group min-h-[150px] md:min-h-[180px] flex flex-col justify-center"
                         >
-                          <div className="text-5xl md:text-6xl mb-3 group-hover:scale-110 transition-transform">{game.emoji}</div>
+                          <div className="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform">{game.emoji}</div>
                           <h4 className="font-semibold text-white text-base md:text-lg">{game.name}</h4>
-                          <div className="flex items-center gap-1 mt-3 text-purple-300 text-sm">
+                          <div className="flex items-center gap-1 mt-3 text-[#f0d9ce] text-sm">
                             <Clock className="w-4 h-4" />
                             {game.duration}
                           </div>
@@ -345,7 +345,7 @@ export default function EmotionGames() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ y: -5 }}
-                        className="bg-white/10 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/10 hover:border-purple-400/50 transition-all group min-h-[220px] md:min-h-[260px] flex flex-col justify-between"
+                        className="bg-white/10 backdrop-blur-md rounded-3xl p-5 md:p-6 border border-white/10 hover:border-[#f0b8a7]/60 transition-all group min-h-[190px] md:min-h-[220px] flex flex-col justify-between"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <motion.span 
@@ -361,10 +361,10 @@ export default function EmotionGames() {
                         </div>
                         
                         <h3 className="font-bold text-white text-lg mb-2">{game.name}</h3>
-                        <p className="text-sm text-purple-200 mb-4 line-clamp-2">{game.description}</p>
+                        <p className="text-sm text-[#f6e7de] mb-4 line-clamp-2">{game.description}</p>
                         
                         <div className="bg-white/10 rounded-xl p-3 mb-4">
-                          <p className="text-xs text-purple-200 flex items-center gap-2">
+                          <p className="text-xs text-[#f0d9ce] flex items-center gap-2">
                             <Heart className="w-4 h-4 text-pink-400" />
                             {game.benefit}
                           </p>
@@ -401,11 +401,11 @@ export default function EmotionGames() {
                             whileHover={{ scale: 1.05, y: -3 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handlePlayGame(game)}
-                            className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-cyan-400/50 hover:bg-white/15 transition-all text-left"
+                            className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-[#f0b8a7]/60 hover:bg-white/15 transition-all text-left"
                           >
                             <div className="text-3xl mb-2">{game.emoji}</div>
                             <h4 className="font-semibold text-white text-sm">{game.name}</h4>
-                            <p className="text-xs text-purple-300 mt-1 flex items-center gap-1">
+                            <p className="text-xs text-[#f0d9ce] mt-1 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               {game.duration}
                             </p>
