@@ -19,10 +19,21 @@ User = get_user_model()
 @database_sync_to_async
 def get_user_from_token(token_str):
     """Validate a JWT access token and return the associated user."""
+    from django.db import close_old_connections
+
     try:
+        # Close stale database connections before ORM access
+        close_old_connections()
+
         access_token = AccessToken(token_str)
         user_id = access_token["user_id"]
-        return User.objects.get(id=user_id)
+
+        # Retrieve user only if active
+        user = User.objects.get(id=user_id)
+        if user.is_active:
+            return user
+        else:
+            return AnonymousUser()
     except (TokenError, InvalidToken, User.DoesNotExist, KeyError):
         return AnonymousUser()
 

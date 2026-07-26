@@ -40,6 +40,21 @@ services:
           property: connectionString
       - key: PYTHON_VERSION
         value: "3.11.9"
+      # AI Provider Configuration - Configure in Render Dashboard
+      # Supported providers: 'gemini', 'openai', 'groq'
+      # Set AI_PROVIDER and the corresponding API key below:
+      - key: AI_PROVIDER
+        sync: false
+        # Example: Set to 'gemini', 'openai', or 'groq' in Render dashboard
+      - key: GEMINI_API_KEY
+        sync: false
+        # Set this if using AI_PROVIDER=gemini (get from https://aistudio.google.com/apikey)
+      - key: OPENAI_API_KEY
+        sync: false
+        # Set this if using AI_PROVIDER=openai
+      - key: GROQ_API_KEY
+        sync: false
+        # Set this if using AI_PROVIDER=groq (get from https://console.groq.com)
 
   # Redis - for Django Channels WebSocket layer
   - type: redis

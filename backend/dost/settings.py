@@ -94,6 +94,13 @@ if REDIS_URL:
         }
     }
 else:
+    # Fail fast in production if REDIS_URL is not set
+    if not DEBUG:
+        raise ValueError(
+            'REDIS_URL environment variable is required in production for WebSocket support. '
+            'InMemoryChannelLayer is only suitable for local development.'
+        )
+    # Allow InMemoryChannelLayer for local development
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels.layers.InMemoryChannelLayer',

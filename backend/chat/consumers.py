@@ -5,8 +5,10 @@ Uses the async AI service so outbound LLM HTTP calls never block the
 ASGI event loop. All ORM access is wrapped with @database_sync_to_async.
 """
 import json
+import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from django.core.cache import cache
 from .models import Conversation, Message, CrisisLog
 from .ai_service import get_chat_response_async
 
@@ -39,84 +41,144 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data.get('message', '')
+        typing_indicator_sent = False
+        try:
+            # Parse JSON with error handling
+            try:
+                data = json.loads(text_data)
+            except json.JSONDecodeError:
+                await self.send(text_data=json.dumps({
+                    'type': 'error',
+                    'message': 'Invalid JSON format'
+                }))
+                return
 
-        if not message:
-            return
+            message = data.get('message', '')
 
-        # Get conversation and verify ownership
-        conversation = await self.get_conversation()
-        if not conversation:
+            if not message:
+                return
+
+            # Validate message length (10000 characters max)
+            if len(message) > 10000:
+                await self.send(text_data=json.dumps({
+                    'type': 'error',
+                    'message': 'Message too long (max 10000 characters)'
+                }))
+                return
+
+            # Get conversation and verify ownership
+            conversation = await self.get_conversation()
+            if not conversation:
+                await self.send(text_data=json.dumps({
+                    'type': 'error',
+                    'message': 'Conversation not found'
+                }))
+                return
+
+            # Get conversation history
+            history = await self.get_conversation_history(conversation)
+
+            # Send typing indicator to the client
             await self.send(text_data=json.dumps({
-                'type': 'error',
-                'message': 'Conversation not found'
+                'type': 'typing',
+                'is_typing': True
             }))
-            return
+            typing_indicator_sent = True
 
-        # Get conversation history
-        history = await self.get_conversation_history(conversation)
+            # Get user's preferred tone
+            user_tone = await self.get_user_tone()
 
-        # Send typing indicator to the client
-        await self.send(text_data=json.dumps({
-            'type': 'typing',
-            'is_typing': True
-        }))
+            # Rate limiting: 30 messages per minute per user (matching REST throttle)
+            rate_limit_key = f'chat_ws_rate_{self.user.id}'
+            rate_limit_window = 60  # seconds
+            rate_limit_max = 30
 
-        # Get user's preferred tone
-        user_tone = await self.get_user_tone()
+            # Get current request timestamps from cache
+            request_times = cache.get(rate_limit_key, [])
+            now = time.time()
 
-        # ----- THIS IS THE KEY FIX -----
-        # Previously this was a blocking synchronous call that froze the
-        # entire ASGI event loop while waiting for the LLM to respond.
-        # Now it awaits the async version.
-        result = await get_chat_response_async(message, history, user_tone)
+            # Remove timestamps outside the current window
+            request_times = [t for t in request_times if now - t < rate_limit_window]
 
-        # Save messages to the database
-        user_msg = await self.save_message(
-            conversation, 'user', message,
-            result['detected_emotion'], result['is_crisis']
-        )
-        assistant_msg = await self.save_message(
-            conversation, 'assistant', result['response'],
-            None, result['is_crisis']
-        )
+            # Check if rate limit exceeded
+            if len(request_times) >= rate_limit_max:
+                await self.send(text_data=json.dumps({
+                    'type': 'error',
+                    'message': 'Rate limit exceeded. Please wait a moment before sending another message.'
+                }))
+                return
 
-        # Log crisis if detected
-        if result['is_crisis']:
-            await self.save_crisis_log(
-                user_msg, message, result['response']
+            # Add current request timestamp
+            request_times.append(now)
+            cache.set(rate_limit_key, request_times, rate_limit_window)
+
+            # Get AI response (async, non-blocking)
+            result = await get_chat_response_async(message, history, user_tone)
+
+            # Save messages to the database
+            user_msg = await self.save_message(
+                conversation, 'user', message,
+                result['detected_emotion'], result['is_crisis']
+            )
+            assistant_msg = await self.save_message(
+                conversation, 'assistant', result['response'],
+                None, result['is_crisis']
             )
 
-        # Update conversation timestamp
-        await self.touch_conversation(conversation)
+            # Log crisis if detected
+            if result['is_crisis']:
+                await self.save_crisis_log(
+                    user_msg, message, result['response']
+                )
 
-        # Build response payload
-        response_data = {
-            'type': 'message',
-            'user_message': {
-                'id': user_msg.id,
-                'role': 'user',
-                'content': message,
-                'detected_emotion': result['detected_emotion'],
-                'is_crisis': result['is_crisis'],
-                'created_at': user_msg.created_at.isoformat(),
-            },
-            'assistant_message': {
-                'id': assistant_msg.id,
-                'role': 'assistant',
-                'content': result['response'],
-                'is_crisis': result['is_crisis'],
-                'created_at': assistant_msg.created_at.isoformat(),
+            # Update conversation timestamp
+            await self.touch_conversation(conversation)
+
+            # Build response payload
+            response_data = {
+                'type': 'message',
+                'user_message': {
+                    'id': user_msg.id,
+                    'role': 'user',
+                    'content': message,
+                    'detected_emotion': result['detected_emotion'],
+                    'is_crisis': result['is_crisis'],
+                    'created_at': user_msg.created_at.isoformat(),
+                },
+                'assistant_message': {
+                    'id': assistant_msg.id,
+                    'role': 'assistant',
+                    'content': result['response'],
+                    'is_crisis': result['is_crisis'],
+                    'created_at': assistant_msg.created_at.isoformat(),
+                }
             }
-        }
 
-        # Include coping suggestion if available
-        if result.get('coping_suggestion'):
-            response_data['coping_suggestion'] = result['coping_suggestion']
+            # Include coping suggestion if available
+            if result.get('coping_suggestion'):
+                response_data['coping_suggestion'] = result['coping_suggestion']
 
-        # Send response (also clears the typing indicator on the client)
-        await self.send(text_data=json.dumps(response_data))
+            # Send response (also clears the typing indicator on the client)
+            await self.send(text_data=json.dumps(response_data))
+
+        except Exception as e:
+            # Log the error and send user-visible error response
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error processing message: {e}", exc_info=True)
+
+            await self.send(text_data=json.dumps({
+                'type': 'error',
+                'message': 'An error occurred processing your message. Please try again.'
+            }))
+
+        finally:
+            # Always clear typing indicator if it was sent
+            if typing_indicator_sent:
+                await self.send(text_data=json.dumps({
+                    'type': 'typing',
+                    'is_typing': False
+                }))
 
     # ------------------------------------------------------------------
     # Database helper methods — all wrapped with @database_sync_to_async

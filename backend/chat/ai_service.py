@@ -420,10 +420,74 @@ def detect_conversation_impact(messages: list) -> dict:
     }
 
 
+def _build_system_prompt(user_tone: str = 'friendly', emotion_context: dict = None) -> str:
+    """Build the system prompt with tone adjustments and emotion context."""
+    tone_adjustments = {
+        'calm': "Be that gentle, grounding presence. Speak softly, use calming words, and create a peaceful vibe. Help them feel safe and centered.",
+        'friendly': "Be your natural warm, supportive self. Like talking to a wise friend who really gets it. Caring, insightful, but still conversational.",
+        'minimal': "Keep responses brief but meaningful. Short sentences, clear empathy. Quality over quantity.",
+    }
+
+    system_prompt = settings.DOST_SYSTEM_PROMPT + f"\n\nTone for this conversation: {tone_adjustments.get(user_tone, tone_adjustments['friendly'])}"
+
+    # Add enhanced emotion context to system prompt
+    if emotion_context:
+        emotion = emotion_context.get('emotion', 'neutral')
+        emotion_info = f"\n\n**CURRENT EMOTIONAL STATE:** {emotion}"
+
+        # Add therapeutic guidance based on detected emotion
+        if emotion in EMOTION_THERAPEUTIC_CONTEXT:
+            therapeutic_info = EMOTION_THERAPEUTIC_CONTEXT[emotion]
+            emotion_info += f"\n**Therapeutic Approach:** {therapeutic_info['approach']}"
+            emotion_info += f"\n**Techniques to consider:** {', '.join(therapeutic_info['techniques'])}"
+
+        stress_level = emotion_context.get('stress_level', 'unknown')
+        emotion_info += f"\n**Stress level:** {stress_level}"
+
+        if stress_level == 'high':
+            emotion_info += "\n**Note:** User is highly stressed - be extra gentle, keep responses focused, prioritize validation before anything else."
+
+        conversation_impact = emotion_context.get('conversation_impact', {})
+        if conversation_impact:
+            trend = conversation_impact.get('trend', '')
+            emotion_info += f"\n**Conversation trend:** {trend}"
+
+            if conversation_impact.get('impact') == 'concerning':
+                emotion_info += "\n**Note:** User may need extra support - focus on validation and creating safety."
+            elif conversation_impact.get('impact') == 'positive':
+                emotion_info += "\n**Note:** User seems to be responding well - continue current approach."
+
+        system_prompt += emotion_info
+
+    return system_prompt
+
+
+def _providers_to_try() -> list:
+    """Build the ordered list of providers to try based on configuration."""
+    provider = settings.AI_PROVIDER
+    providers = []
+
+    # Add configured provider first
+    if provider == 'openai' and getattr(settings, 'OPENAI_API_KEY', ''):
+        providers.append('openai')
+    elif provider == 'gemini' and getattr(settings, 'GEMINI_API_KEY', ''):
+        providers.append('gemini')
+
+    # Add Groq as free fallback (very generous free tier)
+    if getattr(settings, 'GROQ_API_KEY', ''):
+        providers.append('groq')
+
+    # Add other providers as fallback
+    if 'gemini' not in providers and getattr(settings, 'GEMINI_API_KEY', ''):
+        providers.append('gemini')
+    if 'openai' not in providers and getattr(settings, 'OPENAI_API_KEY', ''):
+        providers.append('openai')
+
+    return providers
+
+
 def get_ai_response(messages: list, user_tone: str = 'friendly', emotion_context: dict = None) -> str:
     """Get response from AI provider with fallback to rule-based responses."""
-    provider = settings.AI_PROVIDER
-    
     # Get the last user message for fallback
     last_user_message = ""
     detected_emotion = "neutral"
@@ -432,69 +496,18 @@ def get_ai_response(messages: list, user_tone: str = 'friendly', emotion_context
             if msg.get('role') == 'user':
                 last_user_message = msg.get('content', '')
                 break
-    
+
     if emotion_context:
         detected_emotion = emotion_context.get('emotion', 'neutral')
-    
-    # Customize system prompt based on user's preferred tone
-    tone_adjustments = {
-        'calm': "Be that gentle, grounding presence. Speak softly, use calming words, and create a peaceful vibe. Help them feel safe and centered.",
-        'friendly': "Be your natural warm, supportive self. Like talking to a wise friend who really gets it. Caring, insightful, but still conversational.",
-        'minimal': "Keep responses brief but meaningful. Short sentences, clear empathy. Quality over quantity.",
-    }
-    
-    system_prompt = settings.DOST_SYSTEM_PROMPT + f"\n\nTone for this conversation: {tone_adjustments.get(user_tone, tone_adjustments['friendly'])}"
-    
-    # Add enhanced emotion context to system prompt
-    if emotion_context:
-        emotion = emotion_context.get('emotion', 'neutral')
-        emotion_info = f"\n\n**CURRENT EMOTIONAL STATE:** {emotion}"
-        
-        # Add therapeutic guidance based on detected emotion
-        if emotion in EMOTION_THERAPEUTIC_CONTEXT:
-            therapeutic_info = EMOTION_THERAPEUTIC_CONTEXT[emotion]
-            emotion_info += f"\n**Therapeutic Approach:** {therapeutic_info['approach']}"
-            emotion_info += f"\n**Techniques to consider:** {', '.join(therapeutic_info['techniques'])}"
-        
-        stress_level = emotion_context.get('stress_level', 'unknown')
-        emotion_info += f"\n**Stress level:** {stress_level}"
-        
-        if stress_level == 'high':
-            emotion_info += "\n**Note:** User is highly stressed - be extra gentle, keep responses focused, prioritize validation before anything else."
-        
-        conversation_impact = emotion_context.get('conversation_impact', {})
-        if conversation_impact:
-            trend = conversation_impact.get('trend', '')
-            emotion_info += f"\n**Conversation trend:** {trend}"
-            
-            if conversation_impact.get('impact') == 'concerning':
-                emotion_info += "\n**Note:** User may need extra support - focus on validation and creating safety."
-            elif conversation_impact.get('impact') == 'positive':
-                emotion_info += "\n**Note:** User seems to be responding well - continue current approach."
-        
-        system_prompt += emotion_info
-    
-    # Try AI providers in order of preference
-    providers_to_try = []
-    
-    # Add configured provider first
-    if provider == 'openai' and getattr(settings, 'OPENAI_API_KEY', ''):
-        providers_to_try.append('openai')
-    elif provider == 'gemini' and getattr(settings, 'GEMINI_API_KEY', ''):
-        providers_to_try.append('gemini')
-    
-    # Add Groq as free fallback (very generous free tier)
-    if getattr(settings, 'GROQ_API_KEY', ''):
-        providers_to_try.append('groq')
-    
-    # Add other providers as fallback
-    if 'gemini' not in providers_to_try and getattr(settings, 'GEMINI_API_KEY', ''):
-        providers_to_try.append('gemini')
-    if 'openai' not in providers_to_try and getattr(settings, 'OPENAI_API_KEY', ''):
-        providers_to_try.append('openai')
-    
+
+    # Build system prompt using shared helper
+    system_prompt = _build_system_prompt(user_tone, emotion_context)
+
+    # Get ordered list of providers using shared helper
+    providers_list = _providers_to_try()
+
     # Try each provider
-    for prov in providers_to_try:
+    for prov in providers_list:
         try:
             if prov == 'openai':
                 return _get_openai_response(messages, system_prompt)
@@ -688,11 +701,15 @@ async def _get_gemini_response_async(messages: list, system_prompt: str) -> str:
     conversation_text += "Dost:"
 
     # google-genai's generate_content is synchronous; run in a thread
-    # to avoid blocking the event loop
-    response = await asyncio.to_thread(
-        client.models.generate_content,
-        model='gemini-2.0-flash',
-        contents=conversation_text
+    # to avoid blocking the event loop. Wrap with timeout to prevent
+    # slow or cancelled requests from blocking indefinitely.
+    response = await asyncio.wait_for(
+        asyncio.to_thread(
+            client.models.generate_content,
+            model='gemini-2.0-flash',
+            contents=conversation_text
+        ),
+        timeout=30.0
     )
     return response.text
 
@@ -735,8 +752,6 @@ async def _get_groq_response_async(messages: list, system_prompt: str) -> str:
 
 async def get_ai_response_async(messages: list, user_tone: str = 'friendly', emotion_context: dict = None) -> str:
     """Async version of get_ai_response — tries each provider without blocking."""
-    provider = settings.AI_PROVIDER
-
     # Get the last user message for fallback
     last_user_message = ""
     detected_emotion = "neutral"
@@ -749,60 +764,14 @@ async def get_ai_response_async(messages: list, user_tone: str = 'friendly', emo
     if emotion_context:
         detected_emotion = emotion_context.get('emotion', 'neutral')
 
-    # Build system prompt (identical to the sync version)
-    tone_adjustments = {
-        'calm': "Be that gentle, grounding presence. Speak softly, use calming words, and create a peaceful vibe. Help them feel safe and centered.",
-        'friendly': "Be your natural warm, supportive self. Like talking to a wise friend who really gets it. Caring, insightful, but still conversational.",
-        'minimal': "Keep responses brief but meaningful. Short sentences, clear empathy. Quality over quantity.",
-    }
+    # Build system prompt using shared helper
+    system_prompt = _build_system_prompt(user_tone, emotion_context)
 
-    system_prompt = settings.DOST_SYSTEM_PROMPT + f"\n\nTone for this conversation: {tone_adjustments.get(user_tone, tone_adjustments['friendly'])}"
-
-    if emotion_context:
-        emotion = emotion_context.get('emotion', 'neutral')
-        emotion_info = f"\n\n**CURRENT EMOTIONAL STATE:** {emotion}"
-
-        if emotion in EMOTION_THERAPEUTIC_CONTEXT:
-            therapeutic_info = EMOTION_THERAPEUTIC_CONTEXT[emotion]
-            emotion_info += f"\n**Therapeutic Approach:** {therapeutic_info['approach']}"
-            emotion_info += f"\n**Techniques to consider:** {', '.join(therapeutic_info['techniques'])}"
-
-        stress_level = emotion_context.get('stress_level', 'unknown')
-        emotion_info += f"\n**Stress level:** {stress_level}"
-
-        if stress_level == 'high':
-            emotion_info += "\n**Note:** User is highly stressed - be extra gentle, keep responses focused, prioritize validation before anything else."
-
-        conversation_impact = emotion_context.get('conversation_impact', {})
-        if conversation_impact:
-            trend = conversation_impact.get('trend', '')
-            emotion_info += f"\n**Conversation trend:** {trend}"
-
-            if conversation_impact.get('impact') == 'concerning':
-                emotion_info += "\n**Note:** User may need extra support - focus on validation and creating safety."
-            elif conversation_impact.get('impact') == 'positive':
-                emotion_info += "\n**Note:** User seems to be responding well - continue current approach."
-
-        system_prompt += emotion_info
-
-    # Build ordered list of providers to try
-    providers_to_try = []
-
-    if provider == 'openai' and getattr(settings, 'OPENAI_API_KEY', ''):
-        providers_to_try.append('openai')
-    elif provider == 'gemini' and getattr(settings, 'GEMINI_API_KEY', ''):
-        providers_to_try.append('gemini')
-
-    if getattr(settings, 'GROQ_API_KEY', ''):
-        providers_to_try.append('groq')
-
-    if 'gemini' not in providers_to_try and getattr(settings, 'GEMINI_API_KEY', ''):
-        providers_to_try.append('gemini')
-    if 'openai' not in providers_to_try and getattr(settings, 'OPENAI_API_KEY', ''):
-        providers_to_try.append('openai')
+    # Get ordered list of providers using shared helper
+    providers_list = _providers_to_try()
 
     # Try each provider asynchronously
-    for prov in providers_to_try:
+    for prov in providers_list:
         try:
             if prov == 'openai':
                 return await _get_openai_response_async(messages, system_prompt)

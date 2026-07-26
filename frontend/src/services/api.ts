@@ -1,9 +1,21 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://dost-ai-0.onrender.com/api';
-
-if (!import.meta.env.VITE_API_URL && import.meta.env.DEV) {
-  console.warn('[api] VITE_API_URL not set — falling back to production URL. Set it in .env.development');
+// In development, require VITE_API_URL to be set or use local default
+let API_URL: string;
+if (import.meta.env.DEV) {
+  if (!import.meta.env.VITE_API_URL) {
+    // Use local development URL by default
+    API_URL = 'http://localhost:8000/api';
+    console.warn('[api] VITE_API_URL not set — using local development URL:', API_URL);
+  } else {
+    API_URL = import.meta.env.VITE_API_URL;
+  }
+} else {
+  // In production, VITE_API_URL must be set
+  if (!import.meta.env.VITE_API_URL) {
+    throw new Error('VITE_API_URL environment variable is required in production');
+  }
+  API_URL = import.meta.env.VITE_API_URL;
 }
 
 const api = axios.create({
