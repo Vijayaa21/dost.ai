@@ -14,9 +14,40 @@ services:
         name: Cache-Control
         value: no-cache
 
-  # Backend - Web Service (optional, if deploying together)
-  # - type: web
-  #   name: dost-ai-backend
-  #   runtime: python
-  #   buildCommand: cd backend && pip install -r requirements.txt
-  #   startCommand: cd backend && gunicorn dost.wsgi:application
+  # Backend - ASGI Web Service
+  - type: web
+    name: dost-ai-backend
+    runtime: python
+    buildCommand: cd backend && chmod +x build.sh && ./build.sh
+    startCommand: cd backend && daphne -b 0.0.0.0 -p $PORT dost.asgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: dost-ai-backend.onrender.com,dost-ai-0.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://dost-ai-frontend.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dost-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: dost-redis
+          type: redis
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+
+  # Redis - for Django Channels WebSocket layer
+  - type: redis
+    name: dost-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []  # Only internal access
+
+databases:
+  - name: dost-db
+    plan: free

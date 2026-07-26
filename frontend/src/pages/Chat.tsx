@@ -54,6 +54,11 @@ export default function Chat() {
 
   useEffect(() => {
     loadConversations();
+
+    // Disconnect WebSocket when leaving the chat page
+    return () => {
+      chatService.disconnectWS();
+    };
   }, []);
 
   useEffect(() => {
@@ -109,6 +114,7 @@ export default function Chat() {
   };
 
   const startNewConversation = () => {
+    chatService.disconnectWS(); // Disconnect from previous conversation's WS
     setCurrentConversation(null);
     setMessages([]);
     setCopingSuggestion(null);
@@ -134,6 +140,58 @@ export default function Chat() {
     };
     setMessages(prev => [...prev, tempUserMsg]);
 
+    // --- WebSocket path: use for existing conversations ---
+    if (currentConversation) {
+      try {
+        await chatService.sendMessageWS(
+          text,
+          currentConversation,
+          // onTyping — driven by real server events
+          (typing) => setIsTyping(typing),
+          // onMessage — received when the AI finishes responding
+          (wsMsg) => {
+            setMessages(prev => {
+              const filtered = prev.filter(m => m.id !== tempUserMsg.id);
+              const userMsg = wsMsg.user_message
+                ? { ...wsMsg.user_message } as Message
+                : { ...tempUserMsg, id: Math.random() };
+              const assistantMsg = wsMsg.assistant_message
+                ? { ...wsMsg.assistant_message } as Message
+                : null;
+              return assistantMsg
+                ? [...filtered, userMsg, assistantMsg]
+                : [...filtered, userMsg];
+            });
+
+            if (wsMsg.coping_suggestion) {
+              setCopingSuggestion(wsMsg.coping_suggestion as CopingSuggestion);
+            } else {
+              setCopingSuggestion(null);
+            }
+
+            setError(null);
+            setIsLoading(false);
+            setIsTyping(false);
+          },
+          // onError — fall back to REST on WebSocket failure
+          async () => {
+            console.warn('[Chat] WebSocket failed, falling back to REST');
+            await sendViaREST(text, tempUserMsg);
+          }
+        );
+        return; // WS handler takes care of state updates
+      } catch {
+        // sendMessageWS itself threw — fall through to REST
+        console.warn('[Chat] WebSocket send failed, falling back to REST');
+      }
+    }
+
+    // --- REST path: used for new conversations or WS fallback ---
+    await sendViaREST(text, tempUserMsg);
+  };
+
+  /** Send a message using the REST API (fallback path). */
+  const sendViaREST = async (text: string, tempUserMsg: Message) => {
     try {
       const response = await chatService.sendMessage(text, currentConversation || undefined);
       const chatResponse = response as { conversation_id: number; user_message: Message; assistant_message: Message; coping_suggestion?: CopingSuggestion };

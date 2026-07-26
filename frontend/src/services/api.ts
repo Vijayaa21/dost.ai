@@ -2,6 +2,10 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://dost-ai-0.onrender.com/api';
 
+if (!import.meta.env.VITE_API_URL && import.meta.env.DEV) {
+  console.warn('[api] VITE_API_URL not set — falling back to production URL. Set it in .env.development');
+}
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
