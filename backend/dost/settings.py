@@ -13,15 +13,20 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    if os.getenv('DEBUG', 'False').lower() == 'true':
+        SECRET_KEY = 'django-insecure-dev-only-key-do-not-use-in-production'
+    else:
+        raise ValueError('SECRET_KEY environment variable is required in production')
 
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,dost-ai-0.onrender.com').split(',')
 
 # Application definition
 INSTALLED_APPS = [
-    # 'daphne',  # Temporarily disabled for standard HTTP/REST API
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,7 +37,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    # 'channels',  # Temporarily disabled for standard HTTP/REST API
+    'channels',
     # Local apps
     'users',
     'chat',
@@ -77,12 +82,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'dost.wsgi.application'
 ASGI_APPLICATION = 'dost.asgi.application'
 
-# Channels
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+# Channels — use Redis in production, InMemory for local dev
+REDIS_URL = os.getenv('REDIS_URL')
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [REDIS_URL],
+            },
+        }
     }
-}
+else:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        }
+    }
 
 # Database
 SQLITE_DB_URL = f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}"
@@ -119,6 +135,14 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/minute',
+        'user': '30/minute',
+    },
 }
 
 # JWT Settings
@@ -163,8 +187,59 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ---------- Production Security ----------
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# ---------- Logging ----------
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} {levelname} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO' if not DEBUG else 'DEBUG',
+    },
+    'loggers': {
+        'django': {'level': 'WARNING'},
+        'django.request': {'level': 'ERROR'},
+        'chat': {'level': 'INFO'},
+        'users': {'level': 'INFO'},
+    },
+}
+
+# ---------- Sentry Error Monitoring ----------
+if not DEBUG:
+    try:
+        import sentry_sdk
+        SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+        if SENTRY_DSN:
+            sentry_sdk.init(
+                dsn=SENTRY_DSN,
+                traces_sample_rate=0.1,
+                send_default_pii=False,
+            )
+    except ImportError:
+        pass  # sentry-sdk not installed — skip
 
 # AI Configuration
 AI_PROVIDER = os.getenv('AI_PROVIDER', 'gemini')

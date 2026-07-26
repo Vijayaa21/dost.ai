@@ -641,3 +641,227 @@ def get_chat_response(user_message: str, conversation_history: list, user_tone: 
         'conversation_impact': conversation_impact,
         'coping_suggestion': coping_suggestion
     }
+
+
+# ============================================================================
+# ASYNC VERSIONS — used by the WebSocket ChatConsumer so the ASGI event loop
+# is never blocked by outbound HTTP calls to LLM providers.
+# ============================================================================
+
+import asyncio
+
+
+async def _get_openai_response_async(messages: list, system_prompt: str) -> str:
+    """Async OpenAI API call using the official AsyncOpenAI client."""
+    from openai import AsyncOpenAI
+
+    client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+
+    formatted_messages = [{"role": "system", "content": system_prompt}]
+    for msg in messages:
+        formatted_messages.append({
+            "role": msg['role'],
+            "content": msg['content']
+        })
+
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=formatted_messages,
+        max_tokens=250,
+        temperature=0.8,
+    )
+
+    return response.choices[0].message.content
+
+
+async def _get_gemini_response_async(messages: list, system_prompt: str) -> str:
+    """Async Gemini API call using google-genai's async support."""
+    from google import genai
+
+    client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
+    # Format conversation history with system prompt
+    conversation_text = f"System Instructions: {system_prompt}\n\nConversation:\n"
+    for msg in messages:
+        role = "User" if msg['role'] == 'user' else "Dost"
+        conversation_text += f"{role}: {msg['content']}\n"
+    conversation_text += "Dost:"
+
+    # google-genai's generate_content is synchronous; run in a thread
+    # to avoid blocking the event loop
+    response = await asyncio.to_thread(
+        client.models.generate_content,
+        model='gemini-2.0-flash',
+        contents=conversation_text
+    )
+    return response.text
+
+
+async def _get_groq_response_async(messages: list, system_prompt: str) -> str:
+    """Async Groq API call using httpx (non-blocking HTTP client)."""
+    import httpx
+
+    api_key = getattr(settings, 'GROQ_API_KEY', '')
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not configured")
+
+    formatted_messages = [{"role": "system", "content": system_prompt}]
+    for msg in messages:
+        formatted_messages.append({
+            "role": msg['role'],
+            "content": msg['content']
+        })
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": formatted_messages,
+                "max_tokens": 250,
+                "temperature": 0.8
+            },
+        )
+
+    if response.status_code != 200:
+        raise Exception(f"Groq API error: {response.status_code} - {response.text}")
+
+    return response.json()['choices'][0]['message']['content']
+
+
+async def get_ai_response_async(messages: list, user_tone: str = 'friendly', emotion_context: dict = None) -> str:
+    """Async version of get_ai_response — tries each provider without blocking."""
+    provider = settings.AI_PROVIDER
+
+    # Get the last user message for fallback
+    last_user_message = ""
+    detected_emotion = "neutral"
+    if messages:
+        for msg in reversed(messages):
+            if msg.get('role') == 'user':
+                last_user_message = msg.get('content', '')
+                break
+
+    if emotion_context:
+        detected_emotion = emotion_context.get('emotion', 'neutral')
+
+    # Build system prompt (identical to the sync version)
+    tone_adjustments = {
+        'calm': "Be that gentle, grounding presence. Speak softly, use calming words, and create a peaceful vibe. Help them feel safe and centered.",
+        'friendly': "Be your natural warm, supportive self. Like talking to a wise friend who really gets it. Caring, insightful, but still conversational.",
+        'minimal': "Keep responses brief but meaningful. Short sentences, clear empathy. Quality over quantity.",
+    }
+
+    system_prompt = settings.DOST_SYSTEM_PROMPT + f"\n\nTone for this conversation: {tone_adjustments.get(user_tone, tone_adjustments['friendly'])}"
+
+    if emotion_context:
+        emotion = emotion_context.get('emotion', 'neutral')
+        emotion_info = f"\n\n**CURRENT EMOTIONAL STATE:** {emotion}"
+
+        if emotion in EMOTION_THERAPEUTIC_CONTEXT:
+            therapeutic_info = EMOTION_THERAPEUTIC_CONTEXT[emotion]
+            emotion_info += f"\n**Therapeutic Approach:** {therapeutic_info['approach']}"
+            emotion_info += f"\n**Techniques to consider:** {', '.join(therapeutic_info['techniques'])}"
+
+        stress_level = emotion_context.get('stress_level', 'unknown')
+        emotion_info += f"\n**Stress level:** {stress_level}"
+
+        if stress_level == 'high':
+            emotion_info += "\n**Note:** User is highly stressed - be extra gentle, keep responses focused, prioritize validation before anything else."
+
+        conversation_impact = emotion_context.get('conversation_impact', {})
+        if conversation_impact:
+            trend = conversation_impact.get('trend', '')
+            emotion_info += f"\n**Conversation trend:** {trend}"
+
+            if conversation_impact.get('impact') == 'concerning':
+                emotion_info += "\n**Note:** User may need extra support - focus on validation and creating safety."
+            elif conversation_impact.get('impact') == 'positive':
+                emotion_info += "\n**Note:** User seems to be responding well - continue current approach."
+
+        system_prompt += emotion_info
+
+    # Build ordered list of providers to try
+    providers_to_try = []
+
+    if provider == 'openai' and getattr(settings, 'OPENAI_API_KEY', ''):
+        providers_to_try.append('openai')
+    elif provider == 'gemini' and getattr(settings, 'GEMINI_API_KEY', ''):
+        providers_to_try.append('gemini')
+
+    if getattr(settings, 'GROQ_API_KEY', ''):
+        providers_to_try.append('groq')
+
+    if 'gemini' not in providers_to_try and getattr(settings, 'GEMINI_API_KEY', ''):
+        providers_to_try.append('gemini')
+    if 'openai' not in providers_to_try and getattr(settings, 'OPENAI_API_KEY', ''):
+        providers_to_try.append('openai')
+
+    # Try each provider asynchronously
+    for prov in providers_to_try:
+        try:
+            if prov == 'openai':
+                return await _get_openai_response_async(messages, system_prompt)
+            elif prov == 'gemini':
+                return await _get_gemini_response_async(messages, system_prompt)
+            elif prov == 'groq':
+                return await _get_groq_response_async(messages, system_prompt)
+        except Exception as e:
+            print(f"{prov.upper()} API Error (async): {e}")
+            continue
+
+    # All AI providers failed - use rule-based fallback
+    print("All AI providers failed (async), using rule-based fallback")
+    return get_fallback_response(last_user_message, detected_emotion)
+
+
+async def get_chat_response_async(user_message: str, conversation_history: list, user_tone: str = 'friendly') -> dict:
+    """
+    Async version of get_chat_response.
+    Safe to call from an async WebSocket consumer without blocking the event loop.
+
+    Returns:
+        dict with 'response', 'is_crisis', 'detected_emotion', 'stress_level',
+        'conversation_impact', and 'coping_suggestion'
+    """
+    # Crisis detection is pure CPU work (regex) — fast enough to run inline
+    is_crisis = detect_crisis(user_message)
+
+    if is_crisis:
+        return {
+            'response': CRISIS_RESPONSE,
+            'is_crisis': True,
+            'detected_emotion': 'distressed',
+            'stress_level': 'critical',
+            'conversation_impact': {'impact': 'crisis', 'trend': 'immediate support needed'},
+            'coping_suggestion': None
+        }
+
+    # Emotion/stress detection is also pure CPU work
+    detected_emotion = detect_emotion(user_message)
+    stress_analysis = analyze_stress_level(user_message)
+    conversation_impact = detect_conversation_impact(conversation_history)
+    coping_suggestion = get_coping_recommendation(detected_emotion, stress_analysis['level'])
+
+    emotion_context = {
+        'emotion': detected_emotion,
+        'stress_level': stress_analysis['level'],
+        'conversation_impact': conversation_impact
+    }
+
+    # This is the expensive I/O call — now fully async
+    messages = conversation_history + [{'role': 'user', 'content': user_message}]
+    ai_response = await get_ai_response_async(messages, user_tone, emotion_context)
+
+    return {
+        'response': ai_response,
+        'is_crisis': False,
+        'detected_emotion': detected_emotion,
+        'stress_level': stress_analysis['level'],
+        'conversation_impact': conversation_impact,
+        'coping_suggestion': coping_suggestion
+    }
